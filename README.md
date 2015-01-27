@@ -12,7 +12,8 @@
         capabilities of the gnu-gcc preprocessor
     
      -  'burner' Program that transfers assembled bytecode to
-        the 'ttl-cpu' from an ATmega8 mcu
+        the 'ttl-cpu' from a special programmer hardware based
+        on the ATmega8 mcu
 
 
     To build a program, first edit 'prog.c' then run './b' shell script
@@ -22,5 +23,5 @@
      - Copies '/mcc/arch/ttlcpu/template.asm' to am/prog.asm
      - 'mcc' compiles 'prog.c' and extends am/prog.asm with the program output
      - 'am' takes 'am/prog.asm' and generates the bytecode
-     - 'burner' takes bytecode and AVRDude burns it into the ATmega8
+     - 'burner' takes bytecode and AVRDude burns it into the programmer
 
