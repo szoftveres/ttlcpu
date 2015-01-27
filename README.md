@@ -14,3 +14,5 @@
      -  'burner' Program that transfers assembled bytecode to
         the 'ttl-cpu' from an ATmega8 mcu
 
+To build a program, first edit 'prog.c' then run './b' shell script
+
