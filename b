@@ -19,10 +19,9 @@ cd am || exit 1
 cc -O0 -o asm am.c || exit 1
 
 echo "Running AM.."
-./asm > bytecode.h 2> asmlog.txt|| exit 1
+./asm > bytecode.h 2> asmlog.txt || exit 1
 # cat asmlog.txt
 cd .. || exit 1
-
 
 LIMIT=32768
 

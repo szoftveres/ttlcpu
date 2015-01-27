@@ -14,5 +14,13 @@
      -  'burner' Program that transfers assembled bytecode to
         the 'ttl-cpu' from an ATmega8 mcu
 
-To build a program, first edit 'prog.c' then run './b' shell script
+
+    To build a program, first edit 'prog.c' then run './b' shell script
+
+    When you invoke './b' shell script:
+     - It builds 'mcc' for 'ttl-cpu' architecture
+     - Copies '/mcc/arch/ttlcpu/template.asm' to am/prog.asm
+     - 'mcc' compiles 'prog.c' and extends am/prog.asm with the program output
+     - 'am' takes 'am/prog.asm' and generates the bytecode
+     - 'burner' takes bytecode and AVRDude burns it into the ATmega8
 
