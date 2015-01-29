@@ -37,23 +37,23 @@
 #define ldz(d, a) movz(to_ramaddr, literal) lit((a)) movz((d), frm_ram)
 
 /* Base */
-#define inst(d, s, m)   ++progcnt;
-#define litl(l)         ++progcnt;
-#define lith(l)         ++progcnt;
-#define defl(n)         ++progcnt;
-#define defh(n)         ++progcnt;
-#define lbl(n)          lbladd(n);
+#define inst(d, s, m)   do {++progcnt;} while(0);
+#define litl(l)         do {++progcnt;} while(0);
+#define lith(l)         do {++progcnt;} while(0);
+#define defl(n)         do {++progcnt;} while(0);
+#define defh(n)         do {++progcnt;} while(0);
+#define lbl(n)          do {lbladd(n);} while(0);
 
 #else
 /* ============================================================ */
 /* Second pass */
 
-#define inst(d,s,m)     instruction((d),(s),(m));
-#define litl(v)         dataconst((unsigned int)(v), 0);
-#define lith(v)         dataconst((unsigned int)(v), 1);
-#define defl(n)         defaddr((n), 0);
-#define defh(n)         defaddr((n), 1);
-#define lbl(n)          lblprint(n);
+#define inst(d,s,m)     do {instruction((d),(s),(m));} while(0);
+#define litl(v)         do {dataconst((unsigned int)(v), 0);} while(0);
+#define lith(v)         do {dataconst((unsigned int)(v), 1);} while(0);
+#define defl(n)         do {defaddr((n), 0);} while(0);
+#define defh(n)         do {defaddr((n), 1);} while(0);
+#define lbl(n)          do {lblprint(n);} while(0);
 
 #endif
 /* ============================================================ */

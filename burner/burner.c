@@ -172,6 +172,10 @@ int main (void){
     unarm_c();
 
     while (1) {
+
+        MCUCR = MCUCR & (~((1<<SM0) | (1<<SM2))) | (1<<SM1);
+        MCUCR |= (1<<SE);    // Enable sleep
+
         asm volatile (
             "\n\t cli"
             "\n\t sleep"

@@ -269,7 +269,7 @@ int while_statement (void) {
     }
     get_token();
     lbl = new_label();
-    CODE_while_statement_head(lbl);
+    CODE_while_statement_test(lbl);
     if (!expressions()) {
         grammar_error("expected expression");
     }
@@ -277,7 +277,7 @@ int while_statement (void) {
         grammar_error("expected ')'");
     }
     get_token();
-    CODE_while_statement_test(lbl);
+    CODE_while_statement_evaluate(lbl);
     if (!statement()) {
         grammar_error("expected statement");
     }
@@ -296,7 +296,7 @@ int do_statement (void) {
     }
     get_token();
     lbl = new_label();
-    CODE_do_statement_head(lbl);
+    CODE_do_statement_base(lbl);
     if (!statement()) {
         grammar_error("expected statement");
     }
@@ -319,7 +319,7 @@ int do_statement (void) {
         grammar_error("expected ';'");
     }
     get_token();
-    CODE_do_statement_end(lbl);
+    CODE_do_statement_test(lbl);
     return 1;
 }
 
@@ -343,24 +343,24 @@ int for_statement (void) {
     }
     get_token();
     lbl = new_label();
-    CODE_for_statement_restart(lbl);
+    CODE_for_statement_test(lbl);
     if (expressions()) {
         /* for (;;) empty condition is always true */
-        CODE_for_statement_test_jp_false(lbl);
+        CODE_for_statement_evaluate(lbl);
     }
-    CODE_for_statement_jp_continue(lbl);
+    CODE_for_statement_jp_to_base(lbl);
     if (token != T_SEMICOLON) {
         grammar_error("expected ';'");
     }
     get_token();
     CODE_for_statement_action(lbl);
     expressions();
-    CODE_for_statement_jp_restart(lbl);
+    CODE_for_statement_jp_to_test(lbl);
     if (token != T_RIGHT_PARENTH) {
         grammar_error("expected ')'");
     }
     get_token();
-    CODE_for_statement_continue(lbl);
+    CODE_for_statement_base(lbl);
     if (!statement()) {
         grammar_error("expected statement");
     }

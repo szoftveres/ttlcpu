@@ -50,53 +50,53 @@ void CODE_if_statement_end_noelse (int lbl) {
 }
 
 
-void CODE_while_statement_head (int lbl) {
-    fprintf(stdout, "lbl(\"while_%04d_start\")\n", lbl);
+void CODE_while_statement_test (int lbl) {
+    fprintf(stdout, "lbl(\"while_%04d_test\")\n", lbl);
 }
 
-void CODE_while_statement_test (int lbl) {
+void CODE_while_statement_evaluate (int lbl) {
     fprintf(stdout, "    jz(\"while_%04d_end\")\n", lbl);
 }
 
 void CODE_while_statement_end (int lbl) {
-    fprintf(stdout, "    jp(\"while_%04d_start\")\n", lbl);
+    fprintf(stdout, "    jp(\"while_%04d_test\")\n", lbl);
     fprintf(stdout, "lbl(\"while_%04d_end\")\n", lbl);
 }
 
 
-void CODE_do_statement_head (int lbl) {
-    fprintf(stdout, "lbl(\"do_%04d_start\")\n", lbl);
+void CODE_do_statement_base (int lbl) {
+    fprintf(stdout, "lbl(\"do_%04d_base\")\n", lbl);
 }
 
-void CODE_do_statement_end (int lbl) {
+void CODE_do_statement_test (int lbl) {
     fprintf(stdout, "    jz(\"do_%04d_end\")\n", lbl);
-    fprintf(stdout, "    jp(\"do_%04d_start\")\n", lbl);
+    fprintf(stdout, "    jp(\"do_%04d_base\")\n", lbl);
     fprintf(stdout, "lbl(\"do_%04d_end\")\n", lbl);
 }
 
 
-void CODE_for_statement_restart (int lbl) {
-    fprintf(stdout, "lbl(\"for_%04d_restart\")\n", lbl);
+void CODE_for_statement_test (int lbl) {
+    fprintf(stdout, "lbl(\"for_%04d_test\")\n", lbl);
 }
 
-void CODE_for_statement_test_jp_false (int lbl) {
+void CODE_for_statement_evaluate (int lbl) {
     fprintf(stdout, "    jz(\"for_%04d_end\")\n", lbl);
 }
 
-void CODE_for_statement_jp_continue (int lbl) {
-    fprintf(stdout, "    jp(\"for_%04d_continue\")\n", lbl);
+void CODE_for_statement_jp_to_base (int lbl) {
+    fprintf(stdout, "    jp(\"for_%04d_base\")\n", lbl);
 }
 
 void CODE_for_statement_action (int lbl) {
     fprintf(stdout, "lbl(\"for_%04d_action\")\n", lbl);
 }
 
-void CODE_for_statement_jp_restart (int lbl) {
-    fprintf(stdout, "    jp(\"for_%04d_restart\")\n", lbl);
+void CODE_for_statement_jp_to_test (int lbl) {
+    fprintf(stdout, "    jp(\"for_%04d_test\")\n", lbl);
 }
 
-void CODE_for_statement_continue (int lbl) {
-    fprintf(stdout, "lbl(\"for_%04d_continue\")\n", lbl);
+void CODE_for_statement_base (int lbl) {
+    fprintf(stdout, "lbl(\"for_%04d_base\")\n", lbl);
 }
 
 void CODE_for_statement_end (int lbl) {

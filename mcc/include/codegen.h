@@ -16,19 +16,19 @@ void CODE_if_statement_mid (int lbl);
 void CODE_if_statement_end_else (int lbl);
 void CODE_if_statement_end_noelse (int lbl);
 
-void CODE_while_statement_head (int lbl);
 void CODE_while_statement_test (int lbl);
+void CODE_while_statement_evaluate (int lbl);
 void CODE_while_statement_end (int lbl);
 
-void CODE_do_statement_head (int lbl);
-void CODE_do_statement_end (int lbl);
+void CODE_do_statement_base (int lbl);
+void CODE_do_statement_test (int lbl);
 
-void CODE_for_statement_restart (int lbl);
-void CODE_for_statement_test_jp_false (int lbl);
-void CODE_for_statement_jp_continue (int lbl);
+void CODE_for_statement_test (int lbl);
+void CODE_for_statement_evaluate (int lbl);
+void CODE_for_statement_jp_to_base (int lbl);
 void CODE_for_statement_action (int lbl);
-void CODE_for_statement_jp_restart (int lbl);
-void CODE_for_statement_continue (int lbl);
+void CODE_for_statement_jp_to_test (int lbl);
+void CODE_for_statement_base (int lbl);
 void CODE_for_statement_end (int lbl);
 
 void CODE_asm_statement (char* s);
