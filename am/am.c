@@ -57,7 +57,7 @@ static void instruction (int d, int s, char* m) {
     while (*mod) {
       switch (*mod) {
         case 'Z' : case 'z' :
-            ic &= ~((unsigned int)1);
+            ic &= ~((unsigned char)1);
             break;
         case 'C' : case 'c' :
             ic |= 2;
@@ -65,8 +65,8 @@ static void instruction (int d, int s, char* m) {
         }
         mod++;
     }
-    printf(" 0x%02x,\n", (unsigned char)ic);
-    fprintf(stderr, "  %04x:  ", progcnt);
+    printf(" 0x%02X,\n", ic);
+    fprintf(stderr, "  %04X:  ", progcnt);
     for (i = 0; i < 8; i++) {
         fprintf(stderr, (ic & 0x80) ? "1" : "0");
         ic = ic << 1;
@@ -77,7 +77,7 @@ static void instruction (int d, int s, char* m) {
       case to_acc_adder : de = "acc_adder"; break;
       case to_port : de = "port"; break;
       case to_ramaddr : de = "ramaddr"; break;
-      case to_ram : de = "ram_in"; break;
+      case to_ram : de = "ram"; break;
       case to_pc : de = "pc"; break;
       case to_pch : de = "pch_latch"; break;
       default: fprintf(stderr, "         %d <- %d %s\n", d, s, m); exit(1); break;
@@ -89,7 +89,7 @@ static void instruction (int d, int s, char* m) {
       case frm_ram : so = "ram"; break;
       default: fprintf(stderr, "         %d <- %d %s\n", d, s, m); exit(1); break;
     }
-    fprintf(stderr, "         %8s <- %0.8s %s\n", de, so, m);
+    fprintf(stderr, "         %12s <- %0.12s %s\n", de, so, m);
     progcnt += 1;
     return;
 }
@@ -97,8 +97,10 @@ static void instruction (int d, int s, char* m) {
 
 static int defaddr (char* n, int high) {
     int i;
-    unsigned int ic;
+    unsigned char ic;
+    unsigned char ic2;
     struct lbl_s *lbl = head;
+
     while (lbl) {
         if (!strcmp(lbl->name, (n))) {break;}
         lbl = lbl->next;
@@ -107,31 +109,31 @@ static int defaddr (char* n, int high) {
         fprintf(stderr, "ERROR: label %s not found\n", (n));
         exit(1);
     }
-    ic = lbl->addr >> (high ? 8 : 0);
-    printf(" 0x%02x,\n", (unsigned char)ic);
-    fprintf(stderr, "  %04x:  ", progcnt);
-    for (i = 0; i < 8; i++) {
-        fprintf(stderr, (ic & 0x80) ? "1" : "0");
-        ic = ic << 1;
+    ic = (unsigned char) lbl->addr >> (high ? 8 : 0);
+    printf(" 0x%02X,\n", ic);
+    fprintf(stderr, "  %04X:  ", progcnt);
+    for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
+        fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
     }
-    fprintf(stderr, "         (%08s)%s: %02x\n",
+    fprintf(stderr, "         %08s(%s): 0x%02X\n",
             lbl->name,
             (high ? "Hi" : "Lo"),
-            (unsigned char)(lbl->addr >> (high ? 8 : 0)));
+            ic);
     progcnt += 1;
     return;
 }
 
 static int dataconst (unsigned int v, int shift) {
     int i;
-    unsigned int ic = v >> (shift ? 8 : 0);
-    printf(" 0x%02x,\n", (unsigned char)ic);
-    fprintf(stderr, "  %04x:  ", progcnt);
-    for (i = 0; i < 8; i++) {
-        fprintf(stderr, (ic & 0x80) ? "1" : "0");
-        ic = ic << 1;
+    unsigned char ic = (unsigned char)(v >> (shift ? 8 : 0));
+    unsigned char ic2;
+
+    printf(" 0x%02X,\n", ic);
+    fprintf(stderr, "  %04X:  ", progcnt);
+    for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
+        fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
     }
-    fprintf(stderr, "          lit: %d\n", (v >> (shift ? 8 : 0))); 
+    fprintf(stderr, "          lit: 0x%02X\n", ic); 
     progcnt += 1;
     return;
 }
