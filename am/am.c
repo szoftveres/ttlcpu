@@ -89,6 +89,9 @@ static void instruction (int d, int s, char* m) {
       case frm_ram : so = "ram"; break;
       default: fprintf(stderr, "         %d <- %d %s\n", d, s, m); exit(1); break;
     }
+    if ((s == frm_ram) && (d == to_ram)) {
+        fprintf(stderr, "   ILLEGAL ram <- ram \n"); exit(1);
+    }
     fprintf(stderr, "         %12s <- %0.12s %s\n", de, so, m);
     progcnt += 1;
     return;

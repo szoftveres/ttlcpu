@@ -128,7 +128,12 @@ bit2(var a, var b) {
     for (i=a ; i; i-=1);
 }
 */
-/* bit (var <0-7>, var <data>) */
+/* 
+  bit (var <0-7>, var <data>) 
+
+  return (data & (1 << var<0-7>));
+
+*/
 
 lbl("bit")
     dec_sp(1)       // var decl space
@@ -210,4 +215,190 @@ lbl("bit_02_end")
 
 /*-------------------------------------------------------*/
 
-    
+/*
+bwand (var a, var b) {
+    var cc;
+    var ret;
+    cc = 8;
+    ret = 0;
+    while(cc) {
+        cc -= 1;
+        if (bit(cc, a)) if (bit(cc, b)) {
+            ret += 1 << cc;
+        }
+    }
+    ret;
+}
+*/
+
+lbl("bwand")
+/*
+  var cc;
+  var ret;
+*/
+    dec_sp(2)
+
+/* cc = 8; */
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(8)
+
+/* ret = 0; */
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(0)
+
+lbl("bwand_loop_restart")
+
+/* 
+    while(cc) 
+    cc -= 1;
+*/
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    jz("bwand_done")
+    dec()
+    mov(to_ram, frm_acc)
+
+
+/* if (bit(cc, a)) */
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)                      // push fn arg
+    ld(to_acc, SP)
+    add(literal) lit(6+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)                      // push fn arg
+    call("bit", "bwand_call_1")
+    inc_sp(2)
+    jz("bwand_skip")
+
+/* if (bit(cc, b)) */
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)                      // push fn arg
+    ld(to_acc, SP)
+    add(literal) lit(5+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)                      // push fn arg
+    call("bit", "bwand_call_2")
+    inc_sp(2)
+    jz("bwand_skip")
+
+/* ret += 1 << cc; */
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)                  // 1st operand push
+    mov(to_acc, literal) lit(1)      // const
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+lbl("bwand_shift_start")
+    jz("bwand_shift_end")
+    dec()
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    shl()
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, BX)
+    jp("bwand_shift_start")
+lbl("bwand_shift_end")
+    pop(to_acc)
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    mov(to_ramaddr, literal) lit(BX)  // addition
+    add(frm_ram)
+
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    mov(to_ramaddr, literal) lit(BX)
+    mov(to_ramaddr, frm_ram)
+    mov(to_ram, frm_acc)
+
+lbl("bwand_skip")
+    jp("bwand_loop_restart")
+lbl("bwand_done")
+
+/* ret; */
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    inc_sp(2)
+    ret()
+
+/*-------------------------------------------------------*/
+
+/*
+bwand (var a, var b) {
+    var i;
+    var ret_add;
+
+    var cc;
+    var ret;
+    cc = 8;
+    ret = 0;
+    while(cc) {
+        cc -= 1;
+
+        i = 7-cc;
+        while (i) {
+            a;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+            b;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+
+            i -= 1;
+        }
+
+        a;
+        asm ("    rol()\n");
+        asm ("    mov(to_ram, frm_acc)\n");
+        b;
+        asm ("    rol()\n");
+        asm ("    mov(to_ram, frm_acc)\n");
+
+        ret_add = 1;
+        i = cc;
+        while (i) {
+            a;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+            b;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+
+            ret_add;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+
+            i -= 1;
+        }
+
+        if (a==b) {
+            ret += ret_add;
+        }
+    }
+    ret;
+}
+
+*/  

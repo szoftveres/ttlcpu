@@ -394,6 +394,10 @@ int asm_statement (void) {
         grammar_error("expected ')'");
     }
     get_token();
+    if (token != T_SEMICOLON) {
+        grammar_error("expected ';'");
+    }
+    get_token();
     return 1;
 }
 
