@@ -216,189 +216,294 @@ lbl("bit_02_end")
 /*-------------------------------------------------------*/
 
 /*
+
 bwand (var a, var b) {
+    var a_lcl;
+    var b_lcl;
+    var i;
     var cc;
     var ret;
-    cc = 8;
+    var ret_add;
+
+    ret_add = 1;
     ret = 0;
-    while(cc) {
-        cc -= 1;
-        if (bit(cc, a)) if (bit(cc, b)) {
-            ret += 1 << cc;
+    cc = 0;
+
+    while(cc != 8) {
+        a_lcl = a;
+        b_lcl = b;
+
+        i = 7-cc;
+        while (i) {
+            a_lcl;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+            b_lcl;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+
+            i;
+            asm ("    dec()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
         }
+
+        a_lcl;
+        asm ("    rol()\n");
+        asm ("    mov(to_ram, frm_acc)\n");
+        b_lcl;
+        asm ("    rol()\n");
+        asm ("    mov(to_ram, frm_acc)\n");
+
+        i = cc;
+        while (i) {
+            a_lcl;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+            b_lcl;
+            asm ("    shl()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+
+            i;
+            asm ("    dec()\n");
+            asm ("    mov(to_ram, frm_acc)\n");
+        }
+
+        if (a_lcl) if(b_lcl) {
+            ret += ret_add;
+        }
+        
+        ret_add;
+        asm ("    shl()\n");
+        asm ("    mov(to_ram, frm_acc)\n");
+        
+        cc;
+        asm ("    inc()\n");
+        asm ("    mov(to_ram, frm_acc)\n");
     }
     ret;
+
 }
-*/
+
+*/  
 
 lbl("bwand")
-/*
-  var cc;
-  var ret;
-*/
-    dec_sp(2)
+    dec_sp(6)
 
-/* cc = 8; */
-    ld(to_acc, SP)
-    add(literal) lit(2+1)
-    mov(to_ramaddr, frm_acc)
-    mov(to_ram, literal) lit(8)
-
-/* ret = 0; */
-    ld(to_acc, SP)
-    add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
-    mov(to_ram, literal) lit(0)
-
-lbl("bwand_loop_restart")
-
-/* 
-    while(cc) 
-    cc -= 1;
-*/
-    ld(to_acc, SP)
-    add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
-    mov(to_acc, frm_ram)
-    jz("bwand_done")
-    dec()
-    mov(to_ram, frm_acc)
-
-
-/* if (bit(cc, a)) */
-    ld(to_acc, SP)
-    add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
-    mov(to_acc, frm_ram)
-    push(frm_acc)                      // push fn arg
-    ld(to_acc, SP)
-    add(literal) lit(6+1)
-    mov(to_ramaddr, frm_acc)
-    mov(to_acc, frm_ram)
-    push(frm_acc)                      // push fn arg
-    call("bit", "bwand_call_1")
-    inc_sp(2)
-    jz("bwand_skip")
-
-/* if (bit(cc, b)) */
-    ld(to_acc, SP)
-    add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
-    mov(to_acc, frm_ram)
-    push(frm_acc)                      // push fn arg
-    ld(to_acc, SP)
-    add(literal) lit(5+1)
-    mov(to_ramaddr, frm_acc)
-    mov(to_acc, frm_ram)
-    push(frm_acc)                      // push fn arg
-    call("bit", "bwand_call_2")
-    inc_sp(2)
-    jz("bwand_skip")
-
-/* ret += 1 << cc; */
+// ret_add = 1;
     ld(to_acc, SP)
     add(literal) lit(0+1)
     mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(1)
+
+// ret = 0;
+    inc()
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(0)
+
+// cc = 0;
+    inc()
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(0)
+
     mov(to_acc, frm_ram)
-    push(frm_acc)                  // 1st operand push
-    mov(to_acc, literal) lit(1)      // const
-    push(frm_acc)                  // 1st operand push
+
+// while(cc != 8)
+lbl("bwand_rst_1")
+    add(literal) lit(-8)
+    jz("bwand_done")
+
+// a_lcl = a;
     ld(to_acc, SP)
-    add(literal) lit(3+1)
+    add(literal) lit(9+1)
     mov(to_ramaddr, frm_acc)
     mov(to_acc, frm_ram)
-lbl("bwand_shift_start")
-    jz("bwand_shift_end")
-    dec()
-    st(BX, frm_acc)                // store 2nd operand
-    pop(to_acc)                      // 1st operand pop
-    shl()
-    push(frm_acc)                  // 1st operand push
-    ld(to_acc, BX)
-    jp("bwand_shift_start")
-lbl("bwand_shift_end")
-    pop(to_acc)
-    st(BX, frm_acc)                // store 2nd operand
-    pop(to_acc)                      // 1st operand pop
-    mov(to_ramaddr, literal) lit(BX)  // addition
-    add(frm_ram)
-
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
-    add(literal) lit(1+1)
+    add(literal) lit(6+1)
     st(BX, frm_acc)                // store 2nd operand
     pop(to_acc)                      // 1st operand pop
     mov(to_ramaddr, literal) lit(BX)
     mov(to_ramaddr, frm_ram)
     mov(to_ram, frm_acc)
 
-lbl("bwand_skip")
-    jp("bwand_loop_restart")
-lbl("bwand_done")
+// b_lcl = b;
+    ld(to_acc, SP)
+    add(literal) lit(8+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(5+1)
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    mov(to_ramaddr, literal) lit(BX)
+    mov(to_ramaddr, frm_ram)
+    mov(to_ram, frm_acc)
 
-/* ret; */
+// i = 7-cc;
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc_invert, frm_ram)
+    inc()                        // 2nd cmpl      
+    add(literal) lit(7)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(4+1)
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    mov(to_ramaddr, literal) lit(BX)
+    mov(to_ramaddr, frm_ram)
+    mov(to_ram, frm_acc)
+
+// while (i) {
+lbl("bwand_sl1_test")
+    jz("bwand_sl1_end")
+
+    ld(to_acc, SP)
+    add(literal) lit(5+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    shl()
+    mov(to_ram, frm_acc)
+
+    ld(to_acc, SP)
+    add(literal) lit(4+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    shl()
+    mov(to_ram, frm_acc)
+
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    dec()
+    mov(to_ram, frm_acc)
+
+    jp("bwand_sl1_test")
+lbl("bwand_sl1_end")
+
+    ld(to_acc, SP)
+    add(literal) lit(5+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    rol()
+    mov(to_ram, frm_acc)
+
+    ld(to_acc, SP)
+    add(literal) lit(4+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    rol()
+    mov(to_ram, frm_acc)
+
+// i = cc;
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(4+1)
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    mov(to_ramaddr, literal) lit(BX)
+    mov(to_ramaddr, frm_ram)
+    mov(to_ram, frm_acc)
+
+// while (i) {
+lbl("bwand_sl2_test")
+    jz("bwand_sl2_end")
+
+    ld(to_acc, SP)
+    add(literal) lit(5+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    shl()
+    mov(to_ram, frm_acc)
+
+    ld(to_acc, SP)
+    add(literal) lit(4+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    shl()
+    mov(to_ram, frm_acc)
+
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    dec()
+    mov(to_ram, frm_acc)
+
+    jp("bwand_sl2_test")
+lbl("bwand_sl2_end")
+
+// if (a_lcl) if(b_lcl)
+    ld(to_acc, SP)
+    add(literal) lit(5+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    jz("bwand_neg")
+    ld(to_acc, SP)
+    add(literal) lit(4+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    jz("bwand_neg")
+
+// ret += ret_add;
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    mov(to_ramaddr, literal) lit(BX)  // addition
+    add(frm_ram)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    mov(to_ramaddr, literal) lit(BX)
+    mov(to_ramaddr, frm_ram)
+    mov(to_ram, frm_acc)
+lbl("bwand_neg")
+
     ld(to_acc, SP)
     add(literal) lit(0+1)
     mov(to_ramaddr, frm_acc)
     mov(to_acc, frm_ram)
-    inc_sp(2)
+    shl()
+    mov(to_ram, frm_acc)
+
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    inc()
+    mov(to_ram, frm_acc)
+
+    jp("bwand_rst_1")
+lbl("bwand_done")
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    inc_sp(6)
     ret()
 
 /*-------------------------------------------------------*/
 
-/*
-bwand (var a, var b) {
-    var i;
-    var ret_add;
 
-    var cc;
-    var ret;
-    cc = 8;
-    ret = 0;
-    while(cc) {
-        cc -= 1;
 
-        i = 7-cc;
-        while (i) {
-            a;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
-            b;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
 
-            i -= 1;
-        }
 
-        a;
-        asm ("    rol()\n");
-        asm ("    mov(to_ram, frm_acc)\n");
-        b;
-        asm ("    rol()\n");
-        asm ("    mov(to_ram, frm_acc)\n");
 
-        ret_add = 1;
-        i = cc;
-        while (i) {
-            a;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
-            b;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
 
-            ret_add;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
-
-            i -= 1;
-        }
-
-        if (a==b) {
-            ret += ret_add;
-        }
-    }
-    ret;
-}
-
-*/  

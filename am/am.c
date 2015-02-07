@@ -112,7 +112,7 @@ static int defaddr (char* n, int high) {
         fprintf(stderr, "ERROR: label %s not found\n", (n));
         exit(1);
     }
-    ic = (unsigned char) lbl->addr >> (high ? 8 : 0);
+    ic = (unsigned char) (lbl->addr >> (high ? 8 : 0));
     printf(" 0x%02X,\n", ic);
     fprintf(stderr, "  %04X:  ", progcnt);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
