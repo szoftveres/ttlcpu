@@ -231,8 +231,10 @@ void CODE_do_operation_compare_neq (int lbl) {
     fprintf(stdout, "lbl(\"neq_%04d_end\")\n", lbl);
 }
 
-void CODE_do_operation_bwand (void) {
-    unimplemented(__FUNCTION__);
+void CODE_do_operation_bwand (int lbl) {
+    CODE_operand_push();
+    fprintf(stdout, "    call(\"bwand\", \"bwand_%04d\")\n", lbl);
+    fprintf(stdout, "    inc_sp(2)\n");
 }
 
 void CODE_do_operation_bwxor (void) {

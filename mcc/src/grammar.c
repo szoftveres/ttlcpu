@@ -630,7 +630,7 @@ void do_operations (int op_type) {
         break;
       case T_BWAND :
       case T_RECURBWAND :
-        CODE_do_operation_bwand();
+        CODE_do_operation_bwand(new_label());
         break;
       case T_BWXOR :
       case T_RECURBWXOR :
