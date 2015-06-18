@@ -36,7 +36,7 @@ void CODE_asm_statement (char* s);
 void CODE_logical_neg (int lbl);
 void CODE_bitwise_neg (void);
 
-void CODE_operand_push (void);
+void CODE_push (void);
 void CODE_operand_pop (void);
 
 void CODE_do_operation_mul (int lbl);
@@ -58,11 +58,10 @@ void CODE_ternary_cond_mid (int lbl);
 void CODE_ternary_cond_end (int lbl);
 
 
-void CODE_dereference_assign_push (void);
 void CODE_dereference_assign_pop (void);
 void CODE_dereference (void);
 
-void CODE_addressof (int pos);
+void CODE_load_eff_addr (int pos);
 
 
 void CODE_const_expression_str (int lbl, char* c);

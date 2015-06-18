@@ -570,7 +570,7 @@ int binary_operation (int precedence) {
 
     get_token();
 
-    CODE_operand_push();
+    CODE_push();
     inc_var_pos(&(lcl_vars)); /* matching dec_var_pos in do_operations */
 
     if (!primary_expression()) {
@@ -739,7 +739,7 @@ int dereference (void) {
     }
     if (token == T_ASSIGN) {
         get_token();
-        CODE_dereference_assign_push();
+        CODE_push();
         inc_var_pos(&(lcl_vars));
 
         if (!expression()) {    /* only one expression after = */
@@ -778,7 +778,7 @@ int addressof (void) {
         fprintf(stderr, "error : '%s' not defined in this scope\n", id);
         exit(1);
     }
-    CODE_addressof(var->pos);
+    CODE_load_eff_addr(var->pos);
     free(id);
     return 1;
 }
@@ -818,25 +818,26 @@ int identifier_expression (void) {
         fprintf(stderr, "error : '%s' not defined in this scope\n", id);
         exit(1);
     }
+
+    CODE_load_eff_addr(var->pos);
+
     if (token == T_ASSIGN) {
         get_token();
-        if (!expression()) {    /* only one expression after = */
+        CODE_push();
+        inc_var_pos(&(lcl_vars));
+
+        if (!expression()) {
             grammar_error("expected expression after '='");
         }
-        CODE_operand_push();
-        inc_var_pos(&(lcl_vars));
-        CODE_addressof(var->pos);
-        CODE_operand_pop();
+        CODE_dereference_assign_pop();
         dec_var_pos(&(lcl_vars));
-        CODE_store_to_address();
     } else {
-        CODE_addressof(var->pos);
         CODE_dereference();
     }
     if (recursive_assignment()) {
-        CODE_operand_push();
+        CODE_push();
         inc_var_pos(&(lcl_vars));
-        CODE_addressof(var->pos);
+        CODE_load_eff_addr(var->pos);
         CODE_operand_pop();
         dec_var_pos(&(lcl_vars));
         CODE_store_to_address();
@@ -862,7 +863,7 @@ int recursive_assignment (void) {
         return 0;
     }
 
-    CODE_operand_push();
+    CODE_push();
     inc_var_pos(&(lcl_vars));  /* matching dec_var_pos in do_operations */
 
     if (!expression()) {    /* only one expression after assignment */

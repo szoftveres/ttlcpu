@@ -123,7 +123,7 @@ void CODE_bitwise_neg (void) {
     fprintf(stdout, "    inv(frm_acc)\n");
 }
 
-void CODE_operand_push (void) {
+void CODE_push (void) {
     fprintf(stdout, "    push(frm_acc)                  // 1st operand push\n");
 }
 
@@ -140,7 +140,7 @@ void CODE_do_operation_mul (int lbl) {
     fprintf(stdout, "    dec()\n");
     CODE_operand_pop();
     fprintf(stdout, "    shl()\n");
-    CODE_operand_push();
+    CODE_push();
     fprintf(stdout, "    ld(to_acc, BX)\n");
     fprintf(stdout, "    jp(\"mul_%04d_start\")\n", lbl);
     fprintf(stdout, "lbl(\"mul_%04d_end\")\n", lbl);
@@ -176,7 +176,7 @@ void CODE_do_operation_shl (int lbl) {
     fprintf(stdout, "    dec()\n");
     CODE_operand_pop();
     fprintf(stdout, "    shl()\n");
-    CODE_operand_push();
+    CODE_push();
     fprintf(stdout, "    ld(to_acc, BX)\n");
     fprintf(stdout, "    jp(\"sleft_%04d_start\")\n", lbl);
     fprintf(stdout, "lbl(\"sleft_%04d_end\")\n", lbl);
@@ -203,7 +203,7 @@ void CODE_do_operation_shr (int lbl) {
     fprintf(stdout, "    rol()\n");
     fprintf(stdout, "    rol()\n");
     fprintf(stdout, "    rol()\n");
-    CODE_operand_push();
+    CODE_push();
     fprintf(stdout, "    ld(to_acc, BX)\n");
     fprintf(stdout, "    jp(\"sright_%04d_start\")\n", lbl);
     fprintf(stdout, "lbl(\"sright_%04d_end\")\n", lbl);
@@ -232,7 +232,7 @@ void CODE_do_operation_compare_neq (int lbl) {
 }
 
 void CODE_do_operation_bwand (int lbl) {
-    CODE_operand_push();
+    CODE_push();
     fprintf(stdout, "    call(\"bwand\", \"bwand_%04d\")\n", lbl);
     fprintf(stdout, "    inc_sp(2)\n");
 }
@@ -261,10 +261,6 @@ void CODE_ternary_cond_end (int lbl) {
 }
 
 
-void CODE_dereference_assign_push (void){
-    fprintf(stdout, "    push(frm_acc)\n");
-}
-
 void CODE_dereference_assign_pop (void) {
     fprintf(stdout, "    pop(to_ramaddr)\n");
     fprintf(stdout, "    mov(to_ram, frm_acc)\n");
@@ -276,7 +272,7 @@ void CODE_dereference (void) {
 }
 
 
-void CODE_addressof (int pos) {
+void CODE_load_eff_addr (int pos) {
     fprintf(stdout, "    ld(to_acc, SP)\n");
     fprintf(stdout, "    add(literal) lit(%d+1)\n", pos);
 }
