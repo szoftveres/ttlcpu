@@ -55,6 +55,8 @@ int addressof (void);
 
 int identifier_expression (void);
 
+int assignment (void);
+
 int recursive_assignment (void);
 
 int primary_expression(void);

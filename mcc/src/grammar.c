@@ -737,23 +737,9 @@ int dereference (void) {
     if (!expression()) {
         grammar_error("expected expression after '*'");
     }
-    if (token == T_ASSIGN) {
-        get_token();
-        CODE_push();
-        inc_var_pos(&(lcl_vars));
-
-        if (!expression()) {    /* only one expression after = */
-            grammar_error("expected expression after '='");
-        }
-        CODE_dereference_assign_pop();
-        dec_var_pos(&(lcl_vars));
-    } else {
+    if (!assignment()) {
         CODE_dereference();
     }
-/*    if (recursive_assignment()) {
-        fprintf(stdout, "    pop     edx\n");
-        fprintf(stdout, "    mov     [edx], eax\n");
-    }*/
     return 1;
 }
 
@@ -821,6 +807,16 @@ int identifier_expression (void) {
 
     CODE_load_eff_addr(var->pos);
 
+    if (!assignment()) {
+        CODE_dereference();
+    }
+    free(id);
+    return 1;
+}
+
+
+int assignment (void) {
+    /* Addr of location in acc */
     if (token == T_ASSIGN) {
         get_token();
         CODE_push();
@@ -829,20 +825,14 @@ int identifier_expression (void) {
         if (!expression()) {
             grammar_error("expected expression after '='");
         }
-        CODE_dereference_assign_pop();
+        CODE_pop_addr_and_store();
+        dec_var_pos(&(lcl_vars));
+    } else if (recursive_assignment()) {
+        CODE_pop_addr_and_store();
         dec_var_pos(&(lcl_vars));
     } else {
-        CODE_dereference();
+        return 0;
     }
-    if (recursive_assignment()) {
-        CODE_push();
-        inc_var_pos(&(lcl_vars));
-        CODE_load_eff_addr(var->pos);
-        CODE_operand_pop();
-        dec_var_pos(&(lcl_vars));
-        CODE_store_to_address();
-    }
-    free(id);
     return 1;
 }
 
@@ -863,6 +853,10 @@ int recursive_assignment (void) {
         return 0;
     }
 
+    CODE_push();               /* Push the address where we store back */
+    inc_var_pos(&(lcl_vars));  /* matching dec_var_pos */
+
+    CODE_dereference();
     CODE_push();
     inc_var_pos(&(lcl_vars));  /* matching dec_var_pos in do_operations */
 

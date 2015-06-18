@@ -3,10 +3,8 @@
 
 /* Emulated x86-like CPU registers */
 
-#undef FP
-#define FP              0xff
 #undef BX
-#define BX              0xfe
+#define BX              0xff
 
 
 /*-------------------------------------------------------*/
@@ -14,13 +12,13 @@
 /* Emulated Stack implementation */
 
 #undef SP
-#define SP              0xfd
+#define SP              0xfe
 #undef STACK_ACC
-#define STACK_ACC       0xfc
+#define STACK_ACC       0xfd
 #undef STACK_TEMP
-#define STACK_TEMP      0xfb
+#define STACK_TEMP      0xfc
 #undef SP_BASE
-#define SP_BASE         0xfa
+#define SP_BASE         0xfb
 
 
 #undef stackinit
@@ -40,7 +38,6 @@
     jp(l)                           \
 lbl(u)
 
-
 #undef ret
 #define ret()                       \
     st(STACK_ACC, frm_acc)          \
@@ -55,7 +52,6 @@ lbl(u)
     st(STACK_TEMP, frm_acc)         \
     ld(to_acc, STACK_ACC)           \
     ld(to_pc, STACK_TEMP)
-
 
 #undef push
 #define push(s)                     \

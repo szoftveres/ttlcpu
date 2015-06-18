@@ -261,7 +261,7 @@ void CODE_ternary_cond_end (int lbl) {
 }
 
 
-void CODE_dereference_assign_pop (void) {
+void CODE_pop_addr_and_store (void) {
     fprintf(stdout, "    pop(to_ramaddr)\n");
     fprintf(stdout, "    mov(to_ram, frm_acc)\n");
 }
@@ -285,14 +285,6 @@ void CODE_const_expression_str (int lbl, char* c) {
 void CODE_const_expression_int (char* c) {
     fprintf(stdout, "    mov(to_acc, literal) lit(%s)      // const\n", c);
 }
-
-
-void CODE_store_to_address (void) {
-    fprintf(stdout, "    mov(to_ramaddr, literal) lit(BX)\n");
-    fprintf(stdout, "    mov(to_ramaddr, frm_ram)\n");
-    fprintf(stdout, "    mov(to_ram, frm_acc)\n");
-}
-
 
 void CODE_fn_call (int lbl, char* fn_name) {
     fprintf(stdout, "    call(\"%s\", \"call_%04d\")\n", fn_name, lbl);
