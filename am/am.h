@@ -5,6 +5,7 @@
 #undef defl
 #undef defh
 #undef inst
+#undef org
 
 #ifndef _AM_H_
 #define _AM_H_
@@ -28,6 +29,8 @@
 #define out(s) mov(to_port, (s))
 #define in(d) mov((d), frm_port)
 
+#define nop() mov(to_acc, frm_acc)
+
 #define jp(a) mov(to_pch, literal) defh(a) mov(to_pc, literal) defl(a)
 #define jz(a) movz(to_pch, literal) defh(a) movz(to_pc, literal) defl(a)
 
@@ -43,6 +46,7 @@
 #define defl(n)         do {++progcnt;} while(0);
 #define defh(n)         do {++progcnt;} while(0);
 #define lbl(n)          do {lbladd(n);} while(0);
+#define org(n)          while (progcnt != n) {nop();};
 
 #else
 /* ============================================================ */
@@ -54,6 +58,7 @@
 #define defl(n)         do {defaddr((n), 0);} while(0);
 #define defh(n)         do {defaddr((n), 1);} while(0);
 #define lbl(n)          do {lblprint(n);} while(0);
+#define org(n)          while (progcnt != n) {nop();};
 
 #endif
 /* ============================================================ */

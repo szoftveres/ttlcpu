@@ -18,7 +18,7 @@ OBJECTS = $(OBJDIR)/lex.o\
           $(OBJDIR)/codegen.o\
 
 
-ASMTEMPLATE = template.asm
+ASMHEADER = header.asm
 
 ## Build both compiler and program
 all: $(PROGRAM)
@@ -32,8 +32,8 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c -o $(OBJDIR)/$*.o $< 
 
 ## Link object files to build the compiler
-$(PROGRAM): $(OBJECTS) $(ARCHDIR)/$(ASMTEMPLATE)
-	cp $(ARCHDIR)/$(ASMTEMPLATE) $(OUTDIR)/
+$(PROGRAM): $(OBJECTS) $(ARCHDIR)/$(ASMHEADER)
+	cp $(ARCHDIR)/$(ASMHEADER) $(OUTDIR)/
 	$(LD) $(OBJECTS) -o $(OUTDIR)/$(PROGRAM)
 
 clean:

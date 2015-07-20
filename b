@@ -10,7 +10,7 @@ cd .. || exit 1
 
 #compile
 echo "Compiling program.."
-cp ./mcc/output/template.asm  am/prog.asm || exit 1
+cp ./mcc/output/header.asm  am/prog.asm || exit 1
 cc -E ./prog.c | grep -v '^#' | ./mcc/output/mcc >> am/prog.asm || exit 1
 
 # make assembler and assemble 
