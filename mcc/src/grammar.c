@@ -709,8 +709,8 @@ int logical_neg (void) {
         return 0;
     }
     get_token();
-    if (!expression()) {
-        grammar_error("expected expression after '!'");
+    if (!primary_expression()) {
+        grammar_error("expected primary expression after '!'");
     }
     CODE_logical_neg(new_label());
     return 1;
@@ -721,8 +721,8 @@ int bitwise_neg (void) {
         return 0;
     }
     get_token();
-    if (!expression()) {
-        grammar_error("expected expression after '~'");
+    if (!primary_expression()) {
+        grammar_error("expected primary expression after '~'");
     }
     CODE_bitwise_neg();
     return 1;
@@ -734,8 +734,8 @@ int dereference (void) {
         return 0;
     }
     get_token();
-    if (!expression()) {
-        grammar_error("expected expression after '*'");
+    if (!primary_expression()) {
+        grammar_error("expected primary expression after '*'");
     }
     if (!assignment()) {
         CODE_dereference();
