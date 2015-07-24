@@ -31,11 +31,7 @@ gen_freq (int smp_rate, int baud, int cycle) {
         }
 
         for (i = 0; i != (num_smp / 2); i++) {
-            if ((!i) && (num_smp % 2)) {
-                putchar(0);
-            } else {
-                putchar(96);
-            }
+            putchar(96);
         }
         if (num_smp % 2) {
             putchar(0);
