@@ -12,6 +12,7 @@ cd .. || exit 1
 echo "Compiling program.."
 cp ./mcc/output/header.asm  am/prog.asm || exit 1
 cc -E ./prog.c | grep -v '^#' | ./mcc/output/mcc >> am/prog.asm || exit 1
+cat ./mcc/output/footer.asm >> am/prog.asm || exit 1
 
 # make assembler and assemble 
 echo "Making AM.."

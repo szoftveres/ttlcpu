@@ -19,6 +19,7 @@ OBJECTS = $(OBJDIR)/lex.o\
 
 
 ASMHEADER = header.asm
+ASMFOOTER = footer.asm
 
 ## Build both compiler and program
 all: $(PROGRAM)
@@ -32,8 +33,9 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c -o $(OBJDIR)/$*.o $< 
 
 ## Link object files to build the compiler
-$(PROGRAM): $(OBJECTS) $(ARCHDIR)/$(ASMHEADER)
+$(PROGRAM): $(OBJECTS) $(ARCHDIR)/$(ASMHEADER) $(ARCHDIR)/$(ASMFOOTER)
 	cp $(ARCHDIR)/$(ASMHEADER) $(OUTDIR)/
+	cp $(ARCHDIR)/$(ASMFOOTER) $(OUTDIR)/
 	$(LD) $(OBJECTS) -o $(OUTDIR)/$(PROGRAM)
 
 clean:

@@ -5,7 +5,6 @@
 #undef defl
 #undef defh
 #undef inst
-#undef org
 
 #ifndef _AM_H_
 #define _AM_H_
@@ -39,6 +38,19 @@
 #define ld(d, a) mov(to_ramaddr, literal) lit((a)) mov((d), frm_ram)
 #define ldz(d, a) movz(to_ramaddr, literal) lit((a)) movz((d), frm_ram)
 
+/* = Code organization = */
+
+#define _org(n)         while (progcnt != (n)) {nop();};
+
+#define _jptbl(name, n) do {                                                            \
+                            if ((progcnt & (~0xFF)) != ((progcnt + (n)) & (~0xFF))) {   \
+                                while (progcnt != ((progcnt + (n)) & (~0xFF))) {nop();} \
+                            }                                                           \
+                            lbl(name);                                                  \
+                        } while (0);                                                    \
+
+
+/* ============================================================ */
 /* Base */
 #define inst(d, s, m)   do {++progcnt;} while(0);
 #define litl(l)         do {++progcnt;} while(0);
@@ -46,7 +58,6 @@
 #define defl(n)         do {++progcnt;} while(0);
 #define defh(n)         do {++progcnt;} while(0);
 #define lbl(n)          do {lbladd(n);} while(0);
-#define org(n)          while (progcnt != n) {nop();};
 
 #else
 /* ============================================================ */
@@ -58,7 +69,6 @@
 #define defl(n)         do {defaddr((n), 0);} while(0);
 #define defh(n)         do {defaddr((n), 1);} while(0);
 #define lbl(n)          do {lblprint(n);} while(0);
-#define org(n)          while (progcnt != n) {nop();};
 
 #endif
 /* ============================================================ */
