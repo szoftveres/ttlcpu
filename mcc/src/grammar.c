@@ -14,39 +14,12 @@ void grammar_error (char* s) {
 
 
 int program (void) {
-    get_token();
-    program_base();
-//    func_definitions();
+    func_definitions();
     if (token != T_EOF) {
         grammar_error("expected function declaration");
     }
     exit(0);
 }
-
-int program_base (void) {
-    int var_dcl = 0;
-    int rc = 0;
-
-    rc = var_dcl = var_declaration();
-    if (var_dcl) {
-        var_dcl = 1;
-        if (token != T_SEMICOLON) {
-            grammar_error("expected ';'");
-        }
-        get_token();
-        rc |= program_base();
-    } else {
-        //fprintf(stdout,"call (main)");
-    }
-    rc |= func_definitions();
-    if (var_dcl) {
-//        dec_var_pos(&(lcl_vars));
-//        del_var(&(lcl_vars));
-//        CODE_stack_restore();
-    }
-    return rc;
-}
-
 
 
 int func_definitions (void) {

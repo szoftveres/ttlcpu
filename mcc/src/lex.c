@@ -310,6 +310,7 @@ void get_token (void) {
 
 void lex_init (void) {
     last_char = EOF;
+    get_token();
 }
 
 

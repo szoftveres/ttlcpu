@@ -3,8 +3,6 @@
 
 int program (void);
 
-int program_base (void);
-
 int func_definitions (void);
 
 int func_definition (void);
