@@ -66,7 +66,8 @@ static void instruction (int d, int s, char* m) {
         mod++;
     }
     printf(" 0x%02X,\n", ic);
-    fprintf(stderr, "  %04X:  ", progcnt);
+    fprintf(stderr, "  %04X:", progcnt);
+    fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0; i < 8; i++) {
         fprintf(stderr, (ic & 0x80) ? "1" : "0");
         ic = ic << 1;
@@ -92,7 +93,7 @@ static void instruction (int d, int s, char* m) {
     if ((s == frm_ram) && (d == to_ram)) {
         fprintf(stderr, "   ILLEGAL ram <- ram \n"); exit(1);
     }
-    fprintf(stderr, "         %12s <- %0.12s %s\n", de, so, m);
+    fprintf(stderr, "       mov  %s, %s %s\n", de, so, m);
     progcnt += 1;
     return;
 }
@@ -114,14 +115,14 @@ static int defaddr (char* n, int high) {
     }
     ic = (unsigned char) (lbl->addr >> (high ? 8 : 0));
     printf(" 0x%02X,\n", ic);
-    fprintf(stderr, "  %04X:  ", progcnt);
+    fprintf(stderr, "  %04X:", progcnt);
+    fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
         fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
     }
-    fprintf(stderr, "         %08s(%s): 0x%02X\n",
-            lbl->name,
-            (high ? "Hi" : "Lo"),
-            ic);
+    fprintf(stderr, "       %s(%s)\n",
+            (high ? "high" : "low"),
+            lbl->name);
     progcnt += 1;
     return;
 }
@@ -132,11 +133,12 @@ static int dataconst (unsigned int v, int shift) {
     unsigned char ic2;
 
     printf(" 0x%02X,\n", ic);
-    fprintf(stderr, "  %04X:  ", progcnt);
+    fprintf(stderr, "  %04X:", progcnt);
+    fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
         fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
     }
-    fprintf(stderr, "          lit: 0x%02X\n", ic); 
+    fprintf(stderr, "       db(0x%02x)\n", ic); 
     progcnt += 1;
     return;
 }
