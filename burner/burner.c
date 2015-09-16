@@ -50,15 +50,15 @@ const unsigned char program[] PROGMEM = {
 
 
 
-#define SETDDWR  do {DDRD  |=  (1<<7);} while (0);
-#define RESDDWR  do {DDRD  &= ~(1<<7);} while (0);
-#define SETWR    do {PORTD |=  (1<<7);} while (0);
-#define RESWR    do {PORTD &= ~(1<<7);} while (0);
+#define SETDDWR  do {DDRB  |=  (1<<0);} while (0);
+#define RESDDWR  do {DDRB  &= ~(1<<0);} while (0);
+#define SETWR    do {PORTB |=  (1<<0);} while (0);
+#define RESWR    do {PORTB &= ~(1<<0);} while (0);
 
-#define SETDDRP  do {DDRB  |=  (1<<0);} while (0);
-#define RESDDRP  do {DDRB  &= ~(1<<0);} while (0);
-#define SETP     do {PORTB |=  (1<<0);} while (0);
-#define RESP     do {PORTB &= ~(1<<0);} while (0);
+#define SETDDRP  do {DDRD  |=  (1<<7);} while (0);
+#define RESDDRP  do {DDRD  &= ~(1<<7);} while (0);
+#define SETP     do {PORTD |=  (1<<7);} while (0);
+#define RESP     do {PORTD &= ~(1<<7);} while (0);
 
 
 
@@ -137,9 +137,9 @@ void write (unsigned char data) {
     if (data & (0x01 << 5)) {SETD5;} else {RESD5;}
     if (data & (0x01 << 6)) {SETD6;} else {RESD6;}
     if (data & (0x01 << 7)) {SETD7;} else {RESD7;}
-    
+
     arm_d();
-    
+
     for (i = 0; i < PULSELEN; i++) {SETWR;} /* data setup time */
     for (i = 0; i < PULSELEN; i++) {RESWR;}
     for (i = 0; i < PULSELEN; i++) {SETWR;}
@@ -158,7 +158,7 @@ void write (unsigned char data) {
 
 int main (void){
     int i;
-    
+
     for (i = 0; i < 30000; i++) {
         SFIOR |= (1 << PUD);
     }

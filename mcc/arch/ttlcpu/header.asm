@@ -99,6 +99,7 @@ lbl(u)
 
     /* Entry point of main program */
     stackinit()
+    out(literal) lit(0)
     call("main", "main_caller_ret")
 lbl("haltcpu")
     jp("haltcpu")
