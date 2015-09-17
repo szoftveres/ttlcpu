@@ -32,7 +32,8 @@ int func_definitions (void) {
 
 
 int func_definition (void) {
-    int i = 0;
+    int i;
+    int j;
     if (token != T_IDENTIFIER) {
         return 0;
     }
@@ -42,17 +43,18 @@ int func_definition (void) {
         grammar_error("expected '('");
     }
     get_token();
-    arg_declarations(&i);
+    i = arg_declarations();
     if (token != T_RIGHT_PARENTH) {
         grammar_error("expected ')'");
     }
-    inc_var_pos(&(lcl_vars));       // return address is 2xlarger than int
-    inc_var_pos(&(lcl_vars));
+    for (j = 0; j != SYM_code_pointer_size(); j++) {
+        inc_var_pos(&(lcl_vars));
+    }
     get_token();
     if (!block()) {
         grammar_error("expected block");
     }
-    while(i--) {
+    while (i--) {
         pop_var(&(lcl_vars));
     }
     CODE_func_definition_ret();
@@ -60,59 +62,63 @@ int func_definition (void) {
 }
 
 
-int arg_declarations (int *i) {
-    if (!var_declaration()) {
-        return 0;
+int arg_declarations (void) {
+    int args = 0;
+
+    args += var_declaration();
+    if (args) {
+        if (token == T_COMMA) {
+            int more_args;
+            get_token();
+            more_args = arg_declarations();
+            if (!more_args) {
+                grammar_error("expected argument after ','");
+            }
+            args += more_args;
+        }    
     }
-    (*i)++;
-    if (token == T_COMMA) {
-        get_token();
-        if (!arg_declarations(i)) {
-            grammar_error("expected argument after ','");
-        }
-    }
-    return 1;
+    return args;
 }
 
 
-int block (void) {
-    if (token != T_LEFT_BRACE) {
-        return 0;
-    }
-    get_token();
-    if (!block_base()) {
-        grammar_error("expected expressions after '{'");
-    }
-    if (token != T_RIGHT_BRACE) {
-        grammar_error("expected '}'");
-    }
-    get_token();
-    return 1;
-}
+int var_declarations (void) {
+    int vars = 0;
 
-
-int block_base (void) {
-    int var_dcl = 0;
-    int rc = 0;
-
-    rc = var_dcl = var_declaration();
-    if (var_dcl) {
-        CODE_var_declarations_space();
-        var_dcl = 1;
+    vars += var_declaration();
+    if (vars) {
         if (token != T_SEMICOLON) {
             grammar_error("expected ';'");
         }
         get_token();
-        rc |= block_base();
+        vars += var_declarations();
     }
-    rc |= statements();
-    if (var_dcl) {
-        pop_var(&(lcl_vars));
-        CODE_stack_restore();
-    }
-    return rc;
+    return vars;
+
 }
 
+
+int block (void) {
+    int vars;
+
+    if (token != T_LEFT_BRACE) {
+        return 0;
+    }
+    get_token();
+    
+    vars = var_declarations();
+    CODE_var_declarations_space(vars);
+    statements();
+    if (token != T_RIGHT_BRACE) {
+        grammar_error("expected '}'");
+    }
+    get_token();
+    CODE_stack_restore(vars);
+    while (vars--) {
+        pop_var(&(lcl_vars));
+    }
+
+    return 1;
+}
 
 int var_declaration (void) {
     if (token != T_IDENTIFIER) {
@@ -131,7 +137,7 @@ int var_declaration (void) {
     }
     push_var(&(lcl_vars), lexeme);
     get_token();
-    return 1;
+    return 1; /* should be strictly 1 (number of declarations found) */
 }
 
 
@@ -406,14 +412,12 @@ int expressions (void) {
 
 int expression (void) {
 
-    if (!primary_expression()) {
-        return 0;
-    }
-    if (binary_operation(0)) {
+    if (primary_expression()) {
+        binary_operation(0);
+        ternary_cond();
         return 1;
     }
-    ternary_cond();
-    return 1;
+    return 0;
 }
 
 
@@ -843,19 +847,19 @@ int recursive_assignment (void) {
 
 
 int fn_call (char* identifier) {
-    int i = 0;
+    int i;
     if (token != T_LEFT_PARENTH) {
         return 0;
     }
     get_token();
-    fn_call_args(&i);
+    i = fn_call_args();
     if (token != T_RIGHT_PARENTH) {
         grammar_error("expected ')'");
     }
     get_token();
     CODE_fn_call(new_label(), identifier);
+    CODE_stack_restore(i);
     while(i--) {
-        CODE_stack_restore();
         dec_var_pos(&(lcl_vars));
     }
 
@@ -863,20 +867,25 @@ int fn_call (char* identifier) {
 }
 
 
-int fn_call_args (int *i) {
-    if (!expression()) {
-        return 0;
-    }
-    CODE_fn_call_args();
-    inc_var_pos(&(lcl_vars));
-    (*i)++;
-    if (token == T_COMMA) {
-        get_token();
-        if (!fn_call_args(i)) {
-            grammar_error("expected expression after ','");
+int fn_call_args (void) {
+    int args = 0;
+
+    args += expression();
+    if (args) {
+        CODE_fn_call_args();
+        inc_var_pos(&(lcl_vars));
+        if (token == T_COMMA) {
+            int more_args;
+            get_token();
+            more_args = fn_call_args();
+            if (!more_args) {
+                grammar_error("expected expression after ','");
+            }
+            args += more_args;
         }
     }
-    return 1;
+    return args;
 }
+
 
 

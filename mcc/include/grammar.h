@@ -10,15 +10,13 @@ int func_definition (void);
 
 int var_declaration (void);
 
-int var_declarations (int *i);
+int var_declarations (void);
 
-int arg_declarations (int *i);
+int arg_declarations (void);
 
 
 
 int block (void);
-
-int block_base (void);
 
 int statements (void);
 
@@ -65,7 +63,7 @@ int const_expression (void);
 
 int fn_call (char* identifier);
 
-int fn_call_args (int *i);
+int fn_call_args (void);
 
 int binary_operation(int precedence);
 

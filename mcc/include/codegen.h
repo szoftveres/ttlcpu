@@ -2,14 +2,16 @@
 #define _CODEGEN_H_
 
 int SYM_integer_size (void);
+int SYM_data_pointer_size (void);
+int SYM_code_pointer_size (void);
 
 
 void CODE_func_definition_label (char* fn_name);
 void CODE_func_definition_ret (void);
 
-void CODE_stack_restore (void);
+void CODE_stack_restore (int i);
 
-void CODE_var_declarations_space (void);
+void CODE_var_declarations_space (int i);
 
 void CODE_if_statement_head (int lbl);
 void CODE_if_statement_mid (int lbl);

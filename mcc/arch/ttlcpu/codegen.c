@@ -11,9 +11,16 @@ void unimplemented (const char* s) {
 
 
 int SYM_integer_size (void) {
-    return 1;
+    return 1;                   /* 8 bit*/
 }
 
+int SYM_data_pointer_size (void) {
+    return 1;                   /* 8 bit so far */
+}
+
+int SYM_code_pointer_size (void) {
+    return 2;                   /* 16 bit */
+}
 
 void CODE_func_definition_label (char* fn_name) {
     fprintf(stdout, "\n");
@@ -24,12 +31,18 @@ void CODE_func_definition_ret (void) {
     fprintf(stdout, "    ret()\n");
 }
 
-void CODE_stack_restore (void) {
-    fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size());
+void CODE_stack_restore (int i) {
+    if (!i) {
+        return;
+    }    
+    fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size() * i);
 }
 
-void CODE_var_declarations_space (void) {
-    fprintf(stdout, "    dec_sp(%u)\n", SYM_integer_size());
+void CODE_var_declarations_space (int i) {
+    if (!i) {
+        return;
+    }    
+    fprintf(stdout, "    dec_sp(%u)\n", SYM_integer_size() * i);
 }
 
 void CODE_if_statement_head (int lbl) {
