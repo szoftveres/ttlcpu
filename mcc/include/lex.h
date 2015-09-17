@@ -17,6 +17,7 @@ enum {
 
     T_STRING_START,             /* " */
     T_STRING_CONTENT,           /* ".* */
+    T_STRING_SPECIAL,           /* \n \t */
     T_STRING,                   /* ".*" */
 
     T_AT,                       /* @ */

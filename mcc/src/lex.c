@@ -84,7 +84,7 @@ int lex (char c) {
             return 1;
           case T_STRING_START :
           case T_STRING_CONTENT :
-            token = T_STRING_CONTENT;
+            token = T_STRING_SPECIAL;
             return 1;
         }
         fprintf(stderr, "syntax error : unexpected '\\' \n");
@@ -106,6 +106,9 @@ int lex (char c) {
           case T_NONE :
             token = T_STRING_START;
             return 1;   /* ok, continue */
+          case T_STRING_SPECIAL :
+            token = T_STRING_CONTENT;
+            return 1;   /* ok, continue */
           case T_STRING_CONTENT :
             token = T_STRING;
             return 1;   /* seems like finished */
@@ -118,6 +121,7 @@ int lex (char c) {
             token = T_CHAR_CONTENT;
             return 1;   /* ok, continue */
           case T_STRING_START :
+          case T_STRING_SPECIAL :
           case T_STRING_CONTENT :
             token = T_STRING_CONTENT;
             return 1;   /* ok, continue */
@@ -137,6 +141,7 @@ int lex (char c) {
             token = T_CHAR_CONTENT;
             return 1;   /* ok, continue */
           case T_STRING_START :
+          case T_STRING_SPECIAL :
           case T_STRING_CONTENT :
             token = T_STRING_CONTENT;
             return 1;   /* ok, continue */
@@ -159,6 +164,7 @@ int lex (char c) {
             token = T_CHAR_CONTENT;
             return 1;   /* ok, continue */
           case T_STRING_START :
+          case T_STRING_SPECIAL :
           case T_STRING_CONTENT :
             token = T_STRING_CONTENT;
             return 1;   /* ok, continue */
@@ -243,6 +249,7 @@ int lex (char c) {
         token = T_CHAR_CONTENT;
         return 1;   /* ok, continue */
       case T_STRING_START :
+      case T_STRING_SPECIAL :
       case T_STRING_CONTENT :
         token = T_STRING_CONTENT;
         return 1;   /* ok, continue */
