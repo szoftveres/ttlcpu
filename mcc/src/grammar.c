@@ -618,6 +618,7 @@ void do_operations (int op_type) {
         CODE_do_operation_bwor();
         break;
       default:
+        grammar_error("unknown / unimplemented operator");
         return;
     }
     dec_var_pos(&(lcl_vars));       /* there's a POP in each operation */
