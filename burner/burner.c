@@ -126,7 +126,7 @@ void unarm_c (void) {
 /*
  * write the data
  */
-void write (unsigned char data) {
+void write_byte (unsigned char data) {
     int i;
 
     if (data & (0x01 << 0)) {SETD0;} else {RESD0;}
@@ -156,7 +156,10 @@ void write (unsigned char data) {
 
 }
 
-int main (void){
+/*
+ *
+ */
+void burn (void) {
     int i;
 
     for (i = 0; i < 30000; i++) {
@@ -166,10 +169,18 @@ int main (void){
     arm_c();
 
     for (i = 0; i < (sizeof(program)/sizeof(program[0])); i++) {
-        write(pgm_read_byte(&program[i]));
+        write_byte(pgm_read_byte(&program[i]));
     }
 
     unarm_c();
+}
+
+/*
+ *
+ */
+int main (void){
+
+    burn();
 
     while (1) {
 
