@@ -29,7 +29,7 @@ add (var b1, var b2) {
 main () {
     var i;
 
-    /* binary operator precedence can be overriden with () */
+    /* binary operator precedence can be overriden with () parentheses */
     for (i = NUM_TEN; (i - 1 != 255 - (1 == 2)) ? 1 : 0; i += add(1, 0)) {
         var i_p;
         /*
