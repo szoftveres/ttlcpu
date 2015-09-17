@@ -101,6 +101,7 @@ lbl(u)
     stackinit()
     out(literal) lit(0)
     call("main", "main_caller_ret")
+    out(literal) lit(0)
 lbl("haltcpu")
     jp("haltcpu")
 
