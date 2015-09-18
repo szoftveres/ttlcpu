@@ -38,7 +38,7 @@ int func_definition (void) {
         return 0;
     }
     CODE_func_definition_label(lexeme);
-    next_token();
+    lex_consume();
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         grammar_error("expected '('");
     }
@@ -126,7 +126,7 @@ int var_declaration (void) {
         exit(1);
     }
     push_var(&(lcl_vars), lexeme);
-    next_token();
+    lex_consume();
     return 1; /* should be strictly 1 (number of declarations found) */
 }
 
@@ -457,7 +457,7 @@ int binary_operation (int precedence) {
       default: return 0;
     }
 
-    next_token();
+    lex_consume();
 
     CODE_push();
     inc_var_pos(&(lcl_vars)); /* matching dec_var_pos in do_operations */
@@ -639,7 +639,7 @@ int addressof (void) {
         grammar_error("expected identifier after '&'");
     }
     id = strdup(lexeme);
-    next_token();
+    lex_consume();
 
     var = find_var(&(lcl_vars), id);
     if (!var) {
@@ -656,12 +656,12 @@ int const_expression (void) {
 
     if (token == T_STRING) {
         CODE_const_expression_str(new_label(), lexeme);
-        next_token();
+        lex_consume();
         return 1;
     }
     if (token == T_CHAR || token == T_INTEGER) {
         CODE_const_expression_int(lexeme);
-        next_token();
+        lex_consume();
         return 1;
     }
     return 0;
@@ -676,7 +676,7 @@ int identifier_expression (void) {
         return 0;
     }
     id = strdup(lexeme);
-    next_token();
+    lex_consume();
 
     if(function_expression(id)) {
         free(id);
@@ -729,7 +729,7 @@ int recursive_assignment (void) {
       case T_RECURBWAND :
       case T_RECURBWOR :
       case T_RECURBWXOR :
-        next_token();
+        lex_consume();
         break;
       default:
         return 0;
@@ -798,7 +798,7 @@ int asm_expression (char* identifier) {
         }
         str_process();
         CODE_asm_statement(lexeme);
-        next_token();
+        lex_consume();
     } while (token == T_STRING);
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
