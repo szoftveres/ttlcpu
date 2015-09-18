@@ -42,13 +42,13 @@
 
 #define _org(n)         while (progcnt != (n)) {nop();};
 
-#define _fitpage(n)                                                             \
-                do {                                                            \
-                    const unsigned int pagestart = ((progcnt + (n)) & (~0xFF)); \
-                    if ((progcnt & (~0xFF)) != pagestart) {                     \
-                        while (progcnt != pagestart) {nop();}                   \
-                    }                                                           \
-                } while (0);                                                    \
+#define _fitpage(n)                                                         \
+            do {                                                            \
+                const unsigned int pagestart = ((progcnt + (n)) & (~0xFF)); \
+                if ((progcnt & (~0xFF)) != pagestart) {                     \
+                    while (progcnt != pagestart) {nop();}                   \
+                }                                                           \
+            } while (0);                                                    \
 
 
 /* ============================================================ */
