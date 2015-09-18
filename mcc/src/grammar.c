@@ -177,9 +177,6 @@ int keyword (void) {
     if (for_statement()) {
         return 1;
     }
-    if (asm_statement()) {
-        return 1;
-    }
     return 0;
 }
 
@@ -344,39 +341,6 @@ int for_statement (void) {
         grammar_error("expected statement");
     }
     CODE_for_statement_end(lbl);
-    return 1;
-}
-
-
-int asm_statement (void) {
-    if (token != T_IDENTIFIER) {
-        return 0;
-    }
-    if (strcmp(lexeme, "asm")) {
-        return 0;
-    }
-    get_token();
-    if (token != T_LEFT_PARENTH) {
-        grammar_error("expected '('");
-    }
-    get_token();
-
-    do {
-        if (token != T_STRING) {
-            grammar_error("expected asm instructions");
-        }
-        str_process();
-        CODE_asm_statement(lexeme);
-        get_token();
-    } while (token == T_STRING);
-    if (token != T_RIGHT_PARENTH) {
-        grammar_error("expected ')'");
-    }
-    get_token();
-    if (token != T_SEMICOLON) {
-        grammar_error("expected ';'");
-    }
-    get_token();
     return 1;
 }
 
@@ -771,6 +735,12 @@ int identifier_expression (void) {
     if (token != T_IDENTIFIER) {
         return 0;
     }
+
+    if (!strcmp(lexeme, "asm")) {
+        get_token();
+        return asm_expression();
+    }
+
     id = strdup(lexeme);
     get_token();
     if (fn_call(id)) {
@@ -843,6 +813,28 @@ int recursive_assignment (void) {
     }
     do_operations(op_type);  /* inc_var_pos is in do_operations */
 
+    return 1;
+}
+
+
+int asm_expression (void) {
+    if (token != T_LEFT_PARENTH) {
+        grammar_error("expected '('");
+    }
+    get_token();
+
+    do {
+        if (token != T_STRING) {
+            grammar_error("expected string");
+        }
+        str_process();
+        CODE_asm_statement(lexeme);
+        get_token();
+    } while (token == T_STRING);
+    if (token != T_RIGHT_PARENTH) {
+        grammar_error("expected ')'");
+    }
+    get_token();
     return 1;
 }
 
