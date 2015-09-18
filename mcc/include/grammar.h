@@ -23,7 +23,6 @@ int statements (void);
 int keyword (void);
 
 int if_statement (void);
-int else_statement (void);
 
 int while_statement (void);
 int do_statement (void);
@@ -60,7 +59,11 @@ int ternary_cond (void);
 
 int const_expression (void);
 
-int asm_expression (void);
+int function_expression (char* identifier);
+
+int asm_expression (char* identifier);
+
+int sizeof_expression (char* identifier);
 
 int fn_call (char* identifier);
 

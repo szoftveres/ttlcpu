@@ -39,18 +39,16 @@ int func_definition (void) {
     }
     CODE_func_definition_label(lexeme);
     get_token();
-    if (token != T_LEFT_PARENTH) {
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
         grammar_error("expected '('");
     }
-    get_token();
     i = arg_declarations();
-    if (token != T_RIGHT_PARENTH) {
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
     }
     for (j = 0; j != SYM_code_pointer_size(); j++) {
         inc_var_pos(&(lcl_vars));
     }
-    get_token();
     if (!block()) {
         grammar_error("expected block");
     }
@@ -67,9 +65,8 @@ int arg_declarations (void) {
 
     args += var_declaration();
     if (args) {
-        if (token == T_COMMA) {
+        if (lex_get(T_COMMA, NULL)) {
             int more_args;
-            get_token();
             more_args = arg_declarations();
             if (!more_args) {
                 grammar_error("expected argument after ','");
@@ -86,10 +83,9 @@ int var_declarations (void) {
 
     vars += var_declaration();
     if (vars) {
-        if (token != T_SEMICOLON) {
+        if (!lex_get(T_SEMICOLON, NULL)) {
             grammar_error("expected ';'");
         }
-        get_token();
         vars += var_declarations();
     }
     return vars;
@@ -100,18 +96,16 @@ int var_declarations (void) {
 int block (void) {
     int vars;
 
-    if (token != T_LEFT_BRACE) {
+    if (!lex_get(T_LEFT_BRACE, NULL)) {
         return 0;
     }
-    get_token();
     
     vars = var_declarations();
     CODE_var_declarations_space(vars);
     statements();
-    if (token != T_RIGHT_BRACE) {
+    if (!lex_get(T_RIGHT_BRACE, NULL)) {
         grammar_error("expected '}'");
     }
-    get_token();
     CODE_stack_restore(vars);
     while (vars--) {
         pop_var(&(lcl_vars));
@@ -121,13 +115,9 @@ int block (void) {
 }
 
 int var_declaration (void) {
-    if (token != T_IDENTIFIER) {
+    if (!lex_get(T_IDENTIFIER, "var")) {
         return 0;
     }
-    if (strcmp(lexeme, "var")) {
-        return 0;
-    }
-    get_token();
     if (token != T_IDENTIFIER) {
         grammar_error("expected identifier");
     }
@@ -183,30 +173,24 @@ int keyword (void) {
 
 int if_statement (void) {
     int lbl;
-    if (token != T_IDENTIFIER) {
+    if (!lex_get(T_IDENTIFIER, "if")) {
         return 0;
     }
-    if (strcmp(lexeme, "if")) {
-        return 0;
-    }
-    get_token();
-    if (token != T_LEFT_PARENTH) {
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
         grammar_error("expected '('");
     }
-    get_token();
     if (!expressions()) {
         grammar_error("expected expression");
     }
-    if (token != T_RIGHT_PARENTH) {
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
     }
-    get_token();
     lbl = new_label();
     CODE_if_statement_head(lbl);
     if (!statement()) {
         grammar_error("expected statement");
     }
-    if (else_statement()) {
+    if (lex_get(T_IDENTIFIER, "else")) {
         CODE_if_statement_mid(lbl);
         if (!statement()) {
             grammar_error("expected statement");
@@ -219,40 +203,22 @@ int if_statement (void) {
 }
 
 
-int else_statement (void) {
-    if (token != T_IDENTIFIER) {
-        return 0;
-    }
-    if (strcmp(lexeme, "else")) {
-        return 0;
-    }
-    get_token();
-    return 1;
-}
-
-
 int while_statement (void) {
     int lbl;
-    if (token != T_IDENTIFIER) {
+    if (!lex_get(T_IDENTIFIER, "while")) {
         return 0;
     }
-    if (strcmp(lexeme, "while")) {
-        return 0;
-    }
-    get_token();
-    if (token != T_LEFT_PARENTH) {
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
         grammar_error("expected '('");
     }
-    get_token();
     lbl = new_label();
     CODE_while_statement_test(lbl);
     if (!expressions()) {
         grammar_error("expected expression");
     }
-    if (token != T_RIGHT_PARENTH) {
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
     }
-    get_token();
     CODE_while_statement_evaluate(lbl);
     if (!statement()) {
         grammar_error("expected statement");
@@ -264,37 +230,29 @@ int while_statement (void) {
 
 int do_statement (void) {
     int lbl;
-    if (token != T_IDENTIFIER) {
+    if (!lex_get(T_IDENTIFIER, "do")) {
         return 0;
     }
-    if (strcmp(lexeme, "do")) {
-        return 0;
-    }
-    get_token();
     lbl = new_label();
     CODE_do_statement_base(lbl);
     if (!statement()) {
         grammar_error("expected statement");
     }
-    if (token != T_IDENTIFIER || strcmp(lexeme, "while")) {
+    if (!lex_get(T_IDENTIFIER, "while")) {
         grammar_error("expected 'while'");
     }
-    get_token();
-    if (token != T_LEFT_PARENTH) {
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
         grammar_error("expected '('");
     }
-    get_token();
     if (!expressions()) {
         grammar_error("expected expression");
     }
-    if (token != T_RIGHT_PARENTH) {
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
     }
-    get_token();
-    if (token != T_SEMICOLON) {
+    if (!lex_get(T_SEMICOLON, NULL)) {
         grammar_error("expected ';'");
     }
-    get_token();
     CODE_do_statement_test(lbl);
     return 1;
 }
@@ -302,22 +260,16 @@ int do_statement (void) {
 
 int for_statement (void) {
     int lbl;
-    if (token != T_IDENTIFIER) {
+    if (!lex_get(T_IDENTIFIER, "for")) {
         return 0;
     }
-    if (strcmp(lexeme, "for")) {
-        return 0;
-    }
-    get_token();
-    if (token != T_LEFT_PARENTH) {
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
         grammar_error("expected '('");
     }
-    get_token();
     expressions();
-    if (token != T_SEMICOLON) {
+    if (!lex_get(T_SEMICOLON, NULL)) {
         grammar_error("expected ';'");
     }
-    get_token();
     lbl = new_label();
     CODE_for_statement_test(lbl);
     if (expressions()) {
@@ -325,17 +277,15 @@ int for_statement (void) {
         CODE_for_statement_evaluate(lbl);
     }
     CODE_for_statement_jp_to_base(lbl);
-    if (token != T_SEMICOLON) {
+    if (!lex_get(T_SEMICOLON, NULL)) {
         grammar_error("expected ';'");
     }
-    get_token();
     CODE_for_statement_action(lbl);
     expressions();
     CODE_for_statement_jp_to_test(lbl);
-    if (token != T_RIGHT_PARENTH) {
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
     }
-    get_token();
     CODE_for_statement_base(lbl);
     if (!statement()) {
         grammar_error("expected statement");
@@ -349,8 +299,7 @@ int expression_statement (void) {
     int expr;
 
     expr = expressions();
-    if (token == T_SEMICOLON) {
-        get_token();
+    if (lex_get(T_SEMICOLON, NULL)) {
         return 1;
     }
     if (expr) {
@@ -364,8 +313,7 @@ int expressions (void) {
     if (!expression()) {
         return 0;
     }
-    if (token == T_COMMA) {
-        get_token();
+    if (lex_get(T_COMMA, NULL)) {
         if (!expressions()) {
             grammar_error("expected expression after ','");
         }
@@ -592,19 +540,17 @@ void do_operations (int op_type) {
 
 int ternary_cond (void) {
     int lbl;
-    if (token != T_QUESTIONMARK) {
+    if (!lex_get(T_QUESTIONMARK, NULL)) {
         return 0;
     }
-    get_token();
     lbl = new_label();
     CODE_ternary_cond_test(lbl);
     if (!expressions()) {   /* multiple expressions within ?: */
         grammar_error("expexcted expression");
     }
-    if (token != T_COLON) {
+    if (!lex_get(T_COLON, NULL)) {
         grammar_error("expexcted ':'");
     }
-    get_token();
     CODE_ternary_cond_mid(lbl);
     if (!expression()) {    /* only one expression after : */
         grammar_error("expexcted expression");
@@ -615,17 +561,15 @@ int ternary_cond (void) {
 
 
 int parentheses (void) {
-    if (token != T_LEFT_PARENTH) {
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
         return 0;
     }
-    get_token();
     if (!expressions()) {   /* multiple expressions within () */
         grammar_error("expected expression after '('");
     }
-    if (token != T_RIGHT_PARENTH) {
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
     }
-    get_token();
     return 1;
 }
 
@@ -647,10 +591,9 @@ int prefixop(void) {
 
 
 int logical_neg (void) {
-    if (token != T_NEG) { /* '!' Logical Not */
+    if (!lex_get(T_NEG, NULL)) {
         return 0;
     }
-    get_token();
     if (!primary_expression()) {
         grammar_error("expected primary expression after '!'");
     }
@@ -659,10 +602,9 @@ int logical_neg (void) {
 }
 
 int bitwise_neg (void) {
-    if (token != T_BWNEG) { /* '~' Bitwise Not */
+    if (!lex_get(T_BWNEG, NULL)) {
         return 0;
     }
-    get_token();
     if (!primary_expression()) {
         grammar_error("expected primary expression after '~'");
     }
@@ -672,10 +614,9 @@ int bitwise_neg (void) {
 
 
 int dereference (void) {
-    if (token != T_MUL) { /* Dereference */
+    if (!lex_get(T_MUL, NULL)) {
         return 0;
     }
-    get_token();
     if (!primary_expression()) {
         grammar_error("expected primary expression after '*'");
     }
@@ -690,10 +631,9 @@ int addressof (void) {
     char* id;
     var_p var;
 
-    if (token != T_BWAND) { /* addressof operator */
+    if (!lex_get(T_BWAND, NULL)) {
         return 0;
     }
-    get_token();
 
     if (token != T_IDENTIFIER) {
         grammar_error("expected identifier after '&'");
@@ -735,15 +675,10 @@ int identifier_expression (void) {
     if (token != T_IDENTIFIER) {
         return 0;
     }
-
-    if (!strcmp(lexeme, "asm")) {
-        get_token();
-        return asm_expression();
-    }
-
     id = strdup(lexeme);
     get_token();
-    if (fn_call(id)) {
+
+    if(function_expression(id)) {
         free(id);
         return 1;
     }
@@ -765,8 +700,7 @@ int identifier_expression (void) {
 
 int assignment (void) {
     /* Addr of location in acc */
-    if (token == T_ASSIGN) {
-        get_token();
+    if (lex_get(T_ASSIGN, NULL)) {
         CODE_push();
         inc_var_pos(&(lcl_vars));
 
@@ -817,11 +751,46 @@ int recursive_assignment (void) {
 }
 
 
-int asm_expression (void) {
-    if (token != T_LEFT_PARENTH) {
+int function_expression (char* identifier) {
+    if (asm_expression(identifier)) {
+        return 1;
+    }
+    if (sizeof_expression(identifier)) {
+        return 1;
+    }
+    if (fn_call(identifier)) {
+        return 1;
+    }
+    return 0;
+}
+
+
+int sizeof_expression (char* identifier) {
+    if (strcmp(identifier, "sizeof")) {
+        return 0;
+    }
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
         grammar_error("expected '('");
     }
-    get_token();
+
+    if (!expression()) {
+        grammar_error("expected expression");
+    }
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
+        grammar_error("expected ')'");
+    }
+    grammar_error("'sizeof' unimplemented");
+    return 1;
+}
+
+
+int asm_expression (char* identifier) {
+    if (strcmp(identifier, "asm")) {
+        return 0;
+    }
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
+        grammar_error("expected '('");
+    }
 
     do {
         if (token != T_STRING) {
@@ -831,25 +800,22 @@ int asm_expression (void) {
         CODE_asm_statement(lexeme);
         get_token();
     } while (token == T_STRING);
-    if (token != T_RIGHT_PARENTH) {
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
     }
-    get_token();
     return 1;
 }
 
 
 int fn_call (char* identifier) {
     int i;
-    if (token != T_LEFT_PARENTH) {
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
         return 0;
     }
-    get_token();
     i = fn_call_args();
-    if (token != T_RIGHT_PARENTH) {
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         grammar_error("expected ')'");
     }
-    get_token();
     CODE_fn_call(new_label(), identifier);
     CODE_stack_restore(i);
     while(i--) {
@@ -867,9 +833,8 @@ int fn_call_args (void) {
     if (args) {
         CODE_fn_call_args();
         inc_var_pos(&(lcl_vars));
-        if (token == T_COMMA) {
+        if (lex_get(T_COMMA, NULL)) {
             int more_args;
-            get_token();
             more_args = fn_call_args();
             if (!more_args) {
                 grammar_error("expected expression after ','");

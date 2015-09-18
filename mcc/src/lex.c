@@ -321,6 +321,20 @@ void lex_init (void) {
 }
 
 
+int lex_get(int token_type, const char* str) {
+    if (token_type != token) {
+        return 0;
+    }
+    if (str) {
+        if (strcmp(str, lexeme)) {
+            return 0;
+        }
+    }
+    get_token();
+    return 1;
+}
+
+
 void str_process(void) {
     int tp;
     int bp;
