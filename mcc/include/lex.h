@@ -73,7 +73,7 @@ extern char     lexeme[];
 extern int      token;
 
 void lex_init (void);
-void get_token (void);
+void next_token (void);
 int lex_get(int token_type, const char* str);
 void str_process (void);
 

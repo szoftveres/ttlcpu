@@ -294,7 +294,7 @@ int lex (char c) {
 
 /**
 */
-void get_token (void) {
+void next_token (void) {
     int c;
 
     token = T_NONE;
@@ -317,7 +317,7 @@ void get_token (void) {
 
 void lex_init (void) {
     last_char = EOF;
-    get_token();
+    next_token();
 }
 
 
@@ -330,7 +330,7 @@ int lex_get(int token_type, const char* str) {
             return 0;
         }
     }
-    get_token();
+    next_token();
     return 1;
 }
 
