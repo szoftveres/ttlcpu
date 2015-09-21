@@ -17,9 +17,13 @@
 #define STACK_ACC       0xfd
 #undef STACK_TEMP
 #define STACK_TEMP      0xfc
-#undef SP_BASE
-#define SP_BASE         0xfb
+#undef PREVKEY
+#define PREVKEY         0xfb
 
+#undef SP_BASE
+#define SP_BASE         0xfa
+
+/*-------------------------------------------------------*/
 
 #undef stackinit
 #define stackinit()                 \
@@ -496,6 +500,252 @@ lbl("bwand_done")
     mov(to_acc, frm_ram)
     inc_sp(6)
     ret()
+
+/*-------------------------------------------------------*/
+
+/* Display And Scan */
+
+/*
+
+das2 () {
+    var col;
+    var inp;
+    var row;
+    var scan;
+
+    do {
+        col = 0;
+        scan = 255;
+        do {
+            col;
+            asm("    mov(to_pch, frm_acc)\n");
+
+
+            *col;
+            asm("    out(frm_acc)\n");
+
+            if (col, asm("    add(literal) lit(-8) // != 8\n")) { // col != 8
+                inp = (asm("    in(to_acc)\n"));
+                asm("jz(\"das2_nokey_atall\")"); // found
+                asm("    out(literal) lit(0)  // blank \n");
+
+                row = 0;
+                while (row, asm("add(literal) lit(-8) // != 8\n")) {
+                    inp;
+                    asm("inv(frm_acc)"); // ez nem kell ha 74HC541
+                    asm("add(literal) lit(128)");
+                    asm("inv(frm_acc)");
+                    asm("jz(\"das2_key\")"); // found
+                    asm("jp(\"das2_nokey\")");
+                    asm("lbl(\"das2_key\")");
+                    scan = (col , asm("rol() rol() rol()")) + row;
+                    row = 7;
+                    col = 7;
+                    asm("lbl(\"das2_nokey\")");
+                    inp = (inp, asm("   rol()\n"));
+                    row = (row, asm("   inc()\n"));
+                }
+                asm("lbl(\"das2_nokey_atall\")");
+            }
+            col = (col, asm("inc()"));
+        } while (col, asm("    add(literal) lit(-9) // != 9\n")); // col != 9
+        if (scan, asm("    add(literal) lit(1) // != 255\n")) { } else {
+            *(16) = scan;     // release, 255 mindenhol
+        }
+    } while (scan == (*(16)));
+    *(16) = scan;
+}
+*/
+
+
+
+lbl("das")
+    dec_sp(4)
+lbl("das_do_1_base")
+
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(0)
+
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(255)
+
+lbl("das_do_2_base")
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_pch, frm_ram)
+
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_ramaddr, frm_acc)
+    out(frm_ram)
+
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    add(literal) lit(-8) // != 8
+    jz("das_if_continue_1")
+
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    mov(to_ramaddr, frm_acc)
+    in(to_acc)
+    mov(to_ram, frm_acc)
+
+jz("das_nokey_atall")    
+    out(literal) lit(0)  // blank 
+
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(0)
+
+lbl("das_while_1_test")
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    add(literal) lit(-8) // != 8
+    jz("das_while_1_end")
+
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    mov(to_ramaddr, frm_acc)
+    inv(frm_ram)
+    add(literal) lit(128)
+    inv(frm_acc)
+
+    jz("das_key")
+    jp("das_nokey")
+lbl("das_key")
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(4+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    rol()
+    rol()
+    rol()
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)                // store 2nd operand
+    pop(to_acc)                      // 1st operand pop
+    mov(to_ramaddr, literal) lit(BX)  // addition
+    add(frm_ram)
+    pop(to_ramaddr)
+    mov(to_ram, frm_acc)
+
+
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(7)
+
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(7)
+
+
+lbl("das_nokey")
+
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    rol()
+    pop(to_ramaddr)
+    mov(to_ram, frm_acc)
+
+    ld(to_acc, SP)
+    add(literal) lit(1+1)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(2+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    inc()
+    pop(to_ramaddr)
+    mov(to_ram, frm_acc)
+
+    jp("das_while_1_test")
+
+lbl("das_while_1_end")
+lbl("das_nokey_atall")
+lbl("das_if_continue_1")
+
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    push(frm_acc)                  // 1st operand push
+    ld(to_acc, SP)
+    add(literal) lit(4+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    inc()
+    pop(to_ramaddr)
+    mov(to_ram, frm_acc)
+
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    add(literal) lit(-9) // != 9
+
+    jz("das_do_2_end")
+    jp("das_do_2_base")
+lbl("das_do_2_end")
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    add(literal) lit(1) // != 255
+    jz("das_if_continue_2")
+    jp("das_endif_2")
+lbl("das_if_continue_2")
+    
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_ramaddr, literal) lit(PREVKEY)
+    mov(to_ram, frm_acc)
+
+lbl("das_endif_2")
+
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    inv(frm_ram)             // 1st cmpl
+    inc()                        // 2nd cmpl      
+    mov(to_ramaddr, literal) lit(PREVKEY)      // const
+    add(frm_ram)
+
+    jz("das_do_1_base")
+    
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_ramaddr, literal) lit(PREVKEY)
+    mov(to_ram, frm_acc)
+    inc_sp(4)
+    ret()
+
 
 /*-------------------------------------------------------*/
 
