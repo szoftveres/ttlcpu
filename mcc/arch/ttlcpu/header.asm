@@ -538,7 +538,7 @@ das2 () {
                     asm("jz(\"das2_key\")"); // found
                     asm("jp(\"das2_nokey\")");
                     asm("lbl(\"das2_key\")");
-                    scan = (col , asm("rol() rol() rol()")) + row;
+                    scan = (col , asm("shl() shl() shl()")) + row;
                     row = 7;
                     col = 7;
                     asm("lbl(\"das2_nokey\")");
@@ -632,9 +632,9 @@ lbl("das_key")
     add(literal) lit(4+1)
     mov(to_ramaddr, frm_acc)
     mov(to_acc, frm_ram)
-    rol()
-    rol()
-    rol()
+    shl()
+    shl()
+    shl()
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(3+1)
