@@ -77,7 +77,7 @@ put_byte (unsigned char b) {
     int i;
 
     for (i = 0; i != 8; i++) {
-        if (b & 0x01) {
+        if (b & 1) {
             BIT_ONE();
         } else {
             BIT_ZERO();
@@ -94,14 +94,14 @@ main (int argc, char** argv) {
     STAT_ZERO();
     STAT_ONE();
 
-    for (i = 0; i != 600; i++) {
+    for (i = 0; i != (2 * BAUD_RATE); i++) {
         BIT_ONE();              /* 2 sec lead-in */
     }
     for (i = 0; i != (sizeof(data)/sizeof(data[0])); i++) {
-        if (!(i%256)) {
+        if (!(i % 256)) {       /* Page verify break */
             int k;
-            for (k = 0; k != 75; k++) {
-                BIT_ONE();      /* 0.25 sec verify */
+            for (k = 0; k != (BAUD_RATE / 4); k++) {
+                BIT_ONE();
             }
         }
 
@@ -109,7 +109,7 @@ main (int argc, char** argv) {
         put_byte(data[i]);
         BIT_ONE();              /* Stop bit */
     }
-    for (i = 0; i != 600; i++) {
+    for (i = 0; i != (2 * BAUD_RATE); i++) {
         BIT_ONE();              /* 2 sec lead-out */
     }
 }
