@@ -5,23 +5,25 @@
     
     The toolchain contains:
     
-     -  'mcc' A compiler which resembles to 'C' and implements
-        a subset of the 'C' programming language
-    
+     -  'mcc' A compiler which resembles to the 'C' programming language
+        and implements a subset of it.
      -  'am' A very basic assembler implemented by using the
         capabilities of the gnu-gcc preprocessor
-    
      -  'burner' Program that transfers assembled bytecode to
         the 'ttl-cpu' from a special programmer hardware based
-        on the ATmega8 mcu
+        on the ATmega8 AVR mcu
 
+    The main ttl-cpu program is in 'prog.c' file. It can be built and
+    transferred to ttl-cpu by running the './b' shell script
 
-    To build a program, first edit 'prog.c' then run './b' shell script
-
-    When you invoke './b' shell script:
-     - It builds 'mcc' for 'ttl-cpu' architecture
-     - Copies '/mcc/arch/ttlcpu/template.asm' to am/prog.asm
-     - 'mcc' compiles 'prog.c' and extends am/prog.asm with the program output
-     - 'am' takes 'am/prog.asm' and generates the bytecode
-     - 'burner' takes bytecode and AVRDude burns it into the programmer
+    The './b' shell script:
+     - builds the 'mcc' compiler for 'ttl-cpu' architecture
+     - copies '/mcc/arch/ttlcpu/header.asm' to am/prog.asm
+     - invokes 'mcc' to compile 'prog.c', and extends am/prog.asm with the
+       assembly program output
+     - extends am/prog.asm with '/mcc/arch/ttlcpu/footer.asm'
+     - 'am' takes 'am/prog.asm', compiles it and generates the ttl-cpu bytecode
+     - 'burner' takes the bytecode and AVRDude burns it into the AVR programmer
+     - the AVR programmer writes the bytecode to the program memory of
+       the ttl-cpu
 

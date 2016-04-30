@@ -16,7 +16,7 @@ void grammar_error (char* s) {
 int program (void) {
     func_definitions();
     if (token != T_EOF) {
-        grammar_error("expected function declaration");
+        grammar_error("expected function definition");
     }
     exit(0);
 }
