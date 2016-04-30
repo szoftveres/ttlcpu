@@ -120,7 +120,7 @@ static int defaddr (char* n, int high) {
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
         fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
     }
-    fprintf(stderr, "       %s(%s)\n",
+    fprintf(stderr, "       db   %s(%s)\n",
             (high ? "high" : "low"),
             lbl->name);
     progcnt += 1;
@@ -138,7 +138,7 @@ static int dataconst (unsigned int v, int shift) {
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
         fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
     }
-    fprintf(stderr, "       db(0x%02x)\n", ic); 
+    fprintf(stderr, "       db   0x%02x\n", ic); 
     progcnt += 1;
     return;
 }
