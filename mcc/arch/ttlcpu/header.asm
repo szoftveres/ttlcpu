@@ -747,6 +747,84 @@ lbl("das_endif_2")
     ret()
 
 
+
+
+
+/*
+
+disp (var c) {
+    var g;
+    while (c) {
+        g = 0;
+        do {
+            g;
+            asm("    mov(to_pch, frm_acc)\n");
+            *g;
+            asm("    out(frm_acc)\n");
+            g += 1;
+        } while (g, asm("add(literal) lit(-9) // != 9\n")); // g != 9
+        c = (c, asm("add(literal) lit(255)"));
+    }
+}
+
+
+*/
+
+
+
+lbl("disp")
+    dec_sp(1)
+
+lbl("disp_while_test")
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    jz("disp_while_end")
+
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_ram, literal) lit(0)
+
+lbl("disp_do_base")
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_pch, frm_ram)
+
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_ramaddr, frm_acc)
+    out(frm_ram)
+
+    // += 1
+    ld(to_acc, SP)
+    add(literal) lit(0+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    add(literal) lit(1)
+    mov(to_ram, frm_acc)
+
+     // != 9
+    add(literal) lit(-9)
+    jz("disp_do_end")
+    jp("disp_do_base")
+lbl("disp_do_end")
+    ld(to_acc, SP)
+    add(literal) lit(3+1)
+    mov(to_ramaddr, frm_acc)
+    mov(to_acc, frm_ram)
+    add(literal) lit(255)  // -1
+    mov(to_ram, frm_acc)
+
+    jp("disp_while_test")
+lbl("disp_while_end")
+    inc_sp(1)
+    ret()
+
 /*-------------------------------------------------------*/
 
 
