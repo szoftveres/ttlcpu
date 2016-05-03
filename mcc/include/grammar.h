@@ -72,4 +72,9 @@ int fn_call_args (void);
 int binary_operation(int precedence);
 
 void do_operations (int op_type);
+
+int object (void);
+int object_parentheses (void);
+int object_identifier (void);
+
 #endif
