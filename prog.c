@@ -4,10 +4,8 @@
  */
 
 
-
 #define NUM_TEN     10
 /* You can use gnu-gcc preprocessor directives */
-
 
 
 /*
@@ -20,9 +18,17 @@ add (var b1, var b2) {
      * of the last expressions is returned.
      */
     b1 + b2;
-    /*This function returns the value of b1 + b2 */
+    /* This function returns the value of b1 + b2 */
 }
 
+/*
+ * Function arguments are passed via the (emulated) stack, the
+ * accumulator contains the return value (which is the result of
+ * the last expression).
+ *
+ * For stack emulation implementation details,
+ * see mcc/arch/ttlcpu/header.asm
+ */
 
 invert_out (var f) {
     out(~f);
@@ -34,7 +40,7 @@ invert_out (var f) {
 
 /* The main function, program execution starts here */
 main () {
-    /* Variable declarations first */
+    /* Variable declarations at the beginning of each block */
     var i;
 
     /*
