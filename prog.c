@@ -30,6 +30,26 @@ add (var b1, var b2) {
  * see mcc/arch/ttlcpu/header.asm
  */
 
+
+/*
+ * In-line assembly for faster execution
+ */
+dec (var a) {
+    /*
+     * Expressions which are separated with commas, are being evaluated
+     * sequentially after each other.
+     * The first expression (a) does nothing but loads the
+     * value of 'a' into the accumulator register. In order
+     * to decrement its value, there's no need to have the CPU
+     * form the 2nd complement of '1' and add the two numbers
+     * together; instead, we can do it with one assembly instruction,
+     * the accumulator will contain the return value.
+     * Code execution speed can be significantly boosted with these tricks.
+     */    
+    (a, asm("add(literal) lit(255)"));
+}
+
+
 invert_out (var f) {
     out(~f);
     /*
