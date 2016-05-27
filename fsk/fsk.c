@@ -50,9 +50,10 @@ baud_stat (int smp_rate, int baud, int cycle) {
     num_smp = ((((smp_rate * 10) / freq) + 5) / 10);
     achieved_baud = (((smp_rate * 10) / (num_smp) / cycle) + 5 ) / 10;
 
-    fprintf(stderr, "Statistics:\n  desired_baud:%u\n  smp_rate:%uHz\n  "
+    fprintf(stderr, "Statistics:\n  %d-bit signed PCM\n  desired_baud:%u\n  smp_rate:%uHz\n  "
             "freq:%uHz\n  cycle:%u\n  num_smp:%u\n  achieved_baud:%u\n  "
             "deviation:%d\%\n\n\n",
+            (sizeof(data[0]) * 8),
             baud,
             smp_rate,
             freq,

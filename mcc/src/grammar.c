@@ -34,6 +34,7 @@ int func_definitions (void) {
 int func_definition (void) {
     int i;
     int j;
+
     if (token != T_IDENTIFIER) {
         return 0;
     }
@@ -173,6 +174,7 @@ int keyword (void) {
 
 int if_statement (void) {
     int lbl;
+
     if (!lex_get(T_IDENTIFIER, "if")) {
         return 0;
     }
@@ -205,6 +207,7 @@ int if_statement (void) {
 
 int while_statement (void) {
     int lbl;
+
     if (!lex_get(T_IDENTIFIER, "while")) {
         return 0;
     }
@@ -230,6 +233,7 @@ int while_statement (void) {
 
 int do_statement (void) {
     int lbl;
+
     if (!lex_get(T_IDENTIFIER, "do")) {
         return 0;
     }
@@ -260,6 +264,7 @@ int do_statement (void) {
 
 int for_statement (void) {
     int lbl;
+
     if (!lex_get(T_IDENTIFIER, "for")) {
         return 0;
     }
@@ -323,7 +328,6 @@ int expressions (void) {
 
 
 int expression (void) {
-
     if (primary_expression()) {
         binary_operation(0);
         ternary_cond();
@@ -334,7 +338,6 @@ int expression (void) {
 
 
 int primary_expression (void) {
-
     if (parentheses()) {
         return 1;
     }
@@ -540,6 +543,7 @@ void do_operations (int op_type) {
 
 int ternary_cond (void) {
     int lbl;
+
     if (!lex_get(T_QUESTIONMARK, NULL)) {
         return 0;
     }
@@ -552,7 +556,7 @@ int ternary_cond (void) {
         grammar_error("expexcted ':'");
     }
     CODE_ternary_cond_mid(lbl);
-    if (!expression()) {    /* only one expression after : */
+    if (!expression()) {    /* one expressions after : */
         grammar_error("expexcted expression");
     }
     CODE_ternary_cond_end(lbl);
@@ -634,13 +638,11 @@ int addressof (void) {
     if (!lex_get(T_BWAND, NULL)) {
         return 0;
     }
-
     if (token != T_IDENTIFIER) {
         grammar_error("expected identifier after '&'");
     }
     id = strdup(lexeme);
     lex_consume();
-
     var = find_var(&(lcl_vars), id);
     if (!var) {
         fprintf(stderr, "error : '%s' not defined in this scope\n", id);
@@ -653,7 +655,6 @@ int addressof (void) {
 
 
 int const_expression (void) {
-
     if (token == T_STRING) {
         CODE_const_expression_str(new_label(), lexeme);
         lex_consume();
@@ -677,8 +678,7 @@ int identifier_expression (void) {
     }
     id = strdup(lexeme);
     lex_consume();
-
-    if(function_expression(id)) {
+    if (function_expression(id)) {
         free(id);
         return 1;
     }
@@ -687,9 +687,7 @@ int identifier_expression (void) {
         fprintf(stderr, "error : '%s' not defined in this scope\n", id);
         exit(1);
     }
-
     CODE_load_eff_addr(var->pos);
-
     if (!assignment()) {
         CODE_dereference();
     }
@@ -703,7 +701,6 @@ int assignment (void) {
     if (lex_get(T_ASSIGN, NULL)) {
         CODE_push();
         inc_var_pos(&(lcl_vars));
-
         if (!expression()) {
             grammar_error("expected expression after '='");
         }
@@ -791,7 +788,6 @@ int asm_expression (char* identifier) {
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         grammar_error("expected '('");
     }
-
     do {
         if (token != T_STRING) {
             grammar_error("expected string");
@@ -809,6 +805,7 @@ int asm_expression (char* identifier) {
 
 int fn_call (char* identifier) {
     int i;
+
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         return 0;
     }
@@ -818,10 +815,9 @@ int fn_call (char* identifier) {
     }
     CODE_fn_call(new_label(), identifier);
     CODE_stack_restore(i);
-    while(i--) {
+    while (i--) {
         dec_var_pos(&(lcl_vars));
     }
-
     return 1;
 }
 
@@ -845,5 +841,52 @@ int fn_call_args (void) {
     return args;
 }
 
+
+/* ================================= */
+
+
+int object (void) {
+    if (object_parentheses()) {
+        return 1;
+    }
+    if (object_identifier()) {
+        return 1;
+    }
+    return 0;  
+}
+
+
+int object_parentheses (void) {
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
+        return 0;
+    }
+    if (!object()) {   /* multiple expressions within () */
+        grammar_error("expected expression after '('");
+    }
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
+        grammar_error("expected ')'");
+    }
+    return 1;
+}
+
+
+int object_identifier (void) {
+    char* id;
+    var_p var;
+
+    if (token != T_IDENTIFIER) {
+        return 0;
+    }
+    id = strdup(lexeme);
+    lex_consume();
+    var = find_var(&(lcl_vars), id);
+    if (!var) {
+        fprintf(stderr, "error : '%s' not defined in this scope\n", id);
+        exit(1);
+    }
+    CODE_load_eff_addr(var->pos);
+    free(id);
+    return 1;
+}
 
 

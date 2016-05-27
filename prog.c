@@ -4,10 +4,8 @@
  */
 
 
-
 #define NUM_TEN     10
 /* You can use gnu-gcc preprocessor directives */
-
 
 
 /*
@@ -20,7 +18,35 @@ add (var b1, var b2) {
      * of the last expressions is returned.
      */
     b1 + b2;
-    /*This function returns the value of b1 + b2 */
+    /* This function returns the value of b1 + b2 */
+}
+
+/*
+ * Function arguments are passed via the (emulated) stack, the
+ * accumulator contains the return value (which is the result of
+ * the last expression).
+ *
+ * For stack emulation implementation details,
+ * see mcc/arch/ttlcpu/header.asm
+ */
+
+
+/*
+ * In-line assembly for faster execution
+ */
+dec (var a) {
+    /*
+     * Expressions which are separated with commas, are being evaluated
+     * sequentially after each other.
+     * The first expression (a) does nothing but loads the
+     * value of 'a' into the accumulator register. In order
+     * to decrement its value, there's no need to have the CPU
+     * form the 2nd complement of '1' and add the two numbers
+     * together; instead, we can do it with one assembly instruction,
+     * the accumulator will contain the return value.
+     * Code execution speed can be significantly boosted with these tricks.
+     */    
+    (a, asm("add(literal) lit(255)"));
 }
 
 
@@ -34,7 +60,7 @@ invert_out (var f) {
 
 /* The main function, program execution starts here */
 main () {
-    /* Variable declarations first */
+    /* Variable declarations at the beginning of each block */
     var i;
 
     /*
