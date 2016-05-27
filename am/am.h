@@ -33,10 +33,10 @@
 #define jp(a) mov(to_pch, literal) defh(a) mov(to_pc, literal) defl(a)
 #define jz(a) movz(to_pch, literal) defh(a) movz(to_pc, literal) defl(a)
 
-#define st(a, s) mov(to_ramaddr, literal) lit(a) mov(to_ram, (s))
-#define stz(a, s) movz(to_ramaddr, literal) lit(a) movz(to_ram, (s))
-#define ld(d, a) mov(to_ramaddr, literal) lit((a)) mov((d), frm_ram)
-#define ldz(d, a) movz(to_ramaddr, literal) lit((a)) movz((d), frm_ram)
+#define st(a, s) mov(to_mar, literal) lit(a) mov(to_ram, (s))
+#define stz(a, s) movz(to_mar, literal) lit(a) movz(to_ram, (s))
+#define ld(d, a) mov(to_mar, literal) lit((a)) mov((d), frm_ram)
+#define ldz(d, a) movz(to_mar, literal) lit((a)) movz((d), frm_ram)
 
 /* = Code organization = */
 

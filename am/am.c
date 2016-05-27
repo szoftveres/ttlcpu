@@ -9,7 +9,7 @@
 #define to_acc_invert   (0b100)
 #define to_acc_adder    (0b010)
 #define to_port         (0b110)
-#define to_ramaddr      (0b001)
+#define to_mar          (0b001)
 #define to_ram          (0b101)
 #define to_pc           (0b011)
 #define to_pch          (0b111)
@@ -77,7 +77,7 @@ static void instruction (int d, int s, char* m) {
       case to_acc_invert : de = "acc_invert"; break;
       case to_acc_adder : de = "acc_adder"; break;
       case to_port : de = "port"; break;
-      case to_ramaddr : de = "ramaddr"; break;
+      case to_mar : de = "ramaddr"; break;
       case to_ram : de = "ram"; break;
       case to_pc : de = "pc"; break;
       case to_pch : de = "pch_latch"; break;

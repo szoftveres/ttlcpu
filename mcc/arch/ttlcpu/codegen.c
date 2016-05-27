@@ -171,7 +171,7 @@ void CODE_do_operation_mod (void) {
 
 void CODE_do_operation_add (void) {
     CODE_operand_pop();
-    fprintf(stdout, "    mov(to_ramaddr, literal) lit(BX)  // addition\n");
+    fprintf(stdout, "    mov(to_mar, literal) lit(BX)  // addition\n");
     fprintf(stdout, "    add(frm_ram)\n");
 }
 
@@ -179,7 +179,7 @@ void CODE_do_operation_sub (void) {
     fprintf(stdout, "    inv(frm_acc)             // 1st cmpl\n");
     fprintf(stdout, "    inc()                        // 2nd cmpl      \n");
     CODE_operand_pop();
-    fprintf(stdout, "    mov(to_ramaddr, literal) lit(BX)\n");
+    fprintf(stdout, "    mov(to_mar, literal) lit(BX)\n");
     fprintf(stdout, "    add(frm_ram)\n");
 }
 
@@ -275,12 +275,12 @@ void CODE_ternary_cond_end (int lbl) {
 
 
 void CODE_pop_addr_and_store (void) {
-    fprintf(stdout, "    pop(to_ramaddr)\n");
+    fprintf(stdout, "    pop(to_mar)\n");
     fprintf(stdout, "    mov(to_ram, frm_acc)\n");
 }
 
 void CODE_dereference (void) {
-    fprintf(stdout, "    mov(to_ramaddr, frm_acc)\n");
+    fprintf(stdout, "    mov(to_mar, frm_acc)\n");
     fprintf(stdout, "    mov(to_acc, frm_ram)\n");
 }
 

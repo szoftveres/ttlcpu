@@ -4,7 +4,7 @@
 lbl("hex2sym")
     ld(to_acc, SP)
     add(literal) lit(2+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     shl()

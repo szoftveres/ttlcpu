@@ -32,10 +32,10 @@
 #undef call
 #define call(l, u)                  \
     ld(to_acc, SP)                  \
-    mov(to_ramaddr, frm_acc)        \
+    mov(to_mar, frm_acc)            \
     mov(to_ram, literal) defh(u)    \
     dec()                           \
-    mov(to_ramaddr, frm_acc)        \
+    mov(to_mar, frm_acc)            \
     mov(to_ram, literal) defl(u)    \
     dec()                           \
     st(SP, frm_acc)                 \
@@ -48,10 +48,10 @@ lbl(u)
     ld(to_acc, SP)                  \
     add(literal) lit(2)             \
     st(SP, frm_acc)                 \
-    mov(to_ramaddr, frm_acc)        \
+    mov(to_mar, frm_acc)            \
     mov(to_pch, frm_ram)            \
     dec()                           \
-    mov(to_ramaddr, frm_acc)        \
+    mov(to_mar, frm_acc)            \
     mov(to_acc, frm_ram)            \
     st(STACK_TEMP, frm_acc)         \
     ld(to_acc, STACK_ACC)           \
@@ -65,7 +65,7 @@ lbl(u)
     dec()                           \
     st(SP, frm_acc)                 \
     ld(to_acc, STACK_ACC)           \
-    ld(to_ramaddr, STACK_TEMP)      \
+    ld(to_mar, STACK_TEMP)          \
     mov(to_ram, (s))
 
 #undef pop
@@ -79,7 +79,7 @@ lbl(u)
     if ((d) != to_acc) {            \
         ld(to_acc, STACK_ACC)       \
     }                               \
-    ld(to_ramaddr, SP)              \
+    ld(to_mar, SP)                  \
     mov((d), frm_ram)
 
 #undef dec_sp
@@ -115,7 +115,7 @@ lbl("haltcpu")
 lbl("out")
     ld(to_acc, SP)    //mov ebp, esp
     add(literal) lit(3)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     out(frm_ram)
     ret()
 
@@ -141,7 +141,7 @@ lbl("bit")
     dec_sp(1)       // var decl space
     ld(to_acc, SP)          // local var value
     add(literal) lit(5)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     inv(frm_ram)               // 1st compliment
     add(literal) lit(8)       // 2nd compliment
     push(frm_acc)    // var = acc
@@ -149,22 +149,22 @@ lbl("bit")
     add(literal) lit(1+1)
     st(BX, frm_acc)
     pop(to_acc)
-    mov(to_ramaddr, literal) lit(BX)
-    mov(to_ramaddr, frm_ram)
+    mov(to_mar, literal) lit(BX)
+    mov(to_mar, frm_ram)
     mov(to_ram, frm_acc)
 lbl("bit_01_restart")      // teszt
     jz("bit_01_end")
 lbl("bit_01_continue")       // ciklustorzs
     ld(to_acc, SP)          // local var value
     add(literal) lit(4)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     mov(to_ram, frm_acc)
 lbl("bit_01_action")       // ciklusvaltozo noveles
     ld(to_acc, SP)          // local var value
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     dec()
     mov(to_ram, frm_acc)
@@ -172,35 +172,35 @@ lbl("bit_01_action")       // ciklusvaltozo noveles
 lbl("bit_01_end")
     ld(to_acc, SP)          // local var value
     add(literal) lit(4)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     rol()
     mov(to_ram, frm_acc)
     ld(to_acc, SP)          // local var value
     add(literal) lit(5)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     push(frm_acc)    // var = acc
     ld(to_acc, SP)
     add(literal) lit(1+1)
     st(BX, frm_acc)
     pop(to_acc)
-    mov(to_ramaddr, literal) lit(BX)
-    mov(to_ramaddr, frm_ram)
+    mov(to_mar, literal) lit(BX)
+    mov(to_mar, frm_ram)
     mov(to_ram, frm_acc)
 lbl("bit_02_restart")
     jz("bit_02_end")
 lbl("bit_02_continue")
     ld(to_acc, SP)          // local var value
     add(literal) lit(4)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     mov(to_ram, frm_acc)
 lbl("bit_02_action")
     ld(to_acc, SP)          // local var value
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     dec()
     mov(to_ram, frm_acc)
@@ -208,7 +208,7 @@ lbl("bit_02_action")
 lbl("bit_02_end")
     ld(to_acc, SP)          // local var value
     add(literal) lit(4)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     inc_sp(1)      // var decl restore
     ret()
@@ -294,17 +294,17 @@ lbl("bwand")
 // ret_add = 1;
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(1)
 
 // ret = 0;
     inc()
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(0)
 
 // cc = 0;
     inc()
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(0)
 
     mov(to_acc, frm_ram)
@@ -317,35 +317,35 @@ lbl("bwand_rst_1")
 // a_lcl = a;
     ld(to_acc, SP)
     add(literal) lit(9+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(6+1)
     st(BX, frm_acc)                // store 2nd operand
     pop(to_acc)                      // 1st operand pop
-    mov(to_ramaddr, literal) lit(BX)
-    mov(to_ramaddr, frm_ram)
+    mov(to_mar, literal) lit(BX)
+    mov(to_mar, frm_ram)
     mov(to_ram, frm_acc)
 
 // b_lcl = b;
     ld(to_acc, SP)
     add(literal) lit(8+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(5+1)
     st(BX, frm_acc)                // store 2nd operand
     pop(to_acc)                      // 1st operand pop
-    mov(to_ramaddr, literal) lit(BX)
-    mov(to_ramaddr, frm_ram)
+    mov(to_mar, literal) lit(BX)
+    mov(to_mar, frm_ram)
     mov(to_ram, frm_acc)
 
 // i = 7-cc;
     ld(to_acc, SP)
     add(literal) lit(2+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc_invert, frm_ram)
     inc()                        // 2nd cmpl      
     add(literal) lit(7)
@@ -354,8 +354,8 @@ lbl("bwand_rst_1")
     add(literal) lit(4+1)
     st(BX, frm_acc)                // store 2nd operand
     pop(to_acc)                      // 1st operand pop
-    mov(to_ramaddr, literal) lit(BX)
-    mov(to_ramaddr, frm_ram)
+    mov(to_mar, literal) lit(BX)
+    mov(to_mar, frm_ram)
     mov(to_ram, frm_acc)
 
 // while (i) {
@@ -364,21 +364,21 @@ lbl("bwand_sl1_test")
 
     ld(to_acc, SP)
     add(literal) lit(5+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     mov(to_ram, frm_acc)
 
     ld(to_acc, SP)
     add(literal) lit(4+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     mov(to_ram, frm_acc)
 
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     dec()
     mov(to_ram, frm_acc)
@@ -388,14 +388,14 @@ lbl("bwand_sl1_end")
 
     ld(to_acc, SP)
     add(literal) lit(5+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     rol()
     mov(to_ram, frm_acc)
 
     ld(to_acc, SP)
     add(literal) lit(4+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     rol()
     mov(to_ram, frm_acc)
@@ -403,15 +403,15 @@ lbl("bwand_sl1_end")
 // i = cc;
     ld(to_acc, SP)
     add(literal) lit(2+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(4+1)
     st(BX, frm_acc)                // store 2nd operand
     pop(to_acc)                      // 1st operand pop
-    mov(to_ramaddr, literal) lit(BX)
-    mov(to_ramaddr, frm_ram)
+    mov(to_mar, literal) lit(BX)
+    mov(to_mar, frm_ram)
     mov(to_ram, frm_acc)
 
 // while (i) {
@@ -420,21 +420,21 @@ lbl("bwand_sl2_test")
 
     ld(to_acc, SP)
     add(literal) lit(5+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     mov(to_ram, frm_acc)
 
     ld(to_acc, SP)
     add(literal) lit(4+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     mov(to_ram, frm_acc)
 
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     dec()
     mov(to_ram, frm_acc)
@@ -445,49 +445,49 @@ lbl("bwand_sl2_end")
 // if (a_lcl) if(b_lcl)
     ld(to_acc, SP)
     add(literal) lit(5+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     jz("bwand_neg")
     ld(to_acc, SP)
     add(literal) lit(4+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     jz("bwand_neg")
 
 // ret += ret_add;
     ld(to_acc, SP)
     add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     st(BX, frm_acc)                // store 2nd operand
     pop(to_acc)                      // 1st operand pop
-    mov(to_ramaddr, literal) lit(BX)  // addition
+    mov(to_mar, literal) lit(BX)  // addition
     add(frm_ram)
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(2+1)
     st(BX, frm_acc)                // store 2nd operand
     pop(to_acc)                      // 1st operand pop
-    mov(to_ramaddr, literal) lit(BX)
-    mov(to_ramaddr, frm_ram)
+    mov(to_mar, literal) lit(BX)
+    mov(to_mar, frm_ram)
     mov(to_ram, frm_acc)
 lbl("bwand_neg")
 
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     mov(to_ram, frm_acc)
 
     ld(to_acc, SP)
     add(literal) lit(2+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     inc()
     mov(to_ram, frm_acc)
@@ -496,7 +496,7 @@ lbl("bwand_neg")
 lbl("bwand_done")
     ld(to_acc, SP)
     add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     inc_sp(6)
     ret()
@@ -565,37 +565,37 @@ lbl("das_do_1_base")
 
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(0)
 
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(255)
 
 lbl("das_do_2_base")
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_pch, frm_ram)
 
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     out(frm_ram)
 
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     add(literal) lit(-8) // != 8
     jz("das_if_continue_1")
 
     ld(to_acc, SP)
     add(literal) lit(2+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     in(to_acc)
     mov(to_ram, frm_acc)
 
@@ -604,20 +604,20 @@ jz("das_nokey_atall")
 
     ld(to_acc, SP)
     add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(0)
 
 lbl("das_while_1_test")
     ld(to_acc, SP)
     add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     add(literal) lit(-8) // != 8
     jz("das_while_1_end")
 
     ld(to_acc, SP)
     add(literal) lit(2+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     inv(frm_ram)
     add(literal) lit(128)
     inv(frm_acc)
@@ -627,7 +627,7 @@ lbl("das_while_1_test")
 lbl("das_key")
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     shl()
     shl()
@@ -635,27 +635,27 @@ lbl("das_key")
     st(BX, frm_acc)
     ld(to_acc, SP)
     add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    mov(to_ramaddr, literal) lit(BX)
+    mov(to_mar, literal) lit(BX)
     add(frm_ram)
     st(BX, frm_acc)
     ld(to_acc, SP)
     add(literal) lit(0+1)
     push(frm_acc)
     ld(to_acc, BX)
-    pop(to_ramaddr)
+    pop(to_mar)
     mov(to_ram, frm_acc)
 
 
     ld(to_acc, SP)
     add(literal) lit(1+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(7)
 
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(7)
 
 
@@ -666,10 +666,10 @@ lbl("das_nokey")
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     rol()
-    pop(to_ramaddr)
+    pop(to_mar)
     mov(to_ram, frm_acc)
 
     ld(to_acc, SP)
@@ -677,10 +677,10 @@ lbl("das_nokey")
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(2+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     inc()
-    pop(to_ramaddr)
+    pop(to_mar)
     mov(to_ram, frm_acc)
 
     jp("das_while_1_test")
@@ -694,15 +694,15 @@ lbl("das_if_continue_1")
     push(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(literal) lit(4+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     inc()
-    pop(to_ramaddr)
+    pop(to_mar)
     mov(to_ram, frm_acc)
 
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     add(literal) lit(-9) // != 9
 
@@ -711,7 +711,7 @@ lbl("das_if_continue_1")
 lbl("das_do_2_end")
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     add(literal) lit(1) // != 255
     jz("das_if_continue_2")
@@ -720,28 +720,28 @@ lbl("das_if_continue_2")
     
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    mov(to_ramaddr, literal) lit(PREVKEY)
+    mov(to_mar, literal) lit(PREVKEY)
     mov(to_ram, frm_acc)
 
 lbl("das_endif_2")
 
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     inv(frm_ram)             // 1st cmpl
     inc()                        // 2nd cmpl      
-    mov(to_ramaddr, literal) lit(PREVKEY)      // const
+    mov(to_mar, literal) lit(PREVKEY)      // const
     add(frm_ram)
 
     jz("das_do_1_base")
     
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    mov(to_ramaddr, literal) lit(PREVKEY)
+    mov(to_mar, literal) lit(PREVKEY)
     mov(to_ram, frm_acc)
     inc_sp(4)
     ret()
@@ -778,32 +778,31 @@ lbl("disp")
 lbl("disp_while_test")
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     jz("disp_while_end")
 
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_ram, literal) lit(0)
 
 lbl("disp_do_base")
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_pch, frm_ram)
 
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
-    mov(to_acc, frm_ram)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
+    mov(to_mar, frm_ram)
     out(frm_ram)
 
     // += 1
     ld(to_acc, SP)
     add(literal) lit(0+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     add(literal) lit(1)
     mov(to_ram, frm_acc)
@@ -815,7 +814,7 @@ lbl("disp_do_base")
 lbl("disp_do_end")
     ld(to_acc, SP)
     add(literal) lit(3+1)
-    mov(to_ramaddr, frm_acc)
+    mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     add(literal) lit(255)  // -1
     mov(to_ram, frm_acc)
