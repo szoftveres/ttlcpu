@@ -11,15 +11,15 @@ void unimplemented (const char* s) {
 
 
 int SYM_integer_size (void) {
-    return 1;                   /* 8 bit*/
+    return 1;                   /* 8 bit var */
 }
 
 int SYM_data_pointer_size (void) {
-    return 1;                   /* 8 bit so far */
+    return 1;                   /* 256 bytes RAM */
 }
 
 int SYM_code_pointer_size (void) {
-    return 2;                   /* 16 bit */
+    return 2;                   /* 64k program memory */
 }
 
 void CODE_func_definition_label (char* fn_name) {
@@ -201,21 +201,7 @@ void CODE_do_operation_shr (int lbl) {
     fprintf(stdout, "    jz(\"sright_%04d_end\")\n", lbl);
     fprintf(stdout, "    dec()\n");
     CODE_operand_pop();
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    shl()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
-    fprintf(stdout, "    rol()\n");
+    fprintf(stdout, "    shr()\n");
     CODE_push();
     fprintf(stdout, "    ld(to_acc, BX)\n");
     fprintf(stdout, "    jp(\"sright_%04d_start\")\n", lbl);

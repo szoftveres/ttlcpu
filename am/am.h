@@ -1,10 +1,10 @@
 
+#undef inst
 #undef litl
 #undef lith
-#undef lbl
 #undef defl
 #undef defh
-#undef inst
+#undef lbl
 
 #ifndef _AM_H_
 #define _AM_H_
@@ -38,31 +38,45 @@
 #define ld(d, a) mov(to_mar, literal) lit((a)) mov((d), frm_ram)
 #define ldz(d, a) movz(to_mar, literal) lit((a)) movz((d), frm_ram)
 
+#define ror()       rol() rol() rol() rol() rol() rol() rol()
+#define shr()       ror() shl() ror()
+
 /* = Code organization = */
 
-#define _org(n)         while (progcnt != (n)) {nop();};
+#define _org(n)         while (pc != (n)) {nop();};
 
 #define _fitpage(n)                                                         \
             do {                                                            \
-                const unsigned int pagestart = ((progcnt + (n)) & (~0xFF)); \
-                if ((progcnt & (~0xFF)) != pagestart) {                     \
-                    while (progcnt != pagestart) {nop();}                   \
+                const unsigned int pagestart = ((pc + (n)) & (~0xFF));      \
+                if ((pc & (~0xFF)) != pagestart) {                          \
+                    while (pc != pagestart) {nop();}                        \
                 }                                                           \
             } while (0);                                                    \
 
 
 /* ============================================================ */
-/* Base */
-#define inst(d, s, m)   do {++progcnt;} while(0);
-#define litl(l)         do {++progcnt;} while(0);
-#define lith(l)         do {++progcnt;} while(0);
-#define defl(n)         do {++progcnt;} while(0);
-#define defh(n)         do {++progcnt;} while(0);
+/* First pass */
+
+/*
+ * In this pass we just calculate position of the labels and add
+ * them to the symbol table
+ */
+
+#define inst(d, s, m)   do {++pc;} while(0);
+#define litl(l)         do {++pc;} while(0);
+#define lith(l)         do {++pc;} while(0);
+#define defl(n)         do {++pc;} while(0);
+#define defh(n)         do {++pc;} while(0);
 #define lbl(n)          do {lbladd(n);} while(0);
 
 #else
 /* ============================================================ */
 /* Second pass */
+
+/*
+ * In this pass we actually generate the bytecode, already knowing
+ * the position of the labels
+ */
 
 #define inst(d,s,m)     do {instruction((d),(s),(m));} while(0);
 #define litl(v)         do {dataconst((unsigned int)(v), 0);} while(0);

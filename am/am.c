@@ -25,7 +25,7 @@ struct lbl_s {
     struct lbl_s    *next;
 };
 
-unsigned int    progcnt;
+unsigned int    pc;
 struct lbl_s    *head;
 
 static void lbladd(char* n) {
@@ -39,7 +39,7 @@ static void lbladd(char* n) {
     lbl = (struct lbl_s*) malloc(sizeof(struct lbl_s));
     lbl->name = (char*) malloc(strlen((n))+1);
     strcpy(lbl->name, (n));
-    lbl->addr = progcnt;
+    lbl->addr = pc;
     lbl->next = head;
     head = lbl;
     return;
@@ -66,7 +66,7 @@ static void instruction (int d, int s, char* m) {
         mod++;
     }
     printf(" 0x%02X,\n", ic);
-    fprintf(stderr, "  %04X:", progcnt);
+    fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0; i < 8; i++) {
         fprintf(stderr, (ic & 0x80) ? "1" : "0");
@@ -77,7 +77,7 @@ static void instruction (int d, int s, char* m) {
       case to_acc_invert : de = "acc_invert"; break;
       case to_acc_adder : de = "acc_adder"; break;
       case to_port : de = "port"; break;
-      case to_mar : de = "ramaddr"; break;
+      case to_mar : de = "mar"; break;
       case to_ram : de = "ram"; break;
       case to_pc : de = "pc"; break;
       case to_pch : de = "pch_latch"; break;
@@ -94,7 +94,7 @@ static void instruction (int d, int s, char* m) {
         fprintf(stderr, "   ILLEGAL ram <- ram \n"); exit(1);
     }
     fprintf(stderr, "       mov  %s, %s %s\n", de, so, m);
-    progcnt += 1;
+    pc += 1;
     return;
 }
 
@@ -115,7 +115,7 @@ static int defaddr (char* n, int high) {
     }
     ic = (unsigned char) (lbl->addr >> (high ? 8 : 0));
     printf(" 0x%02X,\n", ic);
-    fprintf(stderr, "  %04X:", progcnt);
+    fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
         fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
@@ -123,7 +123,7 @@ static int defaddr (char* n, int high) {
     fprintf(stderr, "       db   %s(%s)\n",
             (high ? "high" : "low"),
             lbl->name);
-    progcnt += 1;
+    pc += 1;
     return;
 }
 
@@ -133,13 +133,13 @@ static int dataconst (unsigned int v, int shift) {
     unsigned char ic2;
 
     printf(" 0x%02X,\n", ic);
-    fprintf(stderr, "  %04X:", progcnt);
+    fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
         fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
     }
     fprintf(stderr, "       db   0x%02x\n", ic); 
-    progcnt += 1;
+    pc += 1;
     return;
 }
 
@@ -147,9 +147,9 @@ int
 main (int argc, char** argv) {
     head = NULL;
     
-    progcnt = 0;
+    pc = 0;
     #include "am.h"
-    progcnt = 0;
+    pc = 0;
     #include "am.h"
 
     return 0;
