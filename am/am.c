@@ -65,7 +65,7 @@ static void instruction (int d, int s, char* m) {
         }
         mod++;
     }
-    printf(" 0x%02X,\n", ic);
+    fprintf(stdout, "0x%02X,\n", ic);
     fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0; i < 8; i++) {
@@ -114,7 +114,7 @@ static int defaddr (char* n, int high) {
         exit(1);
     }
     ic = (unsigned char) (lbl->addr >> (high ? 8 : 0));
-    printf(" 0x%02X,\n", ic);
+    fprintf(stdout, "0x%02X,\n", ic);
     fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
@@ -132,7 +132,7 @@ static int dataconst (unsigned int v, int shift) {
     unsigned char ic = (unsigned char)(v >> (shift ? 8 : 0));
     unsigned char ic2;
 
-    printf(" 0x%02X,\n", ic);
+    fprintf(stdout, "0x%02X,\n", ic);
     fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
