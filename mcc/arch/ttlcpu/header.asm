@@ -116,6 +116,7 @@ lbl("out")
 lbl("in")
     in(to_acc)
     ret()
+/*-------------------------------------------------------*/
 
 /*
 bit2(var a, var b) {
@@ -133,7 +134,7 @@ bit2(var a, var b) {
 
 lbl("bit")
     dec_sp(1)       // var decl space
-    ld(to_acc, SP)          // local var value
+    // ld(to_acc, SP)          // local var value
     add(progdata) data(5)
     mov(to_mar, frm_acc)
     inv(frm_ram)               // 1st compliment
@@ -286,7 +287,7 @@ lbl("bwand")
     dec_sp(6)
 
 // ret_add = 1;
-    ld(to_acc, SP)
+    // ld(to_acc, SP)
     add(progdata) data(0+1)
     mov(to_mar, frm_acc)
     mov(to_ram, progdata) data(1)
@@ -739,6 +740,7 @@ lbl("__das_endif_2")
     ret()
 
 
+/*-------------------------------------------------------*/
 
 
 
@@ -818,9 +820,58 @@ lbl("__disp_while_end")
 
 /*-------------------------------------------------------*/
 
+/*
+ * Push one symbol from the right
 
+disp_push (var s) {
+    var i;
+    i = 7;
+    while (i) {
+        *(i) = (*(i, asm("add(progdata) data(255)")));
+        i = (i, asm("add(progdata) data(255)"));
+    }
+    *(0) = s;
+}
 
+ */
 
+lbl("disp_push")
+    dec_sp(1)
+    // ld(to_acc, SP)
+    add(progdata) data(0+1)
+    mov(to_mar, frm_acc)
+    mov(to_ram, progdata) data(7)      // const
+    mov(to_acc, frm_ram)
+lbl("__disp_push_loop_base")
 
+    ld(to_acc, SP)
+    add(progdata) data(0+1)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)
+    add(progdata) data(255)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    ld(to_mar, BX)
+    mov(to_ram, frm_acc)
 
+    ld(to_acc, SP)
+    add(progdata) data(0+1)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    add(progdata) data(255)
+    mov(to_ram, frm_acc)
+    jz("__disp_push_loop_end")
+    jp("__disp_push_loop_base")
+lbl("__disp_push_loop_end")
+    ld(to_acc, SP)
+    add(progdata) data(3+1)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(0)
+    mov(to_ram, frm_acc)
+    inc_sp(1)
+    ret()
+
+/*-------------------------------------------------------*/
 

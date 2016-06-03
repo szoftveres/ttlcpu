@@ -52,19 +52,6 @@ m_shift () {
     *(0) = p;
 }
 
-/**
- * Push one symbol from the right
- */
-disp_push (var s) {
-    var i;
-    i = 7;
-    while (i) {
-        *(i) = (*(i, asm("add(progdata) data(255)")));
-        i = (i, asm("add(progdata) data(255)"));
-    }
-    *(0) = s;
-}
-
 
 put_scan (var code) {
     disp_push(hex2sym((code, asm("rol() rol() rol() rol() \n"))));
