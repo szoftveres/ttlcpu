@@ -1,7 +1,7 @@
 
 #undef inst
-#undef litl
-#undef lith
+#undef datal
+#undef datah
 #undef defl
 #undef defh
 #undef lbl
@@ -11,8 +11,9 @@
 /* ============================================================ */
 /* First pass */
 
-/* derived instructions */
-#define lit(l)      litl(l)
+/* === Derived instructions === */
+
+#define data(l)     datal(l)
 #define def(l)      defl(l)
 
 #define mov(d, s)   inst((d), (s), "")
@@ -20,8 +21,8 @@
 
 #define add(s)      mov(to_acc_adder, (s))
 
-#define inc()       add(literal) lit(1)
-#define dec()       add(literal) lit(-1)
+#define inc()       add(progdata) data(1)
+#define dec()       add(progdata) data(-1)
 #define inv(s)      mov(to_acc_invert, (s))
 #define shl()       add(frm_acc)
 #define rol()       inst(to_acc_adder, frm_acc, "c")
@@ -30,24 +31,30 @@
 
 #define nop()       mov(to_acc, frm_acc)
 
-#define jp(a)       mov(to_pch, literal) defh(a) mov(to_pc, literal) defl(a)
-#define jz(a)       movz(to_pch, literal) defh(a) movz(to_pc, literal) defl(a)
+#define jp(a)       mov(to_pch, progdata) defh(a) mov(to_pc, progdata) defl(a)
+#define jz(a)       movz(to_pch, progdata) defh(a) movz(to_pc, progdata) defl(a)
 
-#define st(a, s)    mov(to_mar, literal) lit(a) mov(to_ram, (s))
-#define stz(a, s)   movz(to_mar, literal) lit(a) movz(to_ram, (s))
-#define ld(d, a)    mov(to_mar, literal) lit((a)) mov((d), frm_ram)
-#define ldz(d, a)   movz(to_mar, literal) lit((a)) movz((d), frm_ram)
+#define st(a, s)    mov(to_mar, progdata) data(a) mov(to_ram, (s))
+#define stz(a, s)   movz(to_mar, progdata) data(a) movz(to_ram, (s))
+#define ld(d, a)    mov(to_mar, progdata) data((a)) mov((d), frm_ram)
+#define ldz(d, a)   movz(to_mar, progdata) data((a)) movz((d), frm_ram)
 
 #define ror()       rol() rol() rol() rol() rol() rol() rol()
 #define shr()       ror() shl() ror()
 
-/* = Code organization = */
+/* === Code organization === */
 
-#define _org(n)     while (pc != (n)) {nop();};
+#define _org(addr)     while (pc != (addr)) {nop();};
 
-#define _fitpage(n)                                                         \
+#define _align()                                                            \
             do {                                                            \
-                const unsigned int pagestart = ((pc + (n)) & (~0xFF));      \
+                const unsigned int pagestart = ((pc & (~0xFF)) + 0x0100);   \
+                while (pc != pagestart) {nop();}                            \
+            } while (0);
+
+#define _fitpage(size)                                                      \
+            do {                                                            \
+                const unsigned int pagestart = ((pc + (size)) & (~0xFF));   \
                 if ((pc & (~0xFF)) != pagestart) {                          \
                     while (pc != pagestart) {nop();}                        \
                 }                                                           \
@@ -63,8 +70,8 @@
  */
 
 #define inst(d, s, m)   do {++pc;} while(0);
-#define litl(l)         do {++pc;} while(0);
-#define lith(l)         do {++pc;} while(0);
+#define datal(l)         do {++pc;} while(0);
+#define datah(l)         do {++pc;} while(0);
 #define defl(n)         do {++pc;} while(0);
 #define defh(n)         do {++pc;} while(0);
 #define lbl(n)          do {lbladd(n);} while(0);
@@ -79,8 +86,8 @@
  */
 
 #define inst(d, s, m)   do {instruction((d),(s),(m));} while(0);
-#define litl(v)         do {dataconst((unsigned int)(v), 0);} while(0);
-#define lith(v)         do {dataconst((unsigned int)(v), 1);} while(0);
+#define datal(v)         do {dataconst((unsigned int)(v), 0);} while(0);
+#define datah(v)         do {dataconst((unsigned int)(v), 1);} while(0);
 #define defl(n)         do {defaddr((n), 0);} while(0);
 #define defh(n)         do {defaddr((n), 1);} while(0);
 #define lbl(n)          do {lblprint(n);} while(0);

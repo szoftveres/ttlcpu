@@ -46,7 +46,7 @@ dec (var a) {
      * the accumulator will contain the return value.
      * Code execution speed can be significantly boosted with these tricks.
      */    
-    (a, asm("add(literal) lit(255)"));
+    (a, asm("add(progdata) data(255)"));
 }
 
 

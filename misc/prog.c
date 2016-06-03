@@ -59,8 +59,8 @@ disp_push (var s) {
     var i;
     i = 7;
     while (i) {
-        *(i) = (*(i, asm("add(literal) lit(255)")));
-        i = (i, asm("add(literal) lit(255)"));
+        *(i) = (*(i, asm("add(progdata) data(255)")));
+        i = (i, asm("add(progdata) data(255)"));
     }
     *(0) = s;
 }
