@@ -27,31 +27,6 @@
 
 #define SYM_DP          (32)
 
-mem_init () {
-    *(0) = 222;    //O
-    *(1) = 134;    //L
-    *(2) = 134;    //L
-    *(3) = 151;    //E
-    *(4) = 205;    //H
-    *(5) = 2;
-    *(6) = 1;
-    *(7) = 16;
-    *(8) = 1;
-    *(9) = 2;      //_
-}
-
-
-m_shift () {
-    var i;
-    var p;
-
-    p = *(9);
-    for (i = 9; i != 0; i +=255) {
-        *(i) = (*(i-1));
-    }
-    *(0) = p;
-}
-
 
 put_scan (var code) {
     disp_push(hex2sym((code, asm("rol() rol() rol() rol() \n"))));
@@ -59,15 +34,85 @@ put_scan (var code) {
 }
 
 
+count () {
+    var i;
+    i = 0;
+    for (i = 0; i!= 8; i += 1) {disp_push(0);}
+    *(3) = 1;
+    *(4) = 1;
+    do {
+        *(1) = (hex2sym((i, asm("rol() rol() rol() rol() \n"))));
+        *(0) = (hex2sym(i) + SYM_DP);
+        *(7) = (hex2sym((0-i, asm("rol() rol() rol() rol() \n"))));
+        *(6) = (hex2sym(0-i) + SYM_DP);
+        i += 1;
+        disp(32);
+    } while (i);
+//    for (i = 0; i!= 8; i += 1) {disp_push(0);}
+}
+
+
+
 main () {
     while (1) {
-        mem_init();
-        while (1) {
-            disp(250);
-            m_shift();
+        var i;
+        for (i=0; i!= 2; i+=1) {
+            disp_push(205);    //H
+            disp(64);
+            disp_push(151);    //E
+            disp(64);
+            disp_push(134);    //L
+            disp(64);
+            disp_push(134);    //L
+            disp(64);
+            disp_push(222);    //O
+            disp(64);
+            disp_push(0);
+            disp(64);
+            disp_push(0);
+            disp(64);
+            disp_push(0);
+            disp(64);
+
+            disp_push(223);
+            disp(64);
+            disp_push(1);
+            disp(64);
+            disp_push(199);
+            disp(64);
+            disp_push(72);
+            disp(64);
+            disp_push(135);
+            disp(64);
+
+            disp_push(0);
+            disp(64);
+
+            disp_push(135);    //T
+            disp(64);
+            disp_push(135);    //T
+            disp(64);
+            disp_push(134);    //L
+            disp(64);
+            disp_push(0);
+            disp(64);
+            disp_push(150);    //C
+            disp(64);
+            disp_push(157);    //P
+            disp(64);
+            disp_push(206);    //U
+            disp(64);
+            disp_push(0);
+            disp(64);
+            disp_push(0);
+            disp(64);
+            disp_push(0);
+            disp(64);
         }
+        count();
         while (1) {
             put_scan(das());
+            disp(64);
         }
     }
 }

@@ -8,10 +8,15 @@ make clean || exit 1
 make ARCH=ttlcpu all || exit 1
 cd .. || exit 1
 
+if test -z "${1}" ; then
+    echo No file specified, exiting
+    exit 0
+fi
+
 #compile
-echo "Compiling program.."
+echo "Compiling '${1}'.."
 cp ./mcc/output/header.asm  am/prog.asm || exit 1
-cc -E ./prog.c | grep -v '^#' | ./mcc/output/mcc >> am/prog.asm || exit 1
+cc -E "${1}" | grep -v '^#' | ./mcc/output/mcc >> am/prog.asm || exit 1
 cat ./mcc/output/footer.asm >> am/prog.asm || exit 1
 
 # make assembler and assemble 

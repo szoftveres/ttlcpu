@@ -96,8 +96,20 @@ lbl(u)
 /*-------------------------------------------------------*/
 
     /* Entry point of main program */
-    stackinit()
     out(progdata) data(0)
+
+    /* memset the RAM to 0 */
+    mov(to_acc, progdata) data(0)
+lbl("__memclr")
+    mov(to_mar, frm_acc)
+    mov(to_ram, progdata) data(0)
+    inc()
+    jz("__memclr_end")
+    jp("__memclr")
+lbl("__memclr_end")
+    
+    stackinit()
+
     call("main", "__main_caller_ret")
     out(progdata) data(0)
 lbl("__haltcpu")
@@ -792,6 +804,13 @@ lbl("__disp_do_base")
     mov(to_mar, frm_acc)
     mov(to_mar, frm_ram)
     out(frm_ram)
+
+    mov(to_acc, progdata) data(10)
+lbl("__disp_dly")
+    dec()
+    jz("__disp_dly_end")
+    jp("__disp_dly")
+lbl("__disp_dly_end")
 
     // += 1
     ld(to_acc, SP)
