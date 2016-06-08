@@ -95,22 +95,26 @@ lbl(u)
 
 /*-------------------------------------------------------*/
 
+    /* =========================== */
     /* Entry point of main program */
+    /* =========================== */
+
     out(progdata) data(0)
 
-    /* memset the RAM to 0 */
-    mov(to_acc, progdata) data(0)
-lbl("__memclr")
+    /* clear the display */
+    mov(to_acc, progdata) data(8)
+lbl("__disp_clr")
+    dec()
     mov(to_mar, frm_acc)
     mov(to_ram, progdata) data(0)
-    inc()
-    jz("__memclr_end")
-    jp("__memclr")
-lbl("__memclr_end")
+    jz("__disp_clr_end")
+    jp("__disp_clr")
+lbl("__disp_clr_end")
     
     stackinit()
 
     call("main", "__main_caller_ret")
+
     out(progdata) data(0)
 lbl("__haltcpu")
     jp("__haltcpu")
@@ -119,7 +123,7 @@ lbl("__haltcpu")
 /*-------------------------------------------------------*/
 
 lbl("out")
-    ld(to_acc, SP)    //mov ebp, esp
+    ld(to_acc, SP)
     add(progdata) data(3)
     mov(to_mar, frm_acc)
     out(frm_ram)
