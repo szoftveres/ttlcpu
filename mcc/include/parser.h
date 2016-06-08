@@ -1,5 +1,5 @@
-#ifndef _GRAMMAR_H_
-#define _GRAMMAR_H_
+#ifndef _PARSER_H_
+#define _PARSER_H_
 
 int program (void);
 

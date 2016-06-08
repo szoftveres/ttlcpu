@@ -46,7 +46,7 @@ dec (var a) {
      * the accumulator will contain the return value.
      * Code execution speed can be significantly boosted with these tricks.
      */    
-    (a, asm("add(progdata) data(255)"));
+    a, asm("add(progdata) data(255)");
 }
 
 
@@ -62,7 +62,6 @@ invert_out (var f) {
 main () {
     /* Variable declarations at the beginning of each block */
     var i;
-
     /*
      * Built-in operator precedence can be overriden
      * with () parentheses
@@ -70,10 +69,11 @@ main () {
     for (i = NUM_TEN; (i - 1 != 255 - (1 == 2)) ? 1 : 0; i += add(1, 0)) {
         var i_p;
         /*
-         * there's no 'pointer' type, neither
+         * there's neither 'pointer' type, nor
          * pointer arythmetics, everything is 'var'
          */
         i_p = &i;
+        *(i_p) += 1;
         invert_out(*i_p);
     }
     /*

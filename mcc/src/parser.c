@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "grammar.h"
+#include "parser.h"
 #include "codegen.h"
 #include "lex.h"
 #include "sym.h"

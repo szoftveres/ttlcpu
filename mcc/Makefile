@@ -13,7 +13,7 @@ CFLAGS = -Wall -O0 -I $(INCLDIR)
 ## Objects that must be built in order to link
 OBJECTS = $(OBJDIR)/lex.o\
           $(OBJDIR)/main.o\
-          $(OBJDIR)/grammar.o\
+          $(OBJDIR)/parser.o\
           $(OBJDIR)/sym.o\
           $(OBJDIR)/codegen.o\
 
