@@ -41,7 +41,7 @@ lbl(u)
     st(STACK_ACC, frm_acc)          \
     ld(to_acc, SP)                  \
     add(progdata) data(2)           \
-    st(SP, frm_acc)                 \
+    mov(to_ram, frm_acc)            \
     mov(to_mar, frm_acc)            \
     mov(to_pch, frm_ram)            \
     dec()                           \
@@ -54,13 +54,14 @@ lbl(u)
 #undef push
 #define push(s)                     \
     st(STACK_ACC, frm_acc)          \
+    ld(to_mar, SP)                  \
+    mov(to_ram, (s))                \
     ld(to_acc, SP)                  \
-    st(STACK_TEMP, frm_acc)         \
     dec()                           \
-    st(SP, frm_acc)                 \
+    mov(to_ram, frm_acc)            \
     ld(to_acc, STACK_ACC)           \
-    ld(to_mar, STACK_TEMP)          \
-    mov(to_ram, (s))
+
+
 
 #undef pop
 #define pop(d)                      \
@@ -69,25 +70,27 @@ lbl(u)
     }                               \
     ld(to_acc, SP)                  \
     inc()                           \
-    st(SP, frm_acc)                 \
+    mov(to_ram, frm_acc)            \
     if ((d) != to_acc) {            \
         ld(to_acc, STACK_ACC)       \
+        ld(to_mar, SP)              \
+    } else {                        \
+        mov(to_mar, frm_acc)        \
     }                               \
-    ld(to_mar, SP)                  \
     mov((d), frm_ram)
 
 #undef dec_sp
 #define dec_sp(i)                   \
     ld(to_acc, SP)                  \
     add(progdata) data(-(i))        \
-    st(SP, frm_acc)                 \
+    mov(to_ram, frm_acc)            \
 
 #undef inc_sp
 #define inc_sp(i)                   \
     st(STACK_ACC, frm_acc)          \
     ld(to_acc, SP)                  \
     add(progdata) data(i)           \
-    st(SP, frm_acc)                 \
+    mov(to_ram, frm_acc)            \
     ld(to_acc, STACK_ACC)
 
 
