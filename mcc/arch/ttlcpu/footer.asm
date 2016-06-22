@@ -21,47 +21,38 @@ lbl("hex2sym")
     mov(to_pc, frm_acc)
 _fitpage(66)
 lbl("hex2sym_in")
-    mov(to_acc, progdata)    data(222)             // 0
+    mov(to_acc, progdata)    data(0xDE)            // 0
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(72)              // 1
+    mov(to_acc, progdata)    data(0x48)            // 1
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(155)             // 2
+    mov(to_acc, progdata)    data(0x9B)            // 2
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(91)              // 3
+    mov(to_acc, progdata)    data(0x5B)            // 3
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(77)              // 4
+    mov(to_acc, progdata)    data(0x4D)            // 4
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(87)              // 5
+    mov(to_acc, progdata)    data(0x57)            // 5
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(215)             // 6
+    mov(to_acc, progdata)    data(0xD7)            // 6
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(88)              // 7
+    mov(to_acc, progdata)    data(0x58)            // 7
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(223)             // 8
+    mov(to_acc, progdata)    data(0xDF)            // 8
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(95)              // 9
+    mov(to_acc, progdata)    data(0x5F)            // 9
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(221)             // A
+    mov(to_acc, progdata)    data(0xDD)            // A
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(199)             // B
+    mov(to_acc, progdata)    data(0xC7)            // B
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(150)             // C
+    mov(to_acc, progdata)    data(0x96)            // C
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(203)             // D
+    mov(to_acc, progdata)    data(0xCB)            // D
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(151)             // E
+    mov(to_acc, progdata)    data(0x97)            // E
     mov(to_pc, progdata)    defl("hex2sym_out")
-    mov(to_acc, progdata)    data(149)             // F
+    mov(to_acc, progdata)    data(0x95)            // F
     mov(to_pc, progdata)    defl("hex2sym_out")
 lbl("hex2sym_out")
     ret()
-
-
-
-// _fitpage(213)
-// lbl("end")
-
-
-
-
 

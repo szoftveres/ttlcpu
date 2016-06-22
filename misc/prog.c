@@ -8,24 +8,53 @@
 #define SEGMENT_G       (0x01)
 #define SEGMENT_DP      (0x20)
 
-#define SYM_0           (222)
-#define SYM_1           (72)
-#define SYM_2           (155)
-#define SYM_3           (91)
-#define SYM_4           (77)
-#define SYM_5           (87)
-#define SYM_6           (215)
-#define SYM_7           (88)
-#define SYM_8           (223)
-#define SYM_9           (95)
-#define SYM_A           (221)
-#define SYM_B           (199)
-#define SYM_C           (150)
-#define SYM_D           (203)
-#define SYM_E           (151)
-#define SYM_F           (149)
 
-#define SYM_DP          (32)
+#define SYM_DP          (0x20)
+#define SYM_HYPHEN      (0x01)
+#define SYM_UNDERSCORE  (0x0D)
+#define SYM_SPACE       (0x00)
+
+#define SYM_0           (0xDE)
+#define SYM_1           (0x48)
+#define SYM_2           (0x9B)
+#define SYM_3           (0x5B)
+#define SYM_4           (0x4D)
+#define SYM_5           (0x57)
+#define SYM_6           (0xD7)
+#define SYM_7           (0x58)
+#define SYM_8           (0xDF)
+#define SYM_9           (0x5F)
+#define SYM_A           (0xDD)
+#define SYM_B           (0xC7)
+#define SYM_C           (0x96)
+#define SYM_D           (0xCB)
+#define SYM_E           (0x97)
+#define SYM_F           (0x95)
+
+#define SYM_G           (0xD6)
+#define SYM_H           (0xCD)
+#define SYM_I           (0x40)
+#define SYM_J           (0xCA)
+#define SYM_K           (0x00)  /* unimplemented */
+#define SYM_L           (0x86)
+#define SYM_M           (0x00)  /* unimplemented */
+#define SYM_N           (0xC1)
+#define SYM_O           (0xDE)
+#define SYM_P           (0x9D)
+#define SYM_Q           (0x5D)
+#define SYM_R           (0x81)
+#define SYM_S           (0x57)
+#define SYM_T           (0x87)
+#define SYM_U           (0xCE)
+#define SYM_V           (0x00)  /* unimplemented */
+#define SYM_W           (0x00)  /* unimplemented */
+#define SYM_X           (0x00)  /* unimplemented */
+#define SYM_Y           (0x4F)
+#define SYM_Z           (0x00)  /* unimplemented */
+
+
+
+
 
 
 put_scan (var code) {
@@ -52,62 +81,53 @@ count () {
 }
 
 
+scroll (var a) {
+    disp_push(a);
+    disp(64);
+}
 
 main () {
     while (1) {
         var i;
         for (i=0; i!= 2; i+=1) {
-            disp_push(205);    //H
-            disp(64);
-            disp_push(151);    //E
-            disp(64);
-            disp_push(134);    //L
-            disp(64);
-            disp_push(134);    //L
-            disp(64);
-            disp_push(222);    //O
-            disp(64);
-            disp_push(0);
-            disp(64);
-            disp_push(0);
-            disp(64);
-            disp_push(0);
-            disp(64);
+            scroll(SYM_H);
+            scroll(SYM_E);
+            scroll(SYM_L);
+            scroll(SYM_L);
+            scroll(SYM_O);
+            scroll(SYM_SPACE);
+            scroll(SYM_SPACE);
+            scroll(SYM_SPACE);
 
-            disp_push(223);
-            disp(64);
-            disp_push(1);
-            disp(64);
-            disp_push(199);
-            disp(64);
-            disp_push(72);
-            disp(64);
-            disp_push(135);
-            disp(64);
+            scroll(SYM_T);
+            scroll(SYM_H);
+            scroll(SYM_I);
+            scroll(SYM_S);
+            scroll(SYM_SPACE);
+            scroll(SYM_I);
+            scroll(SYM_S);
+            scroll(SYM_SPACE);
+            scroll(SYM_A);
+            scroll(SYM_SPACE);
 
-            disp_push(0);
-            disp(64);
+            scroll(SYM_8);
+            scroll(SYM_HYPHEN);
+            scroll(SYM_B);
+            scroll(SYM_I);
+            scroll(SYM_T);
+ 
+            scroll(SYM_SPACE);
 
-            disp_push(135);    //T
-            disp(64);
-            disp_push(135);    //T
-            disp(64);
-            disp_push(134);    //L
-            disp(64);
-            disp_push(0);
-            disp(64);
-            disp_push(150);    //C
-            disp(64);
-            disp_push(157);    //P
-            disp(64);
-            disp_push(206);    //U
-            disp(64);
-            disp_push(0);
-            disp(64);
-            disp_push(0);
-            disp(64);
-            disp_push(0);
-            disp(64);
+            scroll(SYM_T);
+            scroll(SYM_T);
+            scroll(SYM_L);
+            scroll(SYM_SPACE);
+            scroll(SYM_C);
+            scroll(SYM_P);
+            scroll(SYM_U);
+            scroll(SYM_SPACE);
+            scroll(SYM_SPACE);
+            scroll(SYM_SPACE);
         }
         count();
         while (1) {
@@ -116,6 +136,4 @@ main () {
         }
     }
 }
-
-
 
