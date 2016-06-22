@@ -660,7 +660,7 @@ int const_expression (void) {
         lex_consume();
         return 1;
     }
-    if (token == T_CHAR || token == T_INTEGER) {
+    if (token == T_CHAR || token == T_INTEGER || token == T_OCTAL || token == T_BINARY || token == T_HEXA) {
         CODE_const_expression_int(lexeme);
         lex_consume();
         return 1;

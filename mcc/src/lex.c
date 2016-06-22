@@ -71,6 +71,37 @@ int alpha (char c) {
     return 0;
 }
 
+int hex (char c) {
+    switch (c) {
+      case '0' : case '1' : case '2' : case '3' : case '4' :
+      case '5' : case '6' : case '7' : case '8' : case '9' :
+      case 'A' : case 'a' :
+      case 'B' : case 'b' :
+      case 'C' : case 'c' :
+      case 'D' : case 'd' :
+      case 'E' : case 'e' :
+      case 'F' : case 'f' :
+        return 1;
+    }
+    return 0;
+}
+
+int bin (char c) {
+    switch (c) {
+      case '0' : case '1' :
+        return 1;
+    }
+    return 0;
+}
+
+int oct (char c) {
+    switch (c) {
+      case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' :
+        return 1;
+    }
+    return 0;
+}
+
 
 /**
 */
@@ -128,14 +159,45 @@ int lex (char c) {
         }
         return 0;
     }
-    /* num : integer or identifier */
+    /* numerical */
     if (num(c)) {
         switch (token) {
           case T_INTEGER :
           case T_IDENTIFIER :
             return 1; /* ok, continue */
+          case T_LEAD_ZERO :
+          case T_OCTAL :
+            if (oct(c)) {
+                token = T_OCTAL;
+                return 1; /* ok, continue */
+            } else {
+                fprintf(stderr, "error : invalid octal digit\n");
+                exit(1);
+            }
+          case T_BINARY_S :
+          case T_BINARY :
+            if (bin(c)) {
+                token = T_BINARY;
+                return 1; /* ok, continue */
+            } else {
+                fprintf(stderr, "error : invalid binary digit\n");
+                exit(1);
+            }
+          case T_HEXA_S :
+          case T_HEXA :
+            if (hex(c)) {
+                token = T_HEXA;
+                return 1; /* ok, continue */
+            } else {
+                fprintf(stderr, "error : invalid hexadecimal digit\n");
+                exit(1);
+            }
           case T_NONE :
-            token = T_INTEGER;
+            if (c == '0') {
+                token = T_LEAD_ZERO;
+            } else {
+                token = T_INTEGER;
+            }
             return 1;
           case T_CHAR_START :
             token = T_CHAR_CONTENT;
@@ -149,7 +211,7 @@ int lex (char c) {
             return 0; /* other token begins */
         }
     }
-    /* alpha : identifier */
+    /* alphabetical */
     if (alpha(c)) {
         switch (token) {
           case T_IDENTIFIER:
@@ -158,8 +220,17 @@ int lex (char c) {
             token = T_IDENTIFIER;
             return 1;
           case T_INTEGER:
-            fprintf(stderr, "error : syntax error\n");
-            exit (1);
+            fprintf(stderr, "error : invalid decimal digit\n");
+            exit(1);
+          case T_HEXA_S :
+          case T_HEXA : 
+            if (hex(c)) {
+                token = T_HEXA;
+                return 1; /* ok, continue */
+            } else {
+                fprintf(stderr, "error : invalid hexadecimal digit\n");
+                exit(1);
+            }
           case T_CHAR_START :
             token = T_CHAR_CONTENT;
             return 1;   /* ok, continue */
@@ -168,6 +239,17 @@ int lex (char c) {
           case T_STRING_CONTENT :
             token = T_STRING_CONTENT;
             return 1;   /* ok, continue */
+          case T_LEAD_ZERO :
+            if (c == 'x' || c == 'X') {
+                token = T_HEXA_S;
+                return 1;
+            } else if (c == 'b' || c == 'B') {
+                token = T_BINARY_S;
+                return 1;
+            } else {
+                fprintf(stderr, "error : invalid character followed by '0'\n");
+                exit (1);
+            }
           default:
             return 0;  /* other token begins, return */
         }
@@ -248,6 +330,13 @@ int lex (char c) {
       case T_CHAR_START :
         token = T_CHAR_CONTENT;
         return 1;   /* ok, continue */
+      case T_LEAD_ZERO:
+        token = T_INTEGER;
+        break;   /* convert LEAD ZERO to integer in case it was not followed by any meaningful */
+      case T_HEXA_S :
+      case T_BINARY_S :
+        fprintf(stderr, "error : expected digit after non-decimal prefix \n");
+        exit (1);  
       case T_STRING_START :
       case T_STRING_SPECIAL :
       case T_STRING_CONTENT :
@@ -305,7 +394,7 @@ void lex_consume (void) {
             if (token != T_NONE) {
                 pushchar(c);
                 *pointer = '\0';
-                /* fprintf(stdout, ";;      %s    \n", token); */
+                // fprintf(stdout, "//      %s    \n", lexeme);
                 return;
             }
             continue; /* It was a trailing whitespace */

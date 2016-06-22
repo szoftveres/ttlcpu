@@ -4,7 +4,7 @@
  */
 
 
-#define NUM_TEN     10
+#define NUM_TEN     0x0A
 /* You can use gnu-gcc preprocessor directives */
 
 
@@ -46,7 +46,7 @@ dec (var a) {
      * the accumulator will contain the return value.
      * Code execution speed can be significantly boosted with these tricks.
      */    
-    a, asm("add(progdata) data(255)");
+    a, asm("add(progdata) data(0xFF)");
 }
 
 
@@ -66,7 +66,7 @@ main () {
      * Built-in operator precedence can be overriden
      * with () parentheses
      */
-    for (i = NUM_TEN; (i - 1 != 255 - (1 == 2)) ? 1 : 0; i += add(1, 0)) {
+    for (i = NUM_TEN; (i - 1 != 0xFF - (1 == 2)) ? 1 : 0; i += add(1, 0)) {
         var i_p;
         /*
          * there's neither 'pointer' type, nor

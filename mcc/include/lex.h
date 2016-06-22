@@ -9,10 +9,16 @@ enum {
     T_EOF,
     T_IDENTIFIER,               /* [a-zA-Z_][a-zA-Z0-9_] */
     T_INTEGER,                  /* [0-9] */
+    T_LEAD_ZERO,                /* 0 */
+    T_BINARY_S,                 /* 0b, 0B */
+    T_BINARY,                   /* 0b, 0B */
+    T_HEXA_S,                   /* 0x  0X */
+    T_HEXA,                     /* 0b, 0B */
+    T_OCTAL,                    /* 00 */
 
     T_CHAR_START,               /* ' */
     T_CHAR_CONTENT,             /* '. */
-    T_CHAR_SPECIAL,           /* \n \t */
+    T_CHAR_SPECIAL,             /* \n \t */
     T_CHAR,                     /* '.' */
 
     T_STRING_START,             /* " */
