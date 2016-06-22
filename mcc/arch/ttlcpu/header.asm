@@ -61,7 +61,14 @@ lbl(u)
     mov(to_ram, frm_acc)            \
     ld(to_acc, STACK_ACC)           \
 
-
+/* This one destroys acc content */
+#undef push_unsafe
+#define push_unsafe(s)              \
+    ld(to_mar, SP)                  \
+    mov(to_ram, (s))                \
+    ld(to_acc, SP)                  \
+    dec()                           \
+    mov(to_ram, frm_acc)            \
 
 #undef pop
 #define pop(d)                      \
@@ -158,7 +165,7 @@ lbl("bit")
     mov(to_mar, frm_acc)
     inv(frm_ram)               // 1st compliment
     add(progdata) data(8)       // 2nd compliment
-    push(frm_acc)    // var = acc
+    push_unsafe(frm_acc)    // var = acc
     ld(to_acc, SP)
     add(progdata) data(1+1)
     st(BX, frm_acc)
@@ -194,7 +201,7 @@ lbl("__bit_01_end")
     add(progdata) data(5)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    push(frm_acc)    // var = acc
+    push_unsafe(frm_acc)    // var = acc
     ld(to_acc, SP)
     add(progdata) data(1+1)
     st(BX, frm_acc)
@@ -333,7 +340,7 @@ lbl("__bwand_rst_1")
     add(progdata) data(9+1)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(6+1)
     st(BX, frm_acc)                // store 2nd operand
@@ -347,7 +354,7 @@ lbl("__bwand_rst_1")
     add(progdata) data(8+1)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(5+1)
     st(BX, frm_acc)                // store 2nd operand
@@ -363,7 +370,7 @@ lbl("__bwand_rst_1")
     mov(to_acc_invert, frm_ram)
     inc()                        // 2nd cmpl      
     add(progdata) data(7)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(4+1)
     st(BX, frm_acc)                // store 2nd operand
@@ -419,7 +426,7 @@ lbl("__bwand_sl1_end")
     add(progdata) data(2+1)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(4+1)
     st(BX, frm_acc)                // store 2nd operand
@@ -473,7 +480,7 @@ lbl("__bwand_sl2_end")
     add(progdata) data(1+1)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(1+1)
     mov(to_mar, frm_acc)
@@ -482,7 +489,7 @@ lbl("__bwand_sl2_end")
     pop(to_acc)                      // 1st operand pop
     mov(to_mar, progdata) data(BX)  // addition
     add(frm_ram)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(2+1)
     st(BX, frm_acc)                // store 2nd operand
@@ -653,7 +660,7 @@ lbl("__das_key")
     st(BX, frm_acc)
     ld(to_acc, SP)
     add(progdata) data(0+1)
-    push(frm_acc)
+    push_unsafe(frm_acc)
     ld(to_acc, BX)
     pop(to_mar)
     mov(to_ram, frm_acc)
@@ -674,7 +681,7 @@ lbl("__das_nokey")
 
     ld(to_acc, SP)
     add(progdata) data(2+1)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(3+1)
     mov(to_mar, frm_acc)
@@ -685,7 +692,7 @@ lbl("__das_nokey")
 
     ld(to_acc, SP)
     add(progdata) data(1+1)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(2+1)
     mov(to_mar, frm_acc)
@@ -702,7 +709,7 @@ lbl("__das_if_continue_1")
 
     ld(to_acc, SP)
     add(progdata) data(3+1)
-    push(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)                  // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(4+1)
     mov(to_mar, frm_acc)

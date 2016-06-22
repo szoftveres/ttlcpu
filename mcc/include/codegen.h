@@ -39,6 +39,7 @@ void CODE_logical_neg (int lbl);
 void CODE_bitwise_neg (void);
 
 void CODE_push (void);
+void CODE_push_unsafe (void);
 void CODE_operand_pop (void);
 
 void CODE_do_operation_mul (int lbl);

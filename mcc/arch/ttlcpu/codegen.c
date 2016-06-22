@@ -169,6 +169,11 @@ void CODE_push (void) {
     fprintf(stdout, "    push(frm_acc)              // 1st operand push\n");
 }
 
+void CODE_push_unsafe (void) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "    push_unsafe(frm_acc)              // 1st operand push\n");
+}
+
 void CODE_operand_pop (void) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, "    st(BX, frm_acc)            // store 2nd operand\n");
@@ -184,7 +189,7 @@ void CODE_do_operation_mul (int lbl) {
     fprintf(stdout, "    dec()\n");
     CODE_operand_pop();
     fprintf(stdout, "    shl()\n");
-    CODE_push();
+    CODE_push_unsafe();
     fprintf(stdout, "    ld(to_acc, BX)\n");
     fprintf(stdout, "    jp(\"mul_%04d_start\")\n", lbl);
     fprintf(stdout, "lbl(\"mul_%04d_end\")\n", lbl);
@@ -223,7 +228,7 @@ void CODE_do_operation_shl (int lbl) {
     fprintf(stdout, "    dec()\n");
     CODE_operand_pop();
     fprintf(stdout, "    shl()\n");
-    CODE_push();
+    CODE_push_unsafe();
     fprintf(stdout, "    ld(to_acc, BX)\n");
     fprintf(stdout, "    jp(\"sleft_%04d_start\")\n", lbl);
     fprintf(stdout, "lbl(\"sleft_%04d_end\")\n", lbl);
@@ -237,7 +242,7 @@ void CODE_do_operation_shr (int lbl) {
     fprintf(stdout, "    dec()\n");
     CODE_operand_pop();
     fprintf(stdout, "    shr()\n");
-    CODE_push();
+    CODE_push_unsafe();
     fprintf(stdout, "    ld(to_acc, BX)\n");
     fprintf(stdout, "    jp(\"sright_%04d_start\")\n", lbl);
     fprintf(stdout, "lbl(\"sright_%04d_end\")\n", lbl);
@@ -269,7 +274,7 @@ void CODE_do_operation_compare_neq (int lbl) {
 
 void CODE_do_operation_bwand (int lbl) {
     print_debugs(__FUNCTION__);
-    CODE_push();
+    CODE_push_unsafe();
     fprintf(stdout, "    call(\"bwand\", \"bwand_%04d\")\n", lbl);
     fprintf(stdout, "    inc_sp(2)\n");
 }
@@ -337,7 +342,7 @@ void CODE_fn_call (int lbl, char* fn_name) {
 
 void CODE_fn_call_args (void) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    push(frm_acc)                      // push fn arg\n");
+    fprintf(stdout, "    push_unsafe(frm_acc)                      // push fn arg\n");
 }
 
 

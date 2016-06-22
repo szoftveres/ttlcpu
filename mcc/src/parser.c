@@ -462,7 +462,7 @@ int binary_operation (int precedence) {
 
     lex_consume();
 
-    CODE_push();
+    CODE_push_unsafe();
     inc_var_pos(&(lcl_vars)); /* matching dec_var_pos in do_operations */
 
     if (!primary_expression()) {
@@ -699,7 +699,7 @@ int identifier_expression (void) {
 int assignment (void) {
     /* Addr of location in acc */
     if (lex_get(T_ASSIGN, NULL)) {
-        CODE_push();
+        CODE_push_unsafe();
         inc_var_pos(&(lcl_vars));
         if (!expression()) {
             grammar_error("expected expression after '='");
@@ -736,7 +736,7 @@ int recursive_assignment (void) {
     inc_var_pos(&(lcl_vars));  /* matching dec_var_pos */
 
     CODE_dereference();
-    CODE_push();
+    CODE_push_unsafe();
     inc_var_pos(&(lcl_vars));  /* matching dec_var_pos in do_operations */
 
     if (!expression()) {    /* only one expression after assignment */
