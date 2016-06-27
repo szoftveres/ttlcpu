@@ -21,8 +21,8 @@
 
 #define add(s)      mov(to_acc_adder, (s))
 
-#define inc()       add(progdata) data(1)
-#define dec()       add(progdata) data(-1)
+#define inc()       do {add(progdata) data(1)} while(0);
+#define dec()       do {add(progdata) data(-1)} while(0);
 #define inv(s)      mov(to_acc_invert, (s))
 #define shl()       add(frm_acc)
 #define rol()       inst(to_acc_adder, frm_acc, "c")
@@ -31,16 +31,16 @@
 
 #define nop()       mov(to_acc, frm_acc)
 
-#define jp(a)       mov(to_pch, progdata) defh(a) mov(to_pc, progdata) defl(a)
-#define jz(a)       movz(to_pch, progdata) defh(a) movz(to_pc, progdata) defl(a)
+#define jp(a)       do {mov(to_pch, progdata) defh(a) mov(to_pc, progdata) defl(a)} while(0);
+#define jz(a)       do {movz(to_pch, progdata) defh(a) movz(to_pc, progdata) defl(a)} while(0);
 
-#define st(a, s)    mov(to_mar, progdata) data(a) mov(to_ram, (s))
-#define stz(a, s)   movz(to_mar, progdata) data(a) movz(to_ram, (s))
-#define ld(d, a)    mov(to_mar, progdata) data((a)) mov((d), frm_ram)
-#define ldz(d, a)   movz(to_mar, progdata) data((a)) movz((d), frm_ram)
+#define st(a, s)    do {mov(to_mar, progdata) data(a) mov(to_ram, (s))} while(0);
+#define stz(a, s)   do {movz(to_mar, progdata) data(a) movz(to_ram, (s))} while(0);
+#define ld(d, a)    do {mov(to_mar, progdata) data((a)) mov((d), frm_ram)} while(0);
+#define ldz(d, a)   do {movz(to_mar, progdata) data((a)) movz((d), frm_ram)} while(0);
 
-#define ror()       rol() rol() rol() rol() rol() rol() rol()
-#define shr()       ror() shl() ror()
+#define ror()       do {rol() rol() rol() rol() rol() rol() rol()} while(0);
+#define shr()       do {ror() shl() ror()} while(0);
 
 /* === Code organization === */
 
@@ -69,12 +69,12 @@
  * them to the symbol table
  */
 
-#define inst(d, s, m)   do {++pc;} while(0);
-#define datal(l)         do {++pc;} while(0);
-#define datah(l)         do {++pc;} while(0);
-#define defl(n)         do {++pc;} while(0);
-#define defh(n)         do {++pc;} while(0);
-#define lbl(n)          do {lbladd(n);} while(0);
+#define inst(d, s, m)   ++pc;
+#define datal(l)        ++pc;
+#define datah(l)        ++pc;
+#define defl(n)         ++pc;
+#define defh(n)         ++pc;
+#define lbl(n)          lbladd(n);
 
 #else
 /* ============================================================ */
@@ -85,12 +85,12 @@
  * the position of the labels
  */
 
-#define inst(d, s, m)   do {instruction((d),(s),(m));} while(0);
-#define datal(v)         do {dataconst((unsigned int)(v), 0);} while(0);
-#define datah(v)         do {dataconst((unsigned int)(v), 1);} while(0);
-#define defl(n)         do {defaddr((n), 0);} while(0);
-#define defh(n)         do {defaddr((n), 1);} while(0);
-#define lbl(n)          do {lblprint(n);} while(0);
+#define inst(d, s, m)   instruction((d),(s),(m));
+#define datal(v)        dataconst((unsigned int)(v), 0);
+#define datah(v)        dataconst((unsigned int)(v), 1);
+#define defl(n)         defaddr((n), 0);
+#define defh(n)         defaddr((n), 1);
+#define lbl(n)          lblprint(n);
 
 #endif
 /* ============================================================ */

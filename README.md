@@ -6,7 +6,7 @@
     The toolchain contains:
     
      -  'mcc' A compiler which resembles to the 'C' programming language
-        and implements a subset of it.
+        and implements a subset of it. (see 'example.c' for details)
      -  'am' A very basic assembler implemented by using the
         capabilities of the gnu-gcc preprocessor
      -  'burner' Program that transfers assembled bytecode to
