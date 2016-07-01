@@ -11,6 +11,11 @@ static char*  pointer;
 char     lexeme[MAX_TOKEN_SIZE];
 int      token;
 
+void syntax_error (const char* msg) {
+    fprintf(stderr, "syntax error: %s\n", msg);
+    exit(1);
+}
+
 void pushchar (int c) {
     if (last_char == EOF) {
         last_char = c;
@@ -96,7 +101,8 @@ int bin (char c) {
 
 int oct (char c) {
     switch (c) {
-      case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' :
+      case '0' : case '1' : case '2' : case '3' :
+      case '4' : case '5' : case '6' : case '7' :
         return 1;
     }
     return 0;
@@ -118,8 +124,7 @@ int lex (char c) {
             token = T_STRING_SPECIAL;
             return 1;
         }
-        fprintf(stderr, "syntax error : unexpected '\\' \n");
-        exit (1);
+        syntax_error("unexpected '\\'");
     }
 
     if (c == '\'') {
@@ -171,8 +176,7 @@ int lex (char c) {
                 token = T_OCTAL;
                 return 1; /* ok, continue */
             } else {
-                fprintf(stderr, "error : invalid octal digit\n");
-                exit(1);
+                syntax_error("invalid octal digit");
             }
           case T_BINARY_S :
           case T_BINARY :
@@ -180,8 +184,7 @@ int lex (char c) {
                 token = T_BINARY;
                 return 1; /* ok, continue */
             } else {
-                fprintf(stderr, "error : invalid binary digit\n");
-                exit(1);
+                syntax_error("invalid binary digit");
             }
           case T_HEXA_S :
           case T_HEXA :
@@ -189,8 +192,7 @@ int lex (char c) {
                 token = T_HEXA;
                 return 1; /* ok, continue */
             } else {
-                fprintf(stderr, "error : invalid hexadecimal digit\n");
-                exit(1);
+                syntax_error("invalid hexadecimal digit");
             }
           case T_NONE :
             if (c == '0') {
@@ -220,16 +222,15 @@ int lex (char c) {
             token = T_IDENTIFIER;
             return 1;
           case T_INTEGER:
-            fprintf(stderr, "error : invalid decimal digit\n");
-            exit(1);
+            syntax_error("invalid decimal digit");
+            break;
           case T_HEXA_S :
           case T_HEXA : 
             if (hex(c)) {
                 token = T_HEXA;
                 return 1; /* ok, continue */
             } else {
-                fprintf(stderr, "error : invalid hexadecimal digit\n");
-                exit(1);
+                syntax_error("invalid hexadecimal digit");
             }
           case T_CHAR_START :
             token = T_CHAR_CONTENT;
@@ -247,8 +248,7 @@ int lex (char c) {
                 token = T_BINARY_S;
                 return 1;
             } else {
-                fprintf(stderr, "error : invalid character followed by '0'\n");
-                exit (1);
+                syntax_error("invalid character followed by 0");
             }
           default:
             return 0;  /* other token begins, return */
@@ -335,8 +335,8 @@ int lex (char c) {
         break;   /* convert LEAD ZERO to integer in case it was not followed by any meaningful */
       case T_HEXA_S :
       case T_BINARY_S :
-        fprintf(stderr, "error : expected digit after non-decimal prefix \n");
-        exit (1);  
+        syntax_error("expected digit after non-decimal prefix");
+        break;
       case T_STRING_START :
       case T_STRING_SPECIAL :
       case T_STRING_CONTENT :
@@ -377,8 +377,9 @@ int lex (char c) {
       case EOF : token = T_EOF; return 1;
     }
 
-    fprintf(stderr, "error : illegal character: %c\n", c);
-    exit(1);
+    syntax_error("illegal character");
+    /* not reached */
+    return (0);
 }
 
 /**
@@ -459,8 +460,7 @@ void str_process(void) {
                 buf[bp] = '\'';
                 break;
               default :
-                fprintf(stderr, "error : unknown esc seq: \\%c\n", lexeme[tp]);
-                exit(1);
+                syntax_error("illegal esc seq");
                 break;
             }
             bp++;

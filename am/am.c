@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* ============================================================ */
-/* data sources and destinations */
+/* data sources and destinations
+ * These values are directly decoded by
+ * the two 74HC138 instruction decoders
+ */
 
 #define to_acc          (0b000)
 #define to_acc_invert   (0b100)
@@ -57,11 +59,11 @@ static void instruction (int d, int s, char* m) {
     while (*mod) {
       switch (*mod) {
         case 'Z' : case 'z' :
-            ic &= ~((unsigned char)1);
-            break;
+          ic &= ~((unsigned char)1);
+          break;
         case 'C' : case 'c' :
-            ic |= 2;
-            break;
+          ic |= 2;
+          break;
         }
         mod++;
     }

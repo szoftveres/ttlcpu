@@ -157,7 +157,7 @@ bit2(var a, var b) {
   return (data & (1 << var<0-7>));
 
 */
-
+/*
 lbl("bit")
     dec_sp(1)       // var decl space
     // ld(to_acc, SP)          // local var value
@@ -233,7 +233,7 @@ lbl("__bit_02_end")
     mov(to_acc, frm_ram)
     inc_sp(1)      // var decl restore
     ret()
-
+*/
 
 
 /*-------------------------------------------------------*/
@@ -818,7 +818,7 @@ lbl("__disp_do_base")
     mov(to_mar, frm_ram)
     out(frm_ram)
 
-    mov(to_acc, progdata) data(10)
+    mov(to_acc, progdata) data(10) // tune this to 'das' 
 lbl("__disp_dly")
     dec()
     jz("__disp_dly_end")

@@ -13,6 +13,7 @@
 #define SYM_HYPHEN      (0x01)
 #define SYM_UNDERSCORE  (0x0D)
 #define SYM_SPACE       (0x00)
+#define SYM_COMMA       (0x80)
 
 #define SYM_0           (0xDE)
 #define SYM_1           (0x48)
@@ -33,7 +34,7 @@
 
 #define SYM_G           (0xD6)
 #define SYM_H           (0xCD)
-#define SYM_I           (0x40)
+#define SYM_I           (0x48)
 #define SYM_J           (0xCA)
 #define SYM_K           (0x00)  /* unimplemented */
 #define SYM_L           (0x86)
@@ -72,8 +73,8 @@ count () {
     do {
         *(1) = (hex2sym((i, asm("rol() rol() rol() rol() \n"))));
         *(0) = (hex2sym(i) + SYM_DP);
-        *(7) = (hex2sym((0-i, asm("rol() rol() rol() rol() \n"))));
-        *(6) = (hex2sym(0-i) + SYM_DP);
+        *(7) = (hex2sym((i, asm("inv(frm_acc) rol() rol() rol() rol() \n"))));
+        *(6) = (hex2sym((i, asm("inv(frm_acc)"))) + SYM_DP);
         i += 1;
         disp(32);
     } while (i);
@@ -95,9 +96,7 @@ main () {
             scroll(SYM_L);
             scroll(SYM_L);
             scroll(SYM_O);
-            scroll(SYM_SPACE);
-            scroll(SYM_SPACE);
-            scroll(SYM_SPACE);
+            scroll(SYM_COMMA);
 
             scroll(SYM_T);
             scroll(SYM_H);
@@ -108,6 +107,7 @@ main () {
             scroll(SYM_S);
             scroll(SYM_SPACE);
             scroll(SYM_A);
+            scroll(SYM_N);
             scroll(SYM_SPACE);
 
             scroll(SYM_8);
