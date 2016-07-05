@@ -58,14 +58,14 @@
 
 
 
-put_scan (var code) {
+put_scan (char code) {
     disp_push(hex2sym((code, asm("rol() rol() rol() rol() \n"))));
     disp_push(hex2sym(code) + SYM_DP);
 }
 
 
 count () {
-    var i;
+    char i;
     i = 0;
     for (i = 0; i!= 8; i += 1) {disp_push(0);}
     *(3) = 1;
@@ -82,14 +82,14 @@ count () {
 }
 
 
-scroll (var a) {
+scroll (char a) {
     disp_push(a);
     disp(64);
 }
 
 main () {
     while (1) {
-        var i;
+        char i;
         for (i=0; i!= 2; i+=1) {
             scroll(SYM_H);
             scroll(SYM_E);

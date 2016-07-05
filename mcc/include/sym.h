@@ -7,7 +7,9 @@
 typedef struct var_s {
     char                name[MAX_TOKEN_SIZE];
     int                 pos;
-    int                 size;
+    int                 size;   /* Size of this type */
+    int                 num;    /* In case it represents an array */
+    struct var_s        *child; /* In case it represents a structure */
     struct var_s        *next;
 } var_t, *var_p;
 
@@ -20,7 +22,7 @@ extern var_p            glb_vars;
 
 
 void sym_init (void);
-void push_var (var_p* pvarp, char* name, int b);
+void push_var (var_p* pvarp, char* name, int size, int num);
 void pop_var (var_p* pvarp);
 var_p find_var (var_p* pvarp, char* name);
 void inc_var_pos (var_p *pvarp, int b);

@@ -32,7 +32,7 @@ int func_definitions (void) {
 
 
 int func_definition (void) {
-    int i;
+    int args;
 
     if (token != T_IDENTIFIER) {
         return 0;
@@ -42,15 +42,16 @@ int func_definition (void) {
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
     }
-    i = arg_declarations();
+    args = arg_declarations();
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         parser_error("expected ')'");
     }
     inc_var_pos(&(lcl_vars), SYM_code_pointer_size());
+    /* The above one doesn't need a pair, (out of scope on return) */
     if (!block()) {
         parser_error("expected block");
     }
-    while (i--) {
+    while (args--) {
         pop_var(&(lcl_vars));
     }
     CODE_func_definition_ret();
@@ -61,7 +62,7 @@ int func_definition (void) {
 int arg_declarations (void) {
     int args = 0;
 
-    args += var_declaration();
+    args += var_declaration(NULL);
     if (args) {
         if (lex_get(T_COMMA, NULL)) {
             int more_args;
@@ -76,15 +77,15 @@ int arg_declarations (void) {
 }
 
 
-int var_declarations (void) {
+int var_declarations (int* space) {
     int vars = 0;
 
-    vars += var_declaration();
+    vars += var_declaration(space);
     if (vars) {
         if (!lex_get(T_SEMICOLON, NULL)) {
             parser_error("expected ';'");
         }
-        vars += var_declarations();
+        vars += var_declarations(space);
     }
     return vars;
 
@@ -93,18 +94,19 @@ int var_declarations (void) {
 
 int block (void) {
     int vars;
+    int var_space = 0;
 
     if (!lex_get(T_LEFT_BRACE, NULL)) {
         return 0;
     }
     
-    vars = var_declarations();
-    CODE_var_declarations_space(vars);
+    vars = var_declarations(&var_space);
+    CODE_var_declarations_space(var_space);
     statements();
     if (!lex_get(T_RIGHT_BRACE, NULL)) {
         parser_error("expected '}'");
     }
-    CODE_stack_restore(vars);
+    CODE_stack_restore(var_space);
     while (vars--) {
         pop_var(&(lcl_vars));
     }
@@ -113,19 +115,38 @@ int block (void) {
 }
 
 
-int var_declaration (void) {
-    if (!lex_get(T_IDENTIFIER, "var")) {
+int var_declaration (int* space) {
+    char* name;
+    int   size;
+    int   num;
+
+    if (!lex_get(T_IDENTIFIER, "char")) {
         return 0;
     }
     if (token != T_IDENTIFIER) {
         parser_error("expected identifier");
     }
-    if (find_var(&(lcl_vars), lexeme)) {
-        fprintf(stderr, "error : '%s' already defined\n", lexeme);
+    name = strdup(lexeme);
+    lex_consume();
+    if (find_var(&(lcl_vars), name)) {
+        fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    push_var(&(lcl_vars), lexeme, SYM_integer_size());
-    lex_consume();
+    if (lex_get(T_LEFT_SQUARE_BRACKET, NULL)) {   
+        if (!lex_get(T_RIGHT_SQUARE_BRACKET, NULL)) {
+            parser_error("expected ']'");
+        }
+        size = SYM_integer_size();
+        num = 4;                   /* experimental */
+    } else {
+        size = SYM_integer_size();
+        num = 1;
+    }
+    push_var(&(lcl_vars), name, size, num);
+    free(name);
+    if (space) {
+        (*space) += (size * num);
+    }
     return 1; /* should be strictly 1 (number of declarations found) */
 }
 

@@ -8,9 +8,9 @@ int func_definitions (void);
 int func_definition (void);
 
 
-int var_declaration (void);
+int var_declaration (int* space);
 
-int var_declarations (void);
+int var_declarations (int* space);
 
 int arg_declarations (void);
 

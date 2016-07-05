@@ -9,10 +9,10 @@
 
 
 /*
- * There's only one data type: 8-bit 'var'
- * Every function returns a 'var' type value, there's no 'void' function
+ * There's only one data type: 8-bit 'char'
+ * Every function returns a 'char' type value, there's no 'void' function
  */
-add (var b1, var b2) {
+add (char b1, char b2) {
     /*
      * There's no return statement; the value
      * of the last expressions is returned.
@@ -34,7 +34,7 @@ add (var b1, var b2) {
 /*
  * In-line assembly for faster execution
  */
-dec (var a) {
+dec (char a) {
     /*
      * Expressions which are separated with commas, are being evaluated
      * sequentially after each other.
@@ -50,7 +50,7 @@ dec (var a) {
 }
 
 
-invert_out (var f) {
+invert_out (char f) {
     out(~f);
     /*
      * Cannot find out() definition? See
@@ -61,16 +61,16 @@ invert_out (var f) {
 /* The main function, program execution starts here */
 main () {
     /* Variable declarations at the beginning of each block */
-    var i;
+    char i;
     /*
      * Built-in operator precedence can be overriden
      * with () parentheses
      */
     for (i = NUM_TEN; (i - 1 != 0xFF - (1 == 2)) ? 1 : 0; i += add(1, 0)) {
-        var i_p;
+        char i_p;
         /*
          * there's neither 'pointer' type, nor
-         * pointer arythmetics, everything is 'var'
+         * pointer arythmetics, everything is 'char'
          */
         i_p = &i;
         *(i_p) += 1;
@@ -87,7 +87,7 @@ main () {
 }
 
 
-out_series (var num) {
+out_series (char num) {
     out(num);
     if (num) {
         /* Arbitrary deep recursion */
