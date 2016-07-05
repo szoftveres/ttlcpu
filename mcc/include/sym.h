@@ -7,6 +7,7 @@
 typedef struct var_s {
     char                name[MAX_TOKEN_SIZE];
     int                 pos;
+    int                 size;
     struct var_s        *next;
 } var_t, *var_p;
 
@@ -19,11 +20,11 @@ extern var_p            glb_vars;
 
 
 void sym_init (void);
-void push_var (var_p* pvarp, char* name);
+void push_var (var_p* pvarp, char* name, int b);
 void pop_var (var_p* pvarp);
 var_p find_var (var_p* pvarp, char* name);
-void inc_var_pos (var_p *pvarp);
-void dec_var_pos (var_p *pvarp);
+void inc_var_pos (var_p *pvarp, int b);
+void dec_var_pos (var_p *pvarp, int b);
 
 
 

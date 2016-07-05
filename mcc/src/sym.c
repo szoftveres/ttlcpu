@@ -47,53 +47,56 @@ static var_p new_var (char* name) {
 }
 
 
-static var_p add_var (var_p* pvarp, var_p var) {
+static var_p add_var (var_p* pvarp, var_p var, int b) {
     if (var) {
         var->next = *pvarp;
         *pvarp = var;
+        var->size = b;
     }
     return var;
 }
 
 
-static var_p del_var (var_p* pvarp) {
+static int del_var (var_p* pvarp) {
     var_p var;
+    int size = 0;
+
     if (!pvarp) {
         fprintf(stderr, "[%s,%d] error \n", __FUNCTION__, __LINE__);
         exit(1);
     }
     var = *pvarp;
     if (var) {
+        size = var->size;
         *pvarp = (*pvarp)->next;
         free(var);
     }
-    return var;
+    return size;
 }
 
 
-void inc_var_pos (var_p *pvarp) {
+void inc_var_pos (var_p *pvarp, int b) {
     var_p it;
     for (it = *pvarp; it; it=it->next) {
-        it->pos += SYM_integer_size();
+        it->pos += b;
     }
 }
 
 
-void dec_var_pos (var_p *pvarp) {
+void dec_var_pos (var_p *pvarp, int b) {
     var_p it;
     for (it = *pvarp; it; it=it->next) {
-        it->pos -= SYM_integer_size();
+        it->pos -= b;
     }
 }
 
 void pop_var (var_p* pvarp) {
-    dec_var_pos(pvarp);
-    del_var(pvarp);
+    dec_var_pos(pvarp, del_var(pvarp));
 }
 
-void push_var (var_p* pvarp, char* name) {
-    inc_var_pos(pvarp);
-    add_var(pvarp, new_var(name));
+void push_var (var_p* pvarp, char* name, int b) {
+    inc_var_pos(pvarp, b);
+    add_var(pvarp, new_var(name), b);
 }
 
 int new_label (void) {

@@ -33,7 +33,6 @@ int func_definitions (void) {
 
 int func_definition (void) {
     int i;
-    int j;
 
     if (token != T_IDENTIFIER) {
         return 0;
@@ -47,9 +46,7 @@ int func_definition (void) {
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         parser_error("expected ')'");
     }
-    for (j = 0; j != SYM_code_pointer_size(); j++) {
-        inc_var_pos(&(lcl_vars));
-    }
+    inc_var_pos(&(lcl_vars), SYM_code_pointer_size());
     if (!block()) {
         parser_error("expected block");
     }
@@ -127,7 +124,7 @@ int var_declaration (void) {
         fprintf(stderr, "error : '%s' already defined\n", lexeme);
         exit(1);
     }
-    push_var(&(lcl_vars), lexeme);
+    push_var(&(lcl_vars), lexeme, SYM_integer_size());
     lex_consume();
     return 1; /* should be strictly 1 (number of declarations found) */
 }
@@ -464,7 +461,8 @@ int binary_operation (int precedence) {
     lex_consume();
 
     CODE_push_unsafe();
-    inc_var_pos(&(lcl_vars)); /* matching dec_var_pos in do_operations */
+    inc_var_pos(&(lcl_vars), SYM_integer_size());
+    /* matching dec_var_pos in do_operations */
 
     if (!primary_expression()) {
         parser_error("expected expression after operator");
@@ -537,7 +535,8 @@ void do_operations (int op_type) {
         parser_error("unknown / unimplemented operator");
         return;
     }
-    dec_var_pos(&(lcl_vars));       /* there's a POP in each operation */
+    dec_var_pos(&(lcl_vars), SYM_integer_size());
+    /* there's a POP in each operation */
     return;
 }
 
@@ -706,15 +705,15 @@ int assignment (void) {
     /* Addr of location in acc */
     if (lex_get(T_ASSIGN, NULL)) {
         CODE_push_unsafe();
-        inc_var_pos(&(lcl_vars));
+        inc_var_pos(&(lcl_vars), SYM_integer_size());
         if (!expression()) {
             parser_error("expected expression after '='");
         }
         CODE_pop_addr_and_store();
-        dec_var_pos(&(lcl_vars));
+        dec_var_pos(&(lcl_vars), SYM_integer_size());
     } else if (recursive_assignment()) {
         CODE_pop_addr_and_store();
-        dec_var_pos(&(lcl_vars));
+        dec_var_pos(&(lcl_vars), SYM_integer_size());
     } else {
         return 0;
     }
@@ -739,11 +738,12 @@ int recursive_assignment (void) {
     }
 
     CODE_push();               /* Push the address where we store back */
-    inc_var_pos(&(lcl_vars));  /* matching dec_var_pos */
+    inc_var_pos(&(lcl_vars), SYM_integer_size());  /* matching dec_var_pos */
 
     CODE_dereference();
     CODE_push_unsafe();
-    inc_var_pos(&(lcl_vars));  /* matching dec_var_pos in do_operations */
+    inc_var_pos(&(lcl_vars), SYM_integer_size());
+    /* matching dec_var_pos in do_operations */
 
     if (!expression()) {    /* only one expression after assignment */
         parser_error("expected expression after assignment operator");
@@ -821,9 +821,7 @@ int fn_call (char* identifier) {
     }
     CODE_fn_call(new_label(), identifier);
     CODE_stack_restore(i);
-    while (i--) {
-        dec_var_pos(&(lcl_vars));
-    }
+    dec_var_pos(&(lcl_vars), i);
     return 1;
 }
 
@@ -834,7 +832,7 @@ int fn_call_args (void) {
     args += expression();
     if (args) {
         CODE_fn_call_args();
-        inc_var_pos(&(lcl_vars));
+        inc_var_pos(&(lcl_vars), SYM_integer_size());
         if (lex_get(T_COMMA, NULL)) {
             int more_args;
             more_args = fn_call_args();
