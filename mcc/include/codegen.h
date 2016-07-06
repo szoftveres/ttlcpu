@@ -68,7 +68,7 @@ void CODE_load_eff_addr (int pos);
 
 
 void CODE_const_expression_str (int lbl, char* c);
-void CODE_const_expression_int (char* c);
+void CODE_const_expression_int (int i);
 
 
 

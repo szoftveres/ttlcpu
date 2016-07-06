@@ -57,6 +57,8 @@ int primary_expression(void);
 
 int ternary_cond (void);
 
+int numeric_const (int* value);
+
 int const_expression (void);
 
 int function_expression (char* identifier);

@@ -411,7 +411,7 @@ void lex_init (void) {
 }
 
 
-int lex_get(int token_type, const char* str) {
+int lex_get (int token_type, const char* str) {
     if (token_type != token) {
         return 0;
     }
@@ -425,7 +425,7 @@ int lex_get(int token_type, const char* str) {
 }
 
 
-void str_process(void) {
+void str_process (void) {
     int tp;
     int bp;
     char buf[MAX_TOKEN_SIZE];
@@ -475,4 +475,51 @@ void str_process(void) {
     buf[bp] = '\0';
     strcpy(lexeme, buf);
 }
+
+
+
+int num_process (void) {
+    int i;
+    int value = 0;
+
+    switch (token) {
+      case T_CHAR:                  /* 'a' */
+        value = lexeme[1];
+        break;
+      case T_INTEGER:               /* 1234 */
+        for (i = 0; lexeme[i]; i++) {
+            value *= 10;
+            value += lexeme[i] - '0';
+        }
+        break;
+      case T_OCTAL:                 /* 0123 */
+        for (i = 1; lexeme[i]; i++) {
+            value *= 8;
+            value += lexeme[i] - '0';
+        }
+        break;
+      case T_BINARY:                /* 0b101 */
+        for (i = 2; lexeme[i]; i++) {
+            value *= 2;
+            value += lexeme[i] - '0';
+        }
+        break;
+      case T_HEXA:                  /* 0x1fa */
+        for (i = 2; lexeme[i]; i++) {
+            value *= 16;
+            if (lexeme[i] >= '0' && lexeme[i] <= '9') {
+                value += lexeme[i] - '0';
+            } else if (lexeme[i] >= 'a' && lexeme[i] <= 'f') {
+                value += lexeme[i] + 0xa - 'a';
+            } else if (lexeme[i] >= 'A' && lexeme[i] <= 'F') {
+                value += lexeme[i] + 0xA - 'A';
+            }
+        }
+        break;
+      default:
+        return 0;
+    }
+    return value;
+}
+
 

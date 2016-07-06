@@ -330,9 +330,9 @@ void CODE_const_expression_str (int lbl, char* c) {
     unimplemented(__FUNCTION__);
 }
 
-void CODE_const_expression_int (char* c) {
+void CODE_const_expression_int (int i) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    mov(to_acc, progdata) data(%s)      // const\n", c);
+    fprintf(stdout, "    mov(to_acc, progdata) data(0x%X)      // const\n", i);
 }
 
 void CODE_fn_call (int lbl, char* fn_name) {

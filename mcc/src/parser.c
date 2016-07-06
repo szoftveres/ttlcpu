@@ -132,12 +132,17 @@ int var_declaration (int* space) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    if (lex_get(T_LEFT_SQUARE_BRACKET, NULL)) {   
+    if (lex_get(T_LEFT_SQUARE_BRACKET, NULL)) {
+        int array_size;
+
+        if (!numeric_const(&array_size)) {
+            parser_error("expected numeric constant");
+        }
         if (!lex_get(T_RIGHT_SQUARE_BRACKET, NULL)) {
             parser_error("expected ']'");
         }
         size = SYM_integer_size();
-        num = 4;                   /* experimental */
+        num = array_size;
     } else {
         size = SYM_integer_size();
         num = 1;
@@ -675,20 +680,30 @@ int addressof (void) {
 }
 
 
+int numeric_const (int* value) {
+    if (token != T_CHAR &&
+        token != T_INTEGER &&
+        token != T_OCTAL &&
+        token != T_BINARY &&
+        token != T_HEXA) {
+        return 0;
+    }
+    *value = num_process(); 
+    lex_consume();
+    return 1;
+}
+
+
 int const_expression (void) {
+    int val;
+
     if (token == T_STRING) {
         CODE_const_expression_str(new_label(), lexeme);
         lex_consume();
         return 1;
     }
-    if (token == T_CHAR ||
-        token == T_INTEGER ||
-        token == T_OCTAL ||
-        token == T_BINARY ||
-        token == T_HEXA) {
-
-        CODE_const_expression_int(lexeme);
-        lex_consume();
+    if (numeric_const(&val)) {
+        CODE_const_expression_int(val);
         return 1;
     }
     return 0;
