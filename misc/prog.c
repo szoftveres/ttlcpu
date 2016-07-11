@@ -64,22 +64,63 @@ memset (char start, char c, char size) {
 }
 
 
+scroll (char c) {
+    disp_push(c);
+    disp(32);
+}
+
+
+msg () {
+    char i;
+    memset(0, 0, 8);
+    scroll(SYM_P);
+    scroll(SYM_R);
+    scroll(SYM_E);
+    scroll(SYM_S);
+    scroll(SYM_S);
+    scroll(SYM_SPACE);
+    scroll(SYM_D);
+    for (i = 0; i != 8; i += 1) {
+        scroll(SYM_SPACE);
+    }
+}
+
+
+mem_monitor (char addr) {
+    memset(0, 0, 8);
+    disp_push(SYM_0);
+    disp_push(SYM_0);
+    disp_push(hex2sym(addr >> 4));
+    disp_push(hex2sym(addr));
+    disp_push(SYM_SPACE);
+    disp_push(SYM_SPACE);
+    disp_push(hex2sym(*(addr) >> 4));
+    disp_push(hex2sym(*(addr)));
+}
+
+
 
 main () {
-    char num;
-
-    num = 0;
+    char memaddr;
+    memaddr = 0;
+    msg();
     while (1) {
 
         char c;
-        c = das();
+        c = das(); /* Display And Scan */
         if (c == 0x0F) {
-            num = 0;
+            memset(0, 0, 8);
         } else if (c == 0x0E) {
+            disp_push(SYM_SPACE);
         } else if (c == 0x0D) {
+            msg();
         } else if (c == 0x0C) {
         } else if (c == 0x0B) {
+            memaddr += 1;
+            mem_monitor(memaddr);
         } else if (c == 0x0A) {
+            memaddr -= 1;
+            mem_monitor(memaddr);
         } else {
             disp_push(hex2sym(c));
         }
