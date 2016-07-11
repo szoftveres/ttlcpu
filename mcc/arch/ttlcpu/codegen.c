@@ -11,7 +11,8 @@ static void unimplemented (const char* s) {
 
 
 static void print_debugs (const char* s) {
-    fprintf(stdout, "    /* %s */\n", s);
+//    fprintf(stdout, "    /* %s */\n", s);
+    ;
 }
 
 

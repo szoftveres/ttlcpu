@@ -55,84 +55,33 @@
 
 
 
-
-
-
-put_scan (char code) {
-    disp_push(hex2sym((code, asm("rol() rol() rol() rol() \n"))));
-    disp_push(hex2sym(code) + SYM_DP);
+memset (char start, char c, char size) {
+    char end;
+    end = start + size;
+    for (; start != end; start += 1) {
+        *(start) = c;
+    }
 }
 
 
-count () {
-    char i;
-    i = 0;
-    for (i = 0; i!= 8; i += 1) {disp_push(0);}
-    *(3) = 1;
-    *(4) = 1;
-    do {
-        *(1) = (hex2sym((i, asm("rol() rol() rol() rol() \n"))));
-        *(0) = (hex2sym(i) + SYM_DP);
-        *(7) = (hex2sym((i, asm("inv(frm_acc) rol() rol() rol() rol() \n"))));
-        *(6) = (hex2sym((i, asm("inv(frm_acc)"))) + SYM_DP);
-        i += 1;
-        disp(32);
-    } while (i);
-//    for (i = 0; i!= 8; i += 1) {disp_push(0);}
-}
-
-
-scroll (char a) {
-    disp_push(a);
-    disp(64);
-}
 
 main () {
+    char num;
+
+    num = 0;
     while (1) {
-        char i;
-        for (i=0; i!= 2; i+=1) {
-            scroll(SYM_H);
-            scroll(SYM_E);
-            scroll(SYM_L);
-            scroll(SYM_L);
-            scroll(SYM_O);
-            scroll(SYM_COMMA);
 
-            scroll(SYM_T);
-            scroll(SYM_H);
-            scroll(SYM_I);
-            scroll(SYM_S);
-            scroll(SYM_SPACE);
-            scroll(SYM_I);
-            scroll(SYM_S);
-            scroll(SYM_SPACE);
-            scroll(SYM_A);
-            scroll(SYM_N);
-            scroll(SYM_SPACE);
-
-            scroll(SYM_8);
-            scroll(SYM_HYPHEN);
-            scroll(SYM_B);
-            scroll(SYM_I);
-            scroll(SYM_T);
- 
-            scroll(SYM_SPACE);
-
-            scroll(SYM_T);
-            scroll(SYM_T);
-            scroll(SYM_L);
-            scroll(SYM_SPACE);
-            scroll(SYM_C);
-            scroll(SYM_P);
-            scroll(SYM_U);
-            scroll(SYM_SPACE);
-            scroll(SYM_SPACE);
-            scroll(SYM_SPACE);
-        }
-        count();
-        while (1) {
-            put_scan(das());
-            disp(64);
+        char c;
+        c = das();
+        if (c == 0x0F) {
+            num = 0;
+        } else if (c == 0x0E) {
+        } else if (c == 0x0D) {
+        } else if (c == 0x0C) {
+        } else if (c == 0x0B) {
+        } else if (c == 0x0A) {
+        } else {
+            disp_push(hex2sym(c));
         }
     }
 }
