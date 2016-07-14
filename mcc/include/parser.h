@@ -75,8 +75,12 @@ int binary_operation(int precedence);
 
 void do_operations (int op_type);
 
-int object (void);
-int object_parentheses (void);
+
+int expression_dereference (void);
+int addressof_operator (void);
 int object_identifier (void);
+int object_address (void);
+int object_value (void);
+
 
 #endif

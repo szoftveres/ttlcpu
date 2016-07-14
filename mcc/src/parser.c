@@ -371,7 +371,10 @@ int primary_expression (void) {
     if (const_expression()) {
         return 1;
     }
-    if (identifier_expression()) {
+//    if (identifier_expression()) {
+//        return 1;
+//    }
+    if (object_value()) {
         return 1;
     }
     return 0;
@@ -604,9 +607,9 @@ int parentheses (void) {
 }
 
 int prefixop(void) {
-    if (dereference()) {
-        return 1;
-    }
+//    if (dereference()) {
+//        return 1;
+//    }
     if (addressof()) {
         return 1;
     }
@@ -884,27 +887,55 @@ int fn_call_args (void) {
 
 /* ================================= */
 
-
-int object (void) {
-    if (object_parentheses()) {
+/* This handles functions too */
+int object_value (void) {
+    int rc;
+    if (addressof_operator()) {
+        if (object_address() != 1) {
+            parser_error("expected object after '&'");
+        }
         return 1;
     }
-    if (object_identifier()) {
-        return 1;
+    rc = object_address();
+    if (rc == 1) {
+        if (!assignment()) {
+            CODE_dereference(); 
+        }
     }
-    return 0;  
+    return rc;
 }
 
 
-int object_parentheses (void) {
-    if (!lex_get(T_LEFT_PARENTH, NULL)) {
+int addressof_operator (void) {
+    char* id;
+    var_p var;
+
+    if (!lex_get(T_BWAND, NULL)) {
         return 0;
     }
-    if (!object()) {   /* multiple expressions within () */
-        parser_error("expected expression after '('");
+    return 1;
+}
+
+
+int object_address (void) {
+    int rc;
+    if (expression_dereference()) {
+        return 1;
     }
-    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
-        parser_error("expected ')'");
+    rc = object_identifier();
+    if (rc == 1) {
+        /* address offset e.g. [4 ]*/
+    }
+    return (rc);  
+}
+
+
+int expression_dereference (void) {
+    if (!lex_get(T_MUL, NULL)) {
+        return 0;
+    }
+    if (!primary_expression()) {
+        parser_error("expected primary expression after '*'");
     }
     return 1;
 }
@@ -919,6 +950,11 @@ int object_identifier (void) {
     }
     id = strdup(lexeme);
     lex_consume();
+    if (function_expression(id)) {
+        free(id);
+        /* 2 means function ret val in acc */
+        return 2;
+    }
     var = find_var(&(lcl_vars), id);
     if (!var) {
         fprintf(stderr, "error : '%s' not defined in this scope\n", id);
@@ -926,6 +962,7 @@ int object_identifier (void) {
     }
     CODE_load_eff_addr(var->pos);
     free(id);
+    /* 1 means address of obj in acc */
     return 1;
 }
 
