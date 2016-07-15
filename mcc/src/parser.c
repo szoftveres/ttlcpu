@@ -371,9 +371,6 @@ int primary_expression (void) {
     if (const_expression()) {
         return 1;
     }
-//    if (identifier_expression()) {
-//        return 1;
-//    }
     if (object_value()) {
         return 1;
     }
@@ -607,12 +604,6 @@ int parentheses (void) {
 }
 
 int prefixop(void) {
-//    if (dereference()) {
-//        return 1;
-//    }
-    if (addressof()) {
-        return 1;
-    }
     if (logical_neg()) {
         return 1;
     }
@@ -646,43 +637,6 @@ int bitwise_neg (void) {
 }
 
 
-int dereference (void) {
-    if (!lex_get(T_MUL, NULL)) {
-        return 0;
-    }
-    if (!primary_expression()) {
-        parser_error("expected primary expression after '*'");
-    }
-    if (!assignment()) {
-        CODE_dereference();
-    }
-    return 1;
-}
-
-
-int addressof (void) {
-    char* id;
-    var_p var;
-
-    if (!lex_get(T_BWAND, NULL)) {
-        return 0;
-    }
-    if (token != T_IDENTIFIER) {
-        parser_error("expected identifier after '&'");
-    }
-    id = strdup(lexeme);
-    lex_consume();
-    var = find_var(&(lcl_vars), id);
-    if (!var) {
-        fprintf(stderr, "error : '%s' not defined in this scope\n", id);
-        exit(1);
-    }
-    CODE_load_eff_addr(var->pos);
-    free(id);
-    return 1;
-}
-
-
 int numeric_const (int* value) {
     if (token != T_CHAR &&
         token != T_INTEGER &&
@@ -710,33 +664,6 @@ int const_expression (void) {
         return 1;
     }
     return 0;
-}
-
-
-int identifier_expression (void) {
-    char* id;
-    var_p var;
-
-    if (token != T_IDENTIFIER) {
-        return 0;
-    }
-    id = strdup(lexeme);
-    lex_consume();
-    if (function_expression(id)) {
-        free(id);
-        return 1;
-    }
-    var = find_var(&(lcl_vars), id);
-    if (!var) {
-        fprintf(stderr, "error : '%s' not defined in this scope\n", id);
-        exit(1);
-    }
-    CODE_load_eff_addr(var->pos);
-    if (!assignment()) {
-        CODE_dereference();
-    }
-    free(id);
-    return 1;
 }
 
 
@@ -907,9 +834,6 @@ int object_value (void) {
 
 
 int addressof_operator (void) {
-    char* id;
-    var_p var;
-
     if (!lex_get(T_BWAND, NULL)) {
         return 0;
     }

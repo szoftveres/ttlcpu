@@ -43,12 +43,6 @@ int parentheses (void);
 int logical_neg (void);
 int bitwise_neg (void);
 
-int dereference (void);
-
-int addressof (void);
-
-int identifier_expression (void);
-
 int assignment (void);
 
 int recursive_assignment (void);

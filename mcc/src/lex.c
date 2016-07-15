@@ -161,6 +161,9 @@ int lex (char c) {
           case T_STRING_CONTENT :
             token = T_STRING_CONTENT;
             return 1;   /* ok, continue */
+          case T_LEAD_ZERO:
+            token = T_INTEGER;
+            return 0;   /* convert LEAD ZERO to integer */
         }
         return 0;
     }
