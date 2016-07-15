@@ -69,7 +69,7 @@ int binary_operation(int precedence);
 
 void do_operations (int op_type);
 
-
+int array_index (void);
 int expression_dereference (void);
 int addressof_operator (void);
 int object_identifier (void);

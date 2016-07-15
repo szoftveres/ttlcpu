@@ -114,11 +114,29 @@ int block (void) {
     return 1;
 }
 
+int array_dimension (int* elements) {
+    int n1;
+    int n2;
+
+    if (!lex_get(T_LEFT_SQUARE_BRACKET, NULL)) {
+        return 0;
+    }
+    if (!numeric_const(&n1)) {
+            parser_error("expected numeric constant");
+    }
+    if (!lex_get(T_RIGHT_SQUARE_BRACKET, NULL)) {
+        parser_error("expected ']'");
+    }
+    *elements = n1 * (array_dimension(&n2) ? n2 : 1);
+
+    return 1;
+}
+
 
 int var_declaration (int* space) {
     char* name;
     int   size;
-    int   num;
+    int   num = 0;
 
     if (!lex_get(T_IDENTIFIER, "char")) {
         return 0;
@@ -132,21 +150,10 @@ int var_declaration (int* space) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    if (lex_get(T_LEFT_SQUARE_BRACKET, NULL)) {
-        int array_size;
-
-        if (!numeric_const(&array_size)) {
-            parser_error("expected numeric constant");
-        }
-        if (!lex_get(T_RIGHT_SQUARE_BRACKET, NULL)) {
-            parser_error("expected ']'");
-        }
-        size = SYM_integer_size();
-        num = array_size;
-    } else {
-        size = SYM_integer_size();
+    if (!array_dimension(&num)) {
         num = 1;
     }
+    size = SYM_integer_size();
     push_var(&(lcl_vars), name, size, num);
     free(name);
     if (space) {
@@ -843,14 +850,33 @@ int addressof_operator (void) {
 
 int object_address (void) {
     int rc;
+
     if (expression_dereference()) {
         return 1;
     }
     rc = object_identifier();
     if (rc == 1) {
-        /* address offset e.g. [4 ]*/
+        array_index();  /* Possible addr offset */
     }
     return (rc);  
+}
+
+
+int array_index (void) {
+    if (!lex_get(T_LEFT_SQUARE_BRACKET, NULL)) {
+        return 0;
+    }
+    /* XXX */ parser_error("array indexing unimplemented");
+    /* XXX save address */
+    CODE_push_unsafe();
+    if (!expressions()) {
+        parser_error("expected expression after '['");
+    }
+    /* XXX restore address and calculate */
+    if (!lex_get(T_RIGHT_SQUARE_BRACKET, NULL)) {
+        parser_error("expected ']'");
+    }
+    return 1;
 }
 
 
