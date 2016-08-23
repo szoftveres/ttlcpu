@@ -1,9 +1,9 @@
 # ttlcpu
 
-    Toolchain created to build programs for the
-    'ttl-cpu' (http://digitarworld.uw.hu/ttlcpu.html)
+    Toolchain  for the 8-bit TTL CPU:
+    http://digitarworld.uw.hu/ttlcpu.html
     
-    The toolchain contains:
+    Toolchain elements:
     
      -  'mcc' A compiler which resembles to the 'C' programming language
         and implements a subset of it. (see 'example.c' for details)
