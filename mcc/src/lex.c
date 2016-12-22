@@ -377,7 +377,7 @@ int lex (char c) {
       case '^' : token = T_BWXOR; return 1;
       case '~' : token = T_BWNEG; return 1;
       case '|' : token = T_BWOR; return 1;
-      case EOF : token = T_EOF; return 1;
+      case (char)EOF : token = T_EOF; return 1;
     }
 
     syntax_error("illegal character");
