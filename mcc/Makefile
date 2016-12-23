@@ -1,8 +1,8 @@
-OBJDIR = obj
-SRCDIR = src
-INCLUDE = -I include -I arch -I lex
+OBJDIR = cc
+SRCDIR = cc
+INCLUDE = -I cc -I arch -I lex
 ARCHDIR = arch/$(ARCH)
-OUTDIR = output
+OUTDIR = .
 
 ## General Flags
 PROGRAM = mcc
@@ -19,27 +19,25 @@ OBJECTS = $(OBJDIR)/main.o\
 ASMHEADER = header.asm
 ASMFOOTER = footer.asm
 
+SUBDIRS = arch lex
+.PHONY : $(SUBDIRS)
+
 ## Build both compiler and program
 all: $(PROGRAM)
 
-codegen:
-	cd arch && make
-
-lex:
-	cd lex && make
-
-.PHONY : lex codegen
+$(SUBDIRS):
+	$(MAKE) -C $@
 
 ## Compile source files
 $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c -o $(OBJDIR)/$*.o $< 
 
 ## Link object files to build the compiler
-$(PROGRAM): codegen lex $(OBJECTS) $(ARCHDIR)/$(ASMHEADER) $(ARCHDIR)/$(ASMFOOTER)
-	cp $(ARCHDIR)/$(ASMHEADER) $(OUTDIR)/
-	cp $(ARCHDIR)/$(ASMFOOTER) $(OUTDIR)/
+$(PROGRAM): $(SUBDIRS) $(OBJECTS)
 	$(LD) $(OBJECTS) lex/lex.o arch/codegen_$(ARCH).o -o $(OUTDIR)/$(PROGRAM)
 
 clean:
-	-rm -rf $(OBJDIR)/* $(OUTDIR)/*
+	-rm -rf $(OBJECTS) $(OUTDIR)/$(PROGRAM) 
+	for dir in $(SUBDIRS); do $(MAKE) clean -C $$dir; done
+
 

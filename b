@@ -15,9 +15,9 @@ fi
 
 #compile
 echo "Compiling '${1}'.."
-cp ./mcc/output/header.asm  am/program.asm || exit 1
-cc -E "${1}" | grep -v '^#' | ./mcc/output/mcc >> am/program.asm || exit 1
-cat ./mcc/output/footer.asm >> am/program.asm || exit 1
+cp ./mcc/arch/ttlcpu/header.asm  am/program.asm || exit 1
+cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> am/program.asm || exit 1
+cat ./mcc/arch/ttlcpu/footer.asm >> am/program.asm || exit 1
 
 # make assembler and assemble 
 echo "Making AM.."
