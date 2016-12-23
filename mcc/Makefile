@@ -1,6 +1,6 @@
 OBJDIR = obj
 SRCDIR = src
-INCLDIR = include
+INCLUDE = -I include -I arch -I lex
 ARCHDIR = arch/$(ARCH)
 OUTDIR = output
 
@@ -8,14 +8,12 @@ OUTDIR = output
 PROGRAM = mcc
 CC = gcc
 LD = gcc
-CFLAGS = -Wall -O0 -I $(INCLDIR)
+CFLAGS = -Wall -O0 $(INCLUDE)
 
 ## Objects that must be built in order to link
-OBJECTS = $(OBJDIR)/lex.o\
-          $(OBJDIR)/main.o\
+OBJECTS = $(OBJDIR)/main.o\
           $(OBJDIR)/parser.o\
           $(OBJDIR)/sym.o\
-          $(OBJDIR)/codegen.o\
 
 
 ASMHEADER = header.asm
@@ -24,19 +22,23 @@ ASMFOOTER = footer.asm
 ## Build both compiler and program
 all: $(PROGRAM)
 
-## Compile target architecture dependent source files
-$(OBJDIR)/%.o : $(ARCHDIR)/%.c
-	$(CC) $(CFLAGS) -c -o $(OBJDIR)/$*.o $< 
+codegen:
+	cd arch && make
+
+lex:
+	cd lex && make
+
+.PHONY : lex codegen
 
 ## Compile source files
 $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c -o $(OBJDIR)/$*.o $< 
 
 ## Link object files to build the compiler
-$(PROGRAM): $(OBJECTS) $(ARCHDIR)/$(ASMHEADER) $(ARCHDIR)/$(ASMFOOTER)
+$(PROGRAM): codegen lex $(OBJECTS) $(ARCHDIR)/$(ASMHEADER) $(ARCHDIR)/$(ASMFOOTER)
 	cp $(ARCHDIR)/$(ASMHEADER) $(OUTDIR)/
 	cp $(ARCHDIR)/$(ASMFOOTER) $(OUTDIR)/
-	$(LD) $(OBJECTS) -o $(OUTDIR)/$(PROGRAM)
+	$(LD) $(OBJECTS) lex/lex.o arch/codegen_$(ARCH).o -o $(OUTDIR)/$(PROGRAM)
 
 clean:
 	-rm -rf $(OBJDIR)/* $(OUTDIR)/*

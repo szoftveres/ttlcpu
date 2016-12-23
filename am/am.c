@@ -30,7 +30,8 @@ struct lbl_s {
 unsigned int    pc;
 struct lbl_s    *head;
 
-static void lbladd (char* n) {
+static void
+lbladd (char* n) {
     struct lbl_s *lbl;
     for (lbl = head; lbl; lbl = lbl->next) {
         if (!strcmp(lbl->name, n)) {
@@ -47,11 +48,13 @@ static void lbladd (char* n) {
     return;
 }
 
-static void lblprint(char* n) {
+static void
+lblprint(char* n) {
     fprintf(stderr, "%s:\n", n);
 }
 
-static void instruction (int d, int s, char* m) {
+static void
+instruction (int d, int s, char* m) {
     char* mod = m;
     char* de = "?", *so = "?";
     int i;
@@ -102,7 +105,8 @@ static void instruction (int d, int s, char* m) {
 }
 
 
-static int defaddr (char* n, int high) {
+static void
+defaddr (char* n, int high) {
     int i;
     unsigned char ic;
     unsigned char ic2;
@@ -130,7 +134,8 @@ static int defaddr (char* n, int high) {
     return;
 }
 
-static int dataconst (unsigned int v, int shift) {
+static void
+dataconst (unsigned int v, int shift) {
     int i;
     unsigned char ic = (unsigned char)(v >> (shift ? 8 : 0));
     unsigned char ic2;
