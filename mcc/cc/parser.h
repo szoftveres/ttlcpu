@@ -42,6 +42,7 @@ int parentheses (void);
 
 int logical_neg (void);
 int bitwise_neg (void);
+int addressof (void);
 
 int assignment (void);
 
@@ -71,8 +72,8 @@ void do_operations (int op_type);
 
 int array_index (void);
 int expression_dereference (void);
-int addressof_operator (void);
 int object_identifier (void);
+int var_address (void);
 int object_address (void);
 int object_value (void);
 

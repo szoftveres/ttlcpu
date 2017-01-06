@@ -6,7 +6,7 @@ memset (char start, char c, char size) {
     char end;
     end = start + size;
     for (; start != end; start += 1) {
-        *(start) = c;
+        *start = c;
     }
 }
 
@@ -41,8 +41,8 @@ mem_monitor (char addr) {
     disp_push(SYM_RIGHT_BRACKET);
     disp_push(SYM_SPACE);
     disp_push(SYM_SPACE);
-    disp_push(hex2sym(*(addr) >> 4));
-    disp_push(hex2sym(*(addr)) + SYM_DP);
+    disp_push(hex2sym(*addr >> 4));
+    disp_push(hex2sym(*addr) + SYM_DP);
 }
 
 

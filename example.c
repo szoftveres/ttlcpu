@@ -73,7 +73,7 @@ main () {
          * pointer arythmetics, everything is 'char'
          */
         i_p = &i;
-        *(i_p) += 1;
+        *i_p += 1;
         invert_out(*i_p);
     }
     /*

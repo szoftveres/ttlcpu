@@ -617,6 +617,10 @@ int prefixop(void) {
     if (bitwise_neg()) {
         return 1;
     }
+    if (addressof()) {
+        return 1;
+    }
+
     return (0);
 }
 
@@ -640,6 +644,16 @@ int bitwise_neg (void) {
         parser_error("expected primary expression after '~'");
     }
     CODE_bitwise_neg();
+    return 1;
+}
+
+int addressof (void) {
+    if (!lex_get(T_BWAND, NULL)) {
+        return 0;
+    }
+    if (var_address() != 1) {
+        parser_error("expected variable after '&'");
+    }
     return 1;
 }
 
@@ -824,12 +838,6 @@ int fn_call_args (void) {
 /* This handles functions too */
 int object_value (void) {
     int rc;
-    if (addressof_operator()) {
-        if (object_address() != 1) {
-            parser_error("expected object after '&'");
-        }
-        return 1;
-    }
     rc = object_address();
     if (rc == 1) {
         if (!assignment()) {
@@ -840,25 +848,23 @@ int object_value (void) {
 }
 
 
-int addressof_operator (void) {
-    if (!lex_get(T_BWAND, NULL)) {
-        return 0;
-    }
-    return 1;
-}
-
-
-int object_address (void) {
+int var_address (void) {
     int rc;
 
-    if (expression_dereference()) {
-        return 1;
-    }
     rc = object_identifier();
     if (rc == 1) {
         array_index();  /* Possible addr offset */
     }
-    return (rc);  
+    return (rc);
+}
+
+
+int object_address (void) {
+    if (expression_dereference()) {
+        CODE_dereference();
+        return 1;
+    }
+    return (var_address());
 }
 
 
@@ -884,8 +890,8 @@ int expression_dereference (void) {
     if (!lex_get(T_MUL, NULL)) {
         return 0;
     }
-    if (!primary_expression()) {
-        parser_error("expected primary expression after '*'");
+    if (!object_address()) {
+        parser_error("expected object after '*'");
     }
     return 1;
 }
