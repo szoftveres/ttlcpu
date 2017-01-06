@@ -45,7 +45,7 @@ dec (char a) {
      * together; instead, we can do it with one assembly instruction,
      * the accumulator will contain the return value.
      * Code execution speed can be significantly boosted with these tricks.
-     */    
+     */
     a, asm("add(progdata) data(0xFF)");
 }
 
@@ -62,6 +62,7 @@ invert_out (char f) {
 main () {
     /* Variable declarations at the beginning of each block */
     char i;
+
     /*
      * Built-in operator precedence can be overriden
      * with () parentheses

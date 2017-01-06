@@ -39,21 +39,58 @@ int popchar (void) {
 
 /**
 */
-int wspace (char c) {
+int newline (char c) {
     switch (c) {
-      case ' ' : case '\t' : case '\n' : case '\r' :
+      case '\n' : case '\r' :
         return 1;
     }
     return 0;
 }
 
-int num (char c) {
+int wspace (char c) {
     switch (c) {
-      case '0' : case '1' : case '2' : case '3' : case '4' :
-      case '5' : case '6' : case '7' : case '8' : case '9' :
+      case ' ' : case '\t' :
+        return 1;
+    }
+    return (newline(c));
+}
+
+int bin (char c) {
+    switch (c) {
+      case '0' : case '1' :
         return 1;
     }
     return 0;
+}
+
+int oct (char c) {
+    switch (c) {
+      case '2' : case '3' : case '4' : case '5' :
+      case '6' : case '7' :
+        return 1;
+    }
+    return bin(c);
+}
+
+int dec (char c) {
+    switch (c) {
+      case '8' : case '9' :
+        return 1;
+    }
+    return oct(c);
+}
+
+int hex (char c) {
+    switch (c) {
+      case 'A' : case 'a' :
+      case 'B' : case 'b' :
+      case 'C' : case 'c' :
+      case 'D' : case 'd' :
+      case 'E' : case 'e' :
+      case 'F' : case 'f' :
+        return 1;
+    }
+    return dec(c);
 }
 
 int alpha (char c) {
@@ -76,39 +113,6 @@ int alpha (char c) {
     return 0;
 }
 
-int hex (char c) {
-    switch (c) {
-      case '0' : case '1' : case '2' : case '3' : case '4' :
-      case '5' : case '6' : case '7' : case '8' : case '9' :
-      case 'A' : case 'a' :
-      case 'B' : case 'b' :
-      case 'C' : case 'c' :
-      case 'D' : case 'd' :
-      case 'E' : case 'e' :
-      case 'F' : case 'f' :
-        return 1;
-    }
-    return 0;
-}
-
-int bin (char c) {
-    switch (c) {
-      case '0' : case '1' :
-        return 1;
-    }
-    return 0;
-}
-
-int oct (char c) {
-    switch (c) {
-      case '0' : case '1' : case '2' : case '3' :
-      case '4' : case '5' : case '6' : case '7' :
-        return 1;
-    }
-    return 0;
-}
-
-
 /**
 */
 int lex (char c) {
@@ -116,7 +120,6 @@ int lex (char c) {
     if (c == '\\') {
         switch (token) {
           case T_CHAR_START :
-          case T_CHAR_CONTENT :
             token = T_CHAR_SPECIAL;
             return 1;
           case T_STRING_START :
@@ -124,7 +127,7 @@ int lex (char c) {
             token = T_STRING_SPECIAL;
             return 1;
         }
-        syntax_error("unexpected '\\'");
+        syntax_error("stray '\\' in program");
     }
 
     if (c == '\'') {
@@ -142,33 +145,25 @@ int lex (char c) {
           case T_NONE :
             token = T_STRING_START;
             return 1;   /* ok, continue */
-          case T_STRING_SPECIAL :
-            token = T_STRING_CONTENT;
-            return 1;   /* ok, continue */
           case T_STRING_CONTENT :
             token = T_STRING;
             return 1;   /* seems like finished */
         }
     }
-    /* wspace */
-    if (wspace(c)) {
+    /* newline */
+    if (newline(c)) {
         switch (token) {
           case T_CHAR_START :
-            token = T_CHAR_CONTENT;
-            return 1;   /* ok, continue */
+          case T_CHAR_CONTENT :
+            syntax_error("missing terminating ' character");
           case T_STRING_START :
-          case T_STRING_SPECIAL :
           case T_STRING_CONTENT :
-            token = T_STRING_CONTENT;
-            return 1;   /* ok, continue */
-          case T_LEAD_ZERO:
-            token = T_INTEGER;
-            return 0;   /* convert LEAD ZERO to integer */
+            syntax_error("missing terminating \" character");
         }
-        return 0;
     }
+
     /* numerical */
-    if (num(c)) {
+    if (dec(c)) {
         switch (token) {
           case T_INTEGER :
           case T_IDENTIFIER :
@@ -204,16 +199,6 @@ int lex (char c) {
                 token = T_INTEGER;
             }
             return 1;
-          case T_CHAR_START :
-            token = T_CHAR_CONTENT;
-            return 1;   /* ok, continue */
-          case T_STRING_START :
-          case T_STRING_SPECIAL :
-          case T_STRING_CONTENT :
-            token = T_STRING_CONTENT;
-            return 1;   /* ok, continue */
-          default :
-            return 0; /* other token begins */
         }
     }
     /* alphabetical */
@@ -228,21 +213,13 @@ int lex (char c) {
             syntax_error("invalid decimal digit");
             break;
           case T_HEXA_S :
-          case T_HEXA : 
+          case T_HEXA :
             if (hex(c)) {
                 token = T_HEXA;
                 return 1; /* ok, continue */
             } else {
                 syntax_error("invalid hexadecimal digit");
             }
-          case T_CHAR_START :
-            token = T_CHAR_CONTENT;
-            return 1;   /* ok, continue */
-          case T_STRING_START :
-          case T_STRING_SPECIAL :
-          case T_STRING_CONTENT :
-            token = T_STRING_CONTENT;
-            return 1;   /* ok, continue */
           case T_LEAD_ZERO :
             if (c == 'x' || c == 'X') {
                 token = T_HEXA_S;
@@ -253,8 +230,6 @@ int lex (char c) {
             } else {
                 syntax_error("invalid character followed by 0");
             }
-          default:
-            return 0;  /* other token begins, return */
         }
     }
     /* two-char operators */
@@ -331,24 +306,28 @@ int lex (char c) {
 
     switch (token) {
       case T_CHAR_START :
+      case T_CHAR_SPECIAL :
         token = T_CHAR_CONTENT;
         return 1;   /* ok, continue */
-      case T_LEAD_ZERO:
-        token = T_INTEGER;
-        break;   /* convert LEAD ZERO to integer in case it was not followed by any meaningful */
-      case T_HEXA_S :
-      case T_BINARY_S :
-        syntax_error("expected digit after non-decimal prefix");
-        break;
       case T_STRING_START :
       case T_STRING_SPECIAL :
       case T_STRING_CONTENT :
         token = T_STRING_CONTENT;
         return 1;   /* ok, continue */
+      case T_LEAD_ZERO:
+        /* convert LEAD ZERO to integer in case it was
+         * not followed by anything useful
+         */
+        token = T_INTEGER;
+        break;
+      case T_HEXA_S :
+      case T_BINARY_S :
+        syntax_error("expected digit after non-decimal prefix");
+        break;
     }
 
-    if (token != T_NONE) {
-        return 0;                       /* Other token begins, return */
+    if ((token != T_NONE) || wspace(c)) {
+        return 0; /* Other token begins, return */
     }
 
     switch (c) {
@@ -379,7 +358,6 @@ int lex (char c) {
       case '|' : token = T_BWOR; return 1;
       case (char)EOF : token = T_EOF; return 1;
     }
-
     syntax_error("illegal character");
     /* not reached */
     return (0);
@@ -398,7 +376,7 @@ void lex_consume (void) {
             if (token != T_NONE) {
                 pushchar(c);
                 *pointer = '\0';
-                // fprintf(stdout, "//      %s    \n", lexeme);
+                //fprintf(stdout, "//      %s    \n", lexeme);
                 return;
             }
             continue; /* It was a trailing whitespace */

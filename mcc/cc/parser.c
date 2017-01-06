@@ -8,7 +8,7 @@
 
 
 void parser_error (char* s) {
-    fprintf(stderr, "parser error: %s\n", s);
+    fprintf(stderr, "parser error: %s (token: %d)\n", s, token);
     exit(1);
 }
 
@@ -71,7 +71,7 @@ int arg_declarations (void) {
                 parser_error("expected argument after ','");
             }
             args += more_args;
-        }    
+        }
     }
     return args;
 }
@@ -99,7 +99,6 @@ int block (void) {
     if (!lex_get(T_LEFT_BRACE, NULL)) {
         return 0;
     }
-    
     vars = var_declarations(&var_space);
     CODE_var_declarations_space(var_space);
     statements();
@@ -666,7 +665,7 @@ int numeric_const (int* value) {
         token != T_HEXA) {
         return 0;
     }
-    *value = num_process(); 
+    *value = num_process();
     lex_consume();
     return 1;
 }
@@ -841,7 +840,7 @@ int object_value (void) {
     rc = object_address();
     if (rc == 1) {
         if (!assignment()) {
-            CODE_dereference(); 
+            CODE_dereference();
         }
     }
     return rc;
@@ -860,7 +859,7 @@ int var_address (void) {
 
 
 int object_address (void) {
-    if (expression_dereference()) {
+    if (dereference()) {
         CODE_dereference();
         return 1;
     }
@@ -886,7 +885,7 @@ int array_index (void) {
 }
 
 
-int expression_dereference (void) {
+int dereference (void) {
     if (!lex_get(T_MUL, NULL)) {
         return 0;
     }

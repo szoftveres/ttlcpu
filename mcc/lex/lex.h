@@ -7,13 +7,14 @@
 enum {
     T_NONE,
     T_EOF,
+    T_BACKSLASH,                /* \ */
     T_IDENTIFIER,               /* [a-zA-Z_][a-zA-Z0-9_] */
     T_INTEGER,                  /* [0-9] */
     T_LEAD_ZERO,                /* 0 */
     T_BINARY_S,                 /* 0b, 0B */
-    T_BINARY,                   /* 0b, 0B */
+    T_BINARY,                   /* 0b[01]*, 0B[01]* */
     T_HEXA_S,                   /* 0x  0X */
-    T_HEXA,                     /* 0b, 0B */
+    T_HEXA,                     /* 0x[0-fF], 0X[0-fF] */
     T_OCTAL,                    /* 00 */
 
     T_CHAR_START,               /* ' */
@@ -51,7 +52,7 @@ enum {
     T_NEQ,                      /* != */
     T_LEQ,                      /* <= */
     T_GREQ,                     /* >= */
-    
+
     T_SLEFT,                    /* << */
     T_SRIGHT,                   /* >> */
 
