@@ -114,10 +114,10 @@ lbl(u)
     /* clear the display */
     mov(to_acc, progdata) data(8)
 lbl("__disp_clr")
+    jz("__disp_clr_end")
     dec()
     mov(to_mar, frm_acc)
     mov(to_ram, progdata) data(0)
-    jz("__disp_clr_end")
     jp("__disp_clr")
 lbl("__disp_clr_end")
     

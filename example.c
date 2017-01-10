@@ -8,6 +8,9 @@
 /* You can use gnu-gcc preprocessor directives */
 
 
+/* Global variables */
+char var_glb;
+
 /*
  * There's only one data type: 8-bit 'char'
  * Every function returns a 'char' type value, there's no 'void' function
@@ -76,6 +79,7 @@ main () {
         i_p = &i;
         *i_p += 1;
         invert_out(*i_p);
+        var_glb += 1;
     }
     /*
      * Functions don't have to (and cannot) be declared
