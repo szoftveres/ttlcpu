@@ -14,9 +14,18 @@ void parser_error (char* s) {
 
 
 int program (void) {
+    int vars;
+    int var_space = 0;
+
+    vars = var_declarations(&var_space);
+    CODE_glob_var_container(var_space);
+
     func_definitions();
     if (token != T_EOF) {
         parser_error("expected function definition");
+    }
+    while (vars--) {
+        pop_var();
     }
     exit(0);
 }
@@ -42,18 +51,20 @@ int func_definition (void) {
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
     }
+    scope_inc();
     args = arg_declarations();
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         parser_error("expected ')'");
     }
-    inc_var_pos(&(lcl_vars), SYM_code_pointer_size());
+    inc_var_pos(SYM_code_pointer_size());
     /* The above one doesn't need a pair, (out of scope on return) */
     if (!block()) {
         parser_error("expected block");
     }
     while (args--) {
-        pop_var(&(lcl_vars));
+        pop_var();
     }
+    scope_dec();
     CODE_func_definition_ret();
     return 1;
 }
@@ -107,7 +118,7 @@ int block (void) {
     }
     CODE_stack_restore(var_space);
     while (vars--) {
-        pop_var(&(lcl_vars));
+        pop_var();
     }
 
     return 1;
@@ -145,7 +156,7 @@ int var_declaration (int* space) {
     }
     name = strdup(lexeme);
     lex_consume();
-    if (find_var(&(lcl_vars), name)) {
+    if (find_var(name, 1)) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
@@ -153,7 +164,7 @@ int var_declaration (int* space) {
         num = 1;
     }
     size = SYM_integer_size();
-    push_var(&(lcl_vars), name, size, num);
+    push_var(name, size, num);
     free(name);
     if (space) {
         (*space) += (size * num);
@@ -172,10 +183,13 @@ int statements (void) {
 
 
 int statement (void) {
-    if (keyword()) {
+    scope_inc();
+    if (block()) {
+        scope_dec();
         return 1;
     }
-    if (block()) {
+    scope_dec();
+    if (keyword()) {
         return 1;
     }
     if (expression_statement()) {
@@ -377,7 +391,7 @@ int primary_expression (void) {
     if (const_expression()) {
         return 1;
     }
-    if (object_value()) {
+    if (identifier_value()) {
         return 1;
     }
     return 0;
@@ -493,7 +507,7 @@ int binary_operation (int precedence) {
     lex_consume();
 
     CODE_push_unsafe();
-    inc_var_pos(&(lcl_vars), SYM_integer_size());
+    inc_var_pos(SYM_integer_size());
     /* matching dec_var_pos in do_operations */
 
     if (!primary_expression()) {
@@ -567,7 +581,7 @@ void do_operations (int op_type) {
         parser_error("unknown / unimplemented operator");
         return;
     }
-    dec_var_pos(&(lcl_vars), SYM_integer_size());
+    dec_var_pos(SYM_integer_size());
     /* there's a POP in each operation */
     return;
 }
@@ -691,15 +705,15 @@ int assignment (void) {
     /* Addr of location in acc */
     if (lex_get(T_ASSIGN, NULL)) {
         CODE_push_unsafe();
-        inc_var_pos(&(lcl_vars), SYM_integer_size());
+        inc_var_pos(SYM_integer_size());
         if (!expression()) {
             parser_error("expected expression after '='");
         }
         CODE_pop_addr_and_store();
-        dec_var_pos(&(lcl_vars), SYM_integer_size());
+        dec_var_pos(SYM_integer_size());
     } else if (recursive_assignment()) {
         CODE_pop_addr_and_store();
-        dec_var_pos(&(lcl_vars), SYM_integer_size());
+        dec_var_pos(SYM_integer_size());
     } else {
         return 0;
     }
@@ -724,11 +738,11 @@ int recursive_assignment (void) {
     }
 
     CODE_push();               /* Push the address where we store back */
-    inc_var_pos(&(lcl_vars), SYM_integer_size());  /* matching dec_var_pos */
+    inc_var_pos(SYM_integer_size());  /* matching dec_var_pos */
 
     CODE_dereference();
     CODE_push_unsafe();
-    inc_var_pos(&(lcl_vars), SYM_integer_size());
+    inc_var_pos(SYM_integer_size());
     /* matching dec_var_pos in do_operations */
 
     if (!expression()) {    /* only one expression after assignment */
@@ -807,7 +821,7 @@ int fn_call (char* identifier) {
     }
     CODE_fn_call(new_label(), identifier);
     CODE_stack_restore(i);
-    dec_var_pos(&(lcl_vars), i);
+    dec_var_pos(i);
     return 1;
 }
 
@@ -818,7 +832,7 @@ int fn_call_args (void) {
     args += expression();
     if (args) {
         CODE_fn_call_args();
-        inc_var_pos(&(lcl_vars), SYM_integer_size());
+        inc_var_pos(SYM_integer_size());
         if (lex_get(T_COMMA, NULL)) {
             int more_args;
             more_args = fn_call_args();
@@ -835,7 +849,7 @@ int fn_call_args (void) {
 /* ================================= */
 
 /* This handles functions too */
-int object_value (void) {
+int identifier_value (void) {
     int rc;
     rc = object_address();
     if (rc == 1) {
@@ -889,7 +903,7 @@ int dereference (void) {
     if (!lex_get(T_MUL, NULL)) {
         return 0;
     }
-    if (!object_address()) {
+    if (object_address() != 1) {
         parser_error("expected object after '*'");
     }
     return 1;
@@ -898,7 +912,7 @@ int dereference (void) {
 
 int object_identifier (void) {
     char* id;
-    var_p var;
+    var_t *var;
 
     if (token != T_IDENTIFIER) {
         return 0;
@@ -910,12 +924,16 @@ int object_identifier (void) {
         /* 2 means function ret val in acc */
         return 2;
     }
-    var = find_var(&(lcl_vars), id);
+    var = find_var(id, 0);
     if (!var) {
         fprintf(stderr, "error : '%s' not defined in this scope\n", id);
         exit(1);
     }
-    CODE_load_eff_addr(var->pos);
+    if (var->scope) {
+        CODE_load_eff_addr_lcl(var->pos);
+    } else {
+        CODE_load_eff_addr_glb(var->pos);
+    }
     free(id);
     /* 1 means address of obj in acc */
     return 1;

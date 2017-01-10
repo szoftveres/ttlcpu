@@ -5,38 +5,42 @@
 #include "codegen.h"
 
 
+
+
+/* variable stack */
+static var_t            *variables;
+
+/* unique labels */
 static int             lbl;
 
+/* scope - 0 means global */
+static int             scope;
 
-/* local variable list */
-var_p            lcl_vars;
-/* global variable list */
-var_p            glb_vars;
-
-
-
-void sym_init (void) {
-    lbl=0;
-    glb_vars = NULL;
-    lcl_vars = NULL;
+void
+sym_init (void) {
+    lbl = 0;
+    variables = NULL;
+    scope = 0;
 }
 
 
-var_p find_var (var_p* pvarp, char* name) {
-    var_p it;
-    for (it = *pvarp; it; it=it->next) {
+var_t *
+find_var (char* name, int scope_loc) {
+    var_t *it;
+    for (it = variables; it && (scope_loc ? it->scope == scope : 1); it = it->next) {
         if (!strcmp(name, it->name)) {
-            return it;
+            return (it);
         }
     }
     return NULL;
 }
 
 
-static var_p new_var (char* name) {
-    var_p   var;
+static var_t *
+new_var (char* name) {
+    var_t   *var;
 
-    var = (var_p) malloc (sizeof(var_t));
+    var = (var_t*) malloc (sizeof(var_t));
     if (!var) {
         fprintf(stderr, "[%s,%d] error \n", __FUNCTION__, __LINE__);
         exit(1);
@@ -47,59 +51,82 @@ static var_p new_var (char* name) {
 }
 
 
-static var_p add_var (var_p* pvarp, var_p var, int size, int num) {
+static var_t *
+add_var (var_t *var, int size, int num) {
     if (var) {
-        var->next = *pvarp;
-        *pvarp = var;
+        var->next = variables;
+        variables = var;
         var->size = size;
         var->num = num;
+        var->scope = scope;
     }
     return var;
 }
 
 
-static int del_var (var_p* pvarp) {
-    var_p var;
+static int
+del_var (void) {
+    var_t *var;
     int space = 0;
 
-    if (!pvarp) {
-        fprintf(stderr, "[%s,%d] error \n", __FUNCTION__, __LINE__);
-        exit(1);
-    }
-    var = *pvarp;
+    var = variables;
     if (var) {
         space = var->size * var->num;
-        *pvarp = (*pvarp)->next;
+        variables = variables->next;
         free(var);
     }
-    return space;
+    return (space);
 }
 
 
-void inc_var_pos (var_p *pvarp, int b) {
-    var_p it;
-    for (it = *pvarp; it; it=it->next) {
+void
+inc_var_pos (int b) {
+    var_t *it;
+    for (it = variables; it && it->scope; it = it->next) {
         it->pos += b;
     }
 }
 
 
-void dec_var_pos (var_p *pvarp, int b) {
-    var_p it;
-    for (it = *pvarp; it; it=it->next) {
+void
+dec_var_pos (int b) {
+    var_t* it;
+    for (it = variables; it && it->scope; it = it->next) {
         it->pos -= b;
     }
 }
 
-void pop_var (var_p* pvarp) {
-    dec_var_pos(pvarp, del_var(pvarp));
+void
+pop_var (void) {
+    dec_var_pos(del_var());
 }
 
-void push_var (var_p* pvarp, char* name, int size, int num) {
-    inc_var_pos(pvarp, size * num);
-    add_var(pvarp, new_var(name), size, num);
+void
+push_var (char* name, int size, int num) {
+    var_t *var;
+    inc_var_pos(size * num);
+    var = new_var(name);
+    add_var(var, size, num);
+    if (!scope) {
+        if (!var->next) {
+            var->pos = 0;
+        } else {
+            var->pos = var->next->pos + (var->next->size * var->next->num);
+        }
+    }
 }
 
-int new_label (void) {
-    return ++lbl;
+int
+new_label (void) {
+    return (++lbl);
+}
+
+void
+scope_inc (void) {
+    scope += 1;
+}
+
+void
+scope_dec (void) {
+    scope -= 1;
 }

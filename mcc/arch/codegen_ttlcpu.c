@@ -40,20 +40,26 @@ void CODE_func_definition_ret (void) {
 }
 
 void CODE_stack_restore (int i) {
-    if (!i) {
-        return;
-    }    
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size() * i);
+    if (i) {
+        fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size() * i);
+    }
 }
 
 void CODE_var_declarations_space (int i) {
-    if (!i) {
-        return;
-    }    
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    dec_sp(%u)\n", SYM_integer_size() * i);
+    if (i) {
+        fprintf(stdout, "    dec_sp(%u)\n", SYM_integer_size() * i);
+    }
 }
+
+void CODE_glob_var_container (int i) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "lbl(\"__main_caller\")\n");
+    fprintf(stdout, "    call(\"main\", \"__main_ret\")\n");
+    fprintf(stdout, "    ret()\n");
+}
+
 
 void CODE_if_statement_head (int lbl) {
     print_debugs(__FUNCTION__);
@@ -320,10 +326,16 @@ void CODE_dereference (void) {
 }
 
 
-void CODE_load_eff_addr (int pos) {
+void CODE_load_eff_addr_lcl (int pos) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, "    ld(to_acc, SP)\n");
-    fprintf(stdout, "    add(progdata) data(%d+1)\n", pos);
+    fprintf(stdout, "    add(progdata) data(%d)\n", pos + 1);
+}
+
+void CODE_load_eff_addr_glb (int pos) {
+    print_debugs(__FUNCTION__);
+//    unimplemented(__FUNCTION__);
+    fprintf(stdout, "    mov(to_acc, progdata) data(0x%X)\n", pos);
 }
 
 

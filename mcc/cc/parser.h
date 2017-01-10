@@ -75,7 +75,7 @@ int dereference (void);
 int object_identifier (void);
 int var_address (void);
 int object_address (void);
-int object_value (void);
+int identifier_value (void);
 
 
 #endif
