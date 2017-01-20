@@ -166,7 +166,9 @@ void CODE_asm_statement (char* s) {
 
 void CODE_return_statement (char* s, int d) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    inc_sp(%u)\n", d);
+    if (d) {
+        fprintf(stdout, "    inc_sp(%u)\n", d);
+    }
     fprintf(stdout, "    jp(\"__%s__ret\")\n", s);
 }
 

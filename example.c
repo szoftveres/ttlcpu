@@ -98,9 +98,10 @@ main () {
 
 out_series (char num) {
     out(num);
-    if (num) {
-        /* Arbitrary deep recursion */
-        out_series(num - 1);
+    if (!num) {
+        return;
     }
+    /* Arbitrary deep recursion */
+    out_series(num - 1);
 }
 
