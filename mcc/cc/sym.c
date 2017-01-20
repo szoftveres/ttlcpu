@@ -16,11 +16,16 @@ static int             lbl;
 /* scope - 0 means global */
 static int             scope;
 
+
+static int             stack_grow;
+static char            function_name[32];
+
 void
 sym_init (void) {
     lbl = 0;
     variables = NULL;
     scope = 0;
+    stack_grow = 0;
 }
 
 
@@ -85,6 +90,7 @@ inc_var_pos (int b) {
     for (it = variables; it && it->scope; it = it->next) {
         it->pos += b;
     }
+    stack_grow += b;
 }
 
 
@@ -94,6 +100,19 @@ dec_var_pos (int b) {
     for (it = variables; it && it->scope; it = it->next) {
         it->pos -= b;
     }
+    stack_grow -= b;
+}
+
+void
+reset_stack_grow (char* fn_name) {
+    stack_grow = 0;
+    strcpy(function_name, fn_name);
+}
+
+int
+get_stack_grow (char** fn_name) {
+    *fn_name = function_name;
+    return (stack_grow);
 }
 
 void

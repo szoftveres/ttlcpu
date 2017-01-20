@@ -34,8 +34,9 @@ void CODE_func_definition_label (char* fn_name) {
     fprintf(stdout, "lbl(\"%s\")\n", fn_name);
 }
 
-void CODE_func_definition_ret (void) {
+void CODE_func_definition_ret (char* fn_name) {
     print_debugs(__FUNCTION__);
+    fprintf(stdout, "lbl(\"__%s__ret\")\n", fn_name);
     fprintf(stdout, "    ret()\n");
 }
 
@@ -163,6 +164,11 @@ void CODE_asm_statement (char* s) {
     fprintf(stdout, "%s", s);
 }
 
+void CODE_return_statement (char* s, int d) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "    inc_sp(%u)\n", d);
+    fprintf(stdout, "    jp(\"__%s__ret\")\n", s);
+}
 
 void CODE_logical_neg (int lbl) {
     print_debugs(__FUNCTION__);

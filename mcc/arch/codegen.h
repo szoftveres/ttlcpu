@@ -7,7 +7,7 @@ int SYM_code_pointer_size (void);
 
 
 void CODE_func_definition_label (char* fn_name);
-void CODE_func_definition_ret (void);
+void CODE_func_definition_ret (char* fn_name);
 
 void CODE_stack_restore (int i);
 
@@ -35,6 +35,7 @@ void CODE_for_statement_base (int lbl);
 void CODE_for_statement_end (int lbl);
 
 void CODE_asm_statement (char* s);
+void CODE_return_statement (char* s, int d);
 
 void CODE_logical_neg (int lbl);
 void CODE_bitwise_neg (void);

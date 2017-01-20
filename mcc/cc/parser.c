@@ -42,11 +42,13 @@ int func_definitions (void) {
 
 int func_definition (void) {
     int args;
+    char* fn_name;
 
     if (token != T_IDENTIFIER) {
         return 0;
     }
     CODE_func_definition_label(lexeme);
+    fn_name = strdup(lexeme);
     lex_consume();
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
@@ -58,6 +60,7 @@ int func_definition (void) {
     }
     inc_var_pos(SYM_code_pointer_size());
     /* The above one doesn't need a pair, (out of scope on return) */
+    reset_stack_grow(fn_name);
     if (!block()) {
         parser_error("expected block");
     }
@@ -65,7 +68,8 @@ int func_definition (void) {
         pop_var();
     }
     scope_dec();
-    CODE_func_definition_ret();
+    CODE_func_definition_ret(fn_name);
+    free(fn_name);
     return 1;
 }
 
@@ -212,6 +216,9 @@ int keyword (void) {
     if (for_statement()) {
         return 1;
     }
+    if (return_statement()) {
+        return 1;
+    }
     return 0;
 }
 
@@ -302,6 +309,22 @@ int do_statement (void) {
         parser_error("expected ';'");
     }
     CODE_do_statement_test(lbl);
+    return 1;
+}
+
+
+int return_statement (void) {
+    char* fn;
+    int size;
+
+    if (!lex_get(T_IDENTIFIER, "return")) {
+        return 0;
+    }
+    if (!lex_get(T_SEMICOLON, NULL)) {
+        parser_error("expected ';'");
+    }
+    size = get_stack_grow(&fn);
+    CODE_return_statement(fn, size);
     return 1;
 }
 

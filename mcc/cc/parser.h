@@ -27,6 +27,7 @@ int if_statement (void);
 int while_statement (void);
 int do_statement (void);
 int for_statement (void);
+int return_statement (void);
 
 int statement (void);
 

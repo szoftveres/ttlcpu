@@ -16,12 +16,16 @@ char var_glb;
  * Every function returns a 'char' type value, there's no 'void' function
  */
 add (char b1, char b2) {
-    /*
-     * There's no return statement; the value
-     * of the last expressions is returned.
-     */
     b1 + b2;
-    /* This function returns the value of b1 + b2 */
+    return;
+    /* The retrun statment has no arguments, it just works as if
+     * it was 'goto' statement that jumps to the end of
+     * the function; it's used purely for program flow control.
+     * The return value of a function is always the value
+     * of the expression that has been evaluated the last.
+     * This function returns the value of b1 + b2, the above return
+     * statement can be omitted in this case.
+     */
 }
 
 /*

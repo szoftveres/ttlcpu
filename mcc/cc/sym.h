@@ -23,6 +23,9 @@ var_t *find_var (char* name, int scope_loc);
 void inc_var_pos (int b);
 void dec_var_pos (int b);
 
+void reset_stack_grow (char* fn_name);
+int get_stack_grow (char** fn_name);
+
 int new_label (void);
 
 void scope_inc (void);
