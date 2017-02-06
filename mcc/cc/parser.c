@@ -320,6 +320,7 @@ int return_statement (void) {
     if (!lex_get(T_IDENTIFIER, "return")) {
         return 0;
     }
+    expression(); /* optional return value */
     if (!lex_get(T_SEMICOLON, NULL)) {
         parser_error("expected ';'");
     }

@@ -167,7 +167,7 @@ void CODE_asm_statement (char* s) {
 void CODE_return_statement (char* s, int d) {
     print_debugs(__FUNCTION__);
     if (d) {
-        fprintf(stdout, "    inc_sp(%u)\n", d);
+        fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size() * d);
     }
     fprintf(stdout, "    jp(\"__%s__ret\")\n", s);
 }
@@ -299,7 +299,7 @@ void CODE_do_operation_bwand (int lbl) {
     print_debugs(__FUNCTION__);
     CODE_push_unsafe();
     fprintf(stdout, "    call(\"bwand\", \"bwand_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(2)\n");
+    fprintf(stdout, "    inc_sp(%d)\n", SYM_code_pointer_size());
 }
 
 void CODE_do_operation_bwxor (void) {
