@@ -1,15 +1,6 @@
 
 #include "../lib/ttlcpuio.h"
-
-
-memset (char start, char c, char size) {
-    char end;
-    end = start + size;
-    for (; start != end; start += 1) {
-        *start = c;
-    }
-}
-
+#include "routines.c"
 
 scroll (char c) {
     disp_push(c);
