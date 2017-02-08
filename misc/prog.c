@@ -1,5 +1,4 @@
 #include "../lib/ttlcpuio.h"
-#include "routines.c"
 
 
 char d0;
@@ -11,13 +10,8 @@ char d5;
 char d6;
 char d7;
 
-memset (char start, char c, char size) {
-    char end;
-    end = start + size;
-    for (; start != end; start += 1) {
-        *start = c;
-    }
-}
+
+#include "routines.c"
 
 
 scroll (char c) {
