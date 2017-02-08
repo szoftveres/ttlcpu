@@ -1,5 +1,5 @@
-
 #include "../lib/ttlcpuio.h"
+#include "routines.c"
 
 
 char d0;

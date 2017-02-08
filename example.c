@@ -10,21 +10,22 @@
 
 /* Global variables */
 char var_glb;
+/* are reset to zero before main function execution begins */
 
 /*
  * There's only one data type: 8-bit 'char'
  * Every function returns a 'char' type value, there's no 'void' function
  */
 add (char b1, char b2) {
-    b1 + b2;
-    return;
-    /* The retrun statment has no arguments, it just works as if
-     * it was 'goto' statement that jumps to the end of
+    return b1 + b2;
+    /* The retrun statment can have a value, however it just works as if
+     * it was a 'goto' statement that jumps to the end of
      * the function; it's used purely for program flow control.
      * The return value of a function is always the value
-     * of the expression that has been evaluated the last.
-     * This function returns the value of b1 + b2, the above return
-     * statement can be omitted in this case.
+     * of the last evaluated expression.
+     * The return statement can be omitted in this case, the body of the function
+     * could be rewritten as a single 'b1 + b2;' statment, the result would be the same.
+     * See the 'dec' function below, which doesn't utilize the return statement;
      */
 }
 
