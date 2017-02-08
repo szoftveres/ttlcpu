@@ -2,6 +2,15 @@
 #include "../lib/ttlcpuio.h"
 
 
+char d0;
+char d1;
+char d2;
+char d3;
+char d4;
+char d5;
+char d6;
+char d7;
+
 memset (char start, char c, char size) {
     char end;
     end = start + size;
@@ -34,15 +43,14 @@ msg () {
 
 
 mem_monitor (char addr) {
-    memset(0, 0, 8);
-    disp_push(SYM_LEFT_BRACKET);
-    disp_push(hex2sym(addr >> 4));
-    disp_push(hex2sym(addr));
-    disp_push(SYM_RIGHT_BRACKET);
-    disp_push(SYM_SPACE);
-    disp_push(SYM_SPACE);
-    disp_push(hex2sym(*addr >> 4));
-    disp_push(hex2sym(*addr) + SYM_DP);
+    d0 = SYM_LEFT_BRACKET;
+    d1 = hex2sym(addr >> 4);
+    d2 = hex2sym(addr);
+    d3 = SYM_RIGHT_BRACKET;
+    d4 = SYM_SPACE;
+    d5 = SYM_SPACE;
+    d6 = hex2sym(*addr >> 4);
+    d7 = hex2sym(*addr) + SYM_DP;
 }
 
 
@@ -58,10 +66,19 @@ main () {
         if (c == 0x0F) {
             memset(0, 0, 8);
         } else if (c == 0x0E) {
-            disp_push(SYM_SPACE);
+            while (1) {
+                msg();
+            }
         } else if (c == 0x0D) {
             msg();
         } else if (c == 0x0C) {
+            char ad;
+            ad = 0;
+            do {
+                mem_monitor(ad);
+                disp(24);
+                ad += 1;
+            } while (ad);
         } else if (c == 0x0B) {
             memaddr += 1;
             mem_monitor(memaddr);
