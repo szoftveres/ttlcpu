@@ -5,8 +5,30 @@ negative (char a) {
     (a, asm("    rol()\n")) - (a, asm("    shl()\n"));
 }
 
+
+shl (char np, char bytes) {
+    char adh;
+
+    adh = np + bytes;
+    np = adh + 0xFF;
+    bytes += 0xFF;
+    do {
+        adh += 0xFF;
+        np += 0xFF;
+        if (bytes) {
+        //    *adh = (*adh, asm("    shl()\n")) + ((*np, asm("    rol()\n")) - (*np, asm("    shl()\n")));
+            *adh = (*adh, asm("    shl()\n")) + negative(*np);
+        }
+        *np = (*np, asm("    shl()\n"));
+        bytes += 0xFF;
+    } while (bytes);
+}
+
+
 /*
- * 8-bit multiplication
+ * a [0-255]
+ * b [0-255]
+ * ret [0-255]
  */
 mul (char a, char b) {
     char i;
@@ -14,7 +36,7 @@ mul (char a, char b) {
     res = 0;
     i = 8;
     do {
-        i += 255; /* -1 */
+        i += 0xFF; /* -1 */
         res = res << 1;
         if (negative(b)) {
             res += a;
@@ -35,7 +57,7 @@ div (char a, char b, char rem_pt) {
     res = 0;
     i = 4;
     do {
-        i += 255; /* -1 */
+        i += 0xFF; /* -1 */
         dif = a - (b << i);
         if (!negative(dif)) {
             res += 1 << i;
@@ -51,9 +73,9 @@ div (char a, char b, char rem_pt) {
 /*
  * Memset
  */
-memset (char start, char c, char size) {
+memset (char start, char c, char bytes) {
     char end;
-    end = start + size;
+    end = start + bytes;
     for (; start != end; start += 1) {
         *start = c;
     }
