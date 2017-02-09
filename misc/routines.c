@@ -1,3 +1,9 @@
+/*
+ * Returns '1' if (a & 0x80)
+ */
+negative (char a) {
+    (a, asm("    rol()\n")) - (a, asm("    shl()\n"));
+}
 
 /*
  * 8-bit multiplication
@@ -10,7 +16,7 @@ mul (char a, char b) {
     do {
         i += 255; /* -1 */
         res = res << 1;
-        if (b & 0x80) {
+        if (negative(b)) {
             res += a;
         }
         b = b << 1;
@@ -31,7 +37,7 @@ div (char a, char b, char rem_pt) {
     do {
         i += 255; /* -1 */
         dif = a - (b << i);
-        if (!(dif & 0x80)) {
+        if (!negative(dif)) {
             res += 1 << i;
             a = dif;
         }
