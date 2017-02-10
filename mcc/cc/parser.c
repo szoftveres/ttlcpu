@@ -17,7 +17,7 @@ int program (void) {
     int vars;
     int var_space = 0;
 
-    vars = var_declarations(&var_space);
+    vars = glb_var_declarations(&var_space);
     CODE_glob_var_container(var_space);
 
     func_definitions();
@@ -77,7 +77,7 @@ int func_definition (void) {
 int arg_declarations (void) {
     int args = 0;
 
-    args += var_declaration(NULL);
+    args += arg_declaration();
     if (args) {
         if (lex_get(T_COMMA, NULL)) {
             int more_args;
@@ -92,15 +92,31 @@ int arg_declarations (void) {
 }
 
 
-int var_declarations (int* space) {
+int lcl_var_declarations (int* space) {
     int vars = 0;
 
-    vars += var_declaration(space);
+    vars += var_declaration(space, 0 /*auto*/);
+    vars += var_declaration(NULL, 1 /*static*/);
     if (vars) {
         if (!lex_get(T_SEMICOLON, NULL)) {
             parser_error("expected ';'");
         }
-        vars += var_declarations(space);
+        vars += lcl_var_declarations(space);
+    }
+    return vars;
+
+}
+
+
+int glb_var_declarations (int* space) {
+    int vars = 0;
+
+    vars += var_declaration(space, 1 /*static*/);
+    if (vars) {
+        if (!lex_get(T_SEMICOLON, NULL)) {
+            parser_error("expected ';'");
+        }
+        vars += glb_var_declarations(space);
     }
     return vars;
 
@@ -114,7 +130,7 @@ int block (void) {
     if (!lex_get(T_LEFT_BRACE, NULL)) {
         return 0;
     }
-    vars = var_declarations(&var_space);
+    vars = lcl_var_declarations(&var_space);
     CODE_var_declarations_space(var_space);
     statements();
     if (!lex_get(T_RIGHT_BRACE, NULL)) {
@@ -147,12 +163,12 @@ int array_dimension (int* elements) {
 }
 
 
-int var_declaration (int* space) {
+int var_declaration (int* space, int stc) {
     char* name;
     int   size;
     int   num = 0;
 
-    if (!lex_get(T_IDENTIFIER, "char")) {
+    if (!lex_get(T_IDENTIFIER, stc ? "static" : "auto")) {
         return 0;
     }
     if (token != T_IDENTIFIER) {
@@ -168,13 +184,31 @@ int var_declaration (int* space) {
         num = 1;
     }
     size = SYM_integer_size();
-    push_var(name, size, num);
+    push_var(name, size, num, stc);
     free(name);
     if (space) {
         (*space) += (size * num);
     }
     return 1; /* should be strictly 1 (number of declarations found) */
 }
+
+int arg_declaration (void) {
+    char* name;
+
+    if (token != T_IDENTIFIER) {
+        return 0;
+    }
+    name = strdup(lexeme);
+    lex_consume();
+    if (find_var(name, 1)) {
+        fprintf(stderr, "error : '%s' already defined\n", name);
+        exit(1);
+    }
+    push_var(name, SYM_integer_size(), 1, 0 /*auto*/);
+    free(name);
+    return 1; /* should be strictly 1 (number of declarations found) */
+}
+
 
 
 int statements (void) {
@@ -953,10 +987,10 @@ int object_identifier (void) {
         fprintf(stderr, "error : '%s' not defined in this scope\n", id);
         exit(1);
     }
-    if (var->scope) {
-        CODE_load_eff_addr_lcl(var->pos);
+    if (var->stc) {
+        CODE_load_eff_addr_stc(var->pos);
     } else {
-        CODE_load_eff_addr_glb(var->pos);
+        CODE_load_eff_addr_auto(var->pos);
     }
     free(id);
     /* 1 means address of obj in acc */

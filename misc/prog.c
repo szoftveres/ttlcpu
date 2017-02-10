@@ -1,27 +1,27 @@
 #include "../lib/ttlcpuio.h"
 
 
-char d0;
-char d1;
-char d2;
-char d3;
-char d4;
-char d5;
-char d6;
-char d7;
+static d0;
+static d1;
+static d2;
+static d3;
+static d4;
+static d5;
+static d6;
+static d7;
 
 
 #include "routines.c"
 
 
-scroll (char c) {
+scroll (c) {
     disp_push(c);
     disp(32);
 }
 
 
 msg () {
-    char i;
+    auto i;
     memset(0, 0, 8);
     scroll(SYM_P);
     scroll(SYM_R);
@@ -36,7 +36,7 @@ msg () {
 }
 
 
-mem_monitor (char addr) {
+mem_monitor (addr) {
     d0 = SYM_LEFT_BRACKET;
     d1 = hex2sym(addr >> 4);
     d2 = hex2sym(addr);
@@ -48,25 +48,60 @@ mem_monitor (char addr) {
 }
 
 
+disp_dec (num) {
+    auto newnum;
+    auto rem;
+
+    newnum = div(num, 10, &rem);
+    if (newnum) {
+        disp_dec(newnum);
+    }
+    disp_push(hex2sym(rem));
+}
+
+
+disp_long (np, bytes) {
+    auto ad;
+    ad = np + bytes;
+    do {
+        ad += 0xFF;
+        bytes += 0xFF;
+        disp_push(hex2sym(*ad >> 4));
+        disp_push(hex2sym(*ad));
+    } while (bytes);
+}
+
+
 main () {
-    char memaddr;
+    auto memaddr;
 
     memaddr = 0;
-    msg();
+//    msg();
     while (1) {
-        char c;
+        auto c;
 
         c = das(); /* Display And Scan */
         if (c == 0x0F) {
             memset(0, 0, 8);
         } else if (c == 0x0E) {
-            while (1) {
-                msg();
+            auto np;
+            auto n;
+            np = 0x10;
+            memset(np,0,4); *np = msb(0xFF);
+            for (n = 0; n != 32; n += 1) {
+                /*
+                memset(4, 0, 4);
+                disp_dec(mul(n,n));
+                */
+                memset(0, 0, 8);
+                disp_long(np, 4);
+                disp(148);
+                shl(np, 3);
             }
         } else if (c == 0x0D) {
             msg();
         } else if (c == 0x0C) {
-            char ad;
+            auto ad;
             ad = 0;
             do {
                 mem_monitor(ad);

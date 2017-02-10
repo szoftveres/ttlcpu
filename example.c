@@ -9,14 +9,14 @@
 
 
 /* Global variables */
-char var_glb;
+static var_glb;
 /* are reset to zero before main function execution begins */
 
 /*
- * There's only one data type: 8-bit 'char'
- * Every function returns a 'char' type value, there's no 'void' function
+ * There are no data types, everything is an 8-bit word
+ * Every function returns a value, there's no 'void' function
  */
-add (char b1, char b2) {
+add (b1, b2) {
     return b1 + b2;
     /* The retrun statment can have a value, however it just works as if
      * it was a 'goto' statement that jumps to the end of
@@ -42,7 +42,7 @@ add (char b1, char b2) {
 /*
  * In-line assembly for faster execution
  */
-dec (char a) {
+dec (a) {
     /*
      * Expressions which are separated with commas, are being evaluated
      * sequentially after each other.
@@ -58,7 +58,7 @@ dec (char a) {
 }
 
 
-invert_out (char f) {
+invert_out (f) {
     out(~f);
     /*
      * Cannot find out() definition? See
@@ -69,17 +69,18 @@ invert_out (char f) {
 /* The main function, program execution starts here */
 main () {
     /* Variable declarations at the beginning of each block */
-    char i;
+    auto i;
+    static g;
 
     /*
      * Built-in operator precedence can be overriden
      * with () parentheses
      */
     for (i = NUM_TEN; (i - 1 != 0xFF - (1 == 2)) ? 1 : 0; i += add(1, 0)) {
-        char i_p;
+        auto i_p;
         /*
          * there's neither 'pointer' type, nor
-         * pointer arythmetics, everything is 'char'
+         * pointer arythmetics; remember, everything is a word
          */
         i_p = &i;
         *i_p += 1;
@@ -97,7 +98,7 @@ main () {
 }
 
 
-out_series (char num) {
+out_series (num) {
     out(num);
     if (!num) {
         return;

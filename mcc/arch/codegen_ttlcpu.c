@@ -342,13 +342,13 @@ void CODE_dereference (void) {
 }
 
 
-void CODE_load_eff_addr_lcl (int pos) {
+void CODE_load_eff_addr_auto (int pos) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, "    ld(to_acc, SP)\n");
     fprintf(stdout, "    add(progdata) data(%d)\n", pos + 1);
 }
 
-void CODE_load_eff_addr_glb (int pos) {
+void CODE_load_eff_addr_stc (int pos) {
     print_debugs(__FUNCTION__);
 //    unimplemented(__FUNCTION__);
     fprintf(stdout, "    mov(to_acc, progdata) data(0x%X)\n", pos);

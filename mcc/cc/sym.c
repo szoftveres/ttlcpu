@@ -15,7 +15,7 @@ static int             lbl;
 
 /* scope - 0 means global */
 static int             scope;
-
+static int             stc_pos;
 
 static int             stack_grow;
 static char            function_name[32];
@@ -26,6 +26,7 @@ sym_init (void) {
     variables = NULL;
     scope = 0;
     stack_grow = 0;
+    stc_pos = 0;
 }
 
 
@@ -57,13 +58,14 @@ new_var (char* name) {
 
 
 static var_t *
-add_var (var_t *var, int size, int num) {
+add_var (var_t *var, int size, int num, int stc) {
     if (var) {
         var->next = variables;
         variables = var;
         var->size = size;
         var->num = num;
         var->scope = scope;
+        var->stc = stc;
     }
     return var;
 }
@@ -76,7 +78,7 @@ del_var (void) {
 
     var = variables;
     if (var) {
-        space = var->size * var->num;
+        space = var->stc ? 0 : var->size * var->num;
         variables = variables->next;
         free(var);
     }
@@ -87,7 +89,8 @@ del_var (void) {
 void
 inc_var_pos (int b) {
     var_t *it;
-    for (it = variables; it && it->scope; it = it->next) {
+    for (it = variables; it; it = it->next) {
+        if (it->stc) continue;
         it->pos += b;
     }
     stack_grow += b;
@@ -97,7 +100,8 @@ inc_var_pos (int b) {
 void
 dec_var_pos (int b) {
     var_t* it;
-    for (it = variables; it && it->scope; it = it->next) {
+    for (it = variables; it; it = it->next) {
+        if (it->stc) continue;
         it->pos -= b;
     }
     stack_grow -= b;
@@ -121,17 +125,16 @@ pop_var (void) {
 }
 
 void
-push_var (char* name, int size, int num) {
+push_var (char* name, int size, int num, int stc) {
     var_t *var;
-    inc_var_pos(size * num);
+    if (!stc) {
+        inc_var_pos(size * num);
+    }
     var = new_var(name);
-    add_var(var, size, num);
-    if (!scope) {
-        if (!var->next) {
-            var->pos = 0;
-        } else {
-            var->pos = var->next->pos + (var->next->size * var->next->num);
-        }
+    add_var(var, size, num, stc);
+    if (stc) {
+        var->pos = stc_pos;
+        stc_pos += (size * num);
     }
 }
 

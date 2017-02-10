@@ -1,26 +1,23 @@
 /*
  * Returns '1' if (a & 0x80)
  */
-negative (char a) {
+msb (a) {
     (a, asm("    rol()\n")) - (a, asm("    shl()\n"));
 }
 
 
-shl (char np, char bytes) {
-    char adh;
-
-    adh = np + bytes;
-    np = adh + 0xFF;
-    bytes += 0xFF;
+/*
+ * SHL operation on arbitrary (bytes) long big-endian integer (n_p)
+ */
+shl (n_p, bytes) {
+    n_p += bytes;
     do {
-        adh += 0xFF;
-        np += 0xFF;
-        if (bytes) {
-        //    *adh = (*adh, asm("    shl()\n")) + ((*np, asm("    rol()\n")) - (*np, asm("    shl()\n")));
-            *adh = (*adh, asm("    shl()\n")) + negative(*np);
-        }
-        *np = (*np, asm("    shl()\n"));
+        auto carry;
+        n_p += 0xFE;
         bytes += 0xFF;
+        carry = bytes ? msb(*n_p) : 0;
+        n_p += 1;
+        *n_p = (*n_p, asm("    shl()\n")) + carry;
     } while (bytes);
 }
 
@@ -30,15 +27,15 @@ shl (char np, char bytes) {
  * b [0-255]
  * ret [0-255]
  */
-mul (char a, char b) {
-    char i;
-    char res;
+mul (a, b) {
+    auto i;
+    auto res;
     res = 0;
     i = 8;
     do {
         i += 0xFF; /* -1 */
         res = res << 1;
-        if (negative(b)) {
+        if (msb(b)) {
             res += a;
         }
         b = b << 1;
@@ -50,16 +47,16 @@ mul (char a, char b) {
  * Divide
  * a [0-255] b [0-15]
  */
-div (char a, char b, char rem_pt) {
-    char i;
-    char res;
-    char dif;
+div (a, b, rem_pt) {
+    auto i;
+    auto res;
+    auto dif;
     res = 0;
     i = 4;
     do {
         i += 0xFF; /* -1 */
         dif = a - (b << i);
-        if (!negative(dif)) {
+        if (!msb(dif)) {
             res += 1 << i;
             a = dif;
         }
@@ -73,8 +70,8 @@ div (char a, char b, char rem_pt) {
 /*
  * Memset
  */
-memset (char start, char c, char bytes) {
-    char end;
+memset (start, c, bytes) {
+    auto end;
     end = start + bytes;
     for (; start != end; start += 1) {
         *start = c;

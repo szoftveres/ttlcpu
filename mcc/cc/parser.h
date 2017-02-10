@@ -8,10 +8,12 @@ int func_definitions (void);
 int func_definition (void);
 
 
-int var_declaration (int* space);
+int var_declaration (int* space, int stc);
 
-int var_declarations (int* space);
+int glb_var_declarations (int* space);
+int lcl_var_declarations (int* space);
 
+int arg_declaration (void);
 int arg_declarations (void);
 
 

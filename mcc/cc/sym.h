@@ -7,6 +7,7 @@
 typedef struct var_s {
     char                name[MAX_TOKEN_SIZE];
     int                 scope;
+    int                 stc;
     int                 pos;
     int                 size;   /* Size of this type */
     int                 num;    /* In case it represents an array */
@@ -17,7 +18,7 @@ typedef struct var_s {
 
 
 void sym_init (void);
-void push_var (char* name, int size, int num);
+void push_var (char* name, int size, int num, int stc);
 void pop_var (void);
 var_t *find_var (char* name, int scope_loc);
 void inc_var_pos (int b);
