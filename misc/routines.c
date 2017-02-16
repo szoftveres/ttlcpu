@@ -6,19 +6,35 @@ msb (a) {
 }
 
 /*
- * Add two (a_p, b_p) arbitrary (bytes) long big-endian integers
- * Result is in a_p
+ * Add two (a_p + b_p) arbitrary (bytes) long big-endian integers
+ * Result in a_p
  */
 add (a_p, b_p, bytes) {
     auto cy;
     cy = 0;
     while (bytes) {
         bytes = (bytes, asm("    dec()\n"));
-        cy = adc(a_p, b_p, cy);
+        cy = adc(a_p, *b_p, cy);
         a_p = (a_p, asm("    inc()\n"));
         b_p = (b_p, asm("    inc()\n"));
     }
 }
+
+/*
+ * Subtract two (a_p - b_p) arbitrary (bytes) long big-endian integers
+ * Result in a_p
+ */
+sub (a_p, b_p, bytes) {
+    auto cy;
+    cy = 1;
+    while (bytes) {
+        bytes = (bytes, asm("    dec()\n"));
+        cy = adc(a_p, (*b_p, asm("    inv(frm_acc)\n")), cy);
+        a_p = (a_p, asm("    inc()\n"));
+        b_p = (b_p, asm("    inc()\n"));
+    }
+}
+
 
 /*
  * SHL operation on arbitrary (bytes) long big-endian integer (n_p)
@@ -36,7 +52,7 @@ shl (n_p, bytes) {
     }
 }
 
-
+#if 0
 /*
  * a [0-255]
  * b [0-255]
@@ -81,4 +97,6 @@ div (a, b, rem_pt) {
     }
     res;
 }
+
+#endif
 

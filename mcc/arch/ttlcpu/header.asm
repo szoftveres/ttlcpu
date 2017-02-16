@@ -908,38 +908,47 @@ lbl("__disp_push_loop_end")
 
 /*-------------------------------------------------------*/
 
+/*
+
+
+adc (a_p, b, cyin) {
+    auto cyout;
+    cyout = (*a_p + b) - (*a_p + b);
+    *a_p += b;
+    cyout += (*a_p + cyin) - (*a_p + cyin);
+    *a_p += cyin;
+    cyout;
+}
+*/
+
 lbl("adc")
     dec_sp(1)
     ld(to_acc, SP)
     add(progdata) data(1)
     push_unsafe(frm_acc)              // 1st operand push
     ld(to_acc, SP)
-    add(progdata) data(7)
+    add(progdata) data(7)           // a_p
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     st(BX, frm_acc)            // store 2nd operand
     ld(to_acc, SP)
-    add(progdata) data(6)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
+    add(progdata) data(6)           // b
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     mov(to_mar, progdata) data(BX)  // addition
     inst(to_acc_adder, frm_ram, "c") // add with Carry
     push_unsafe(frm_acc)              // 1st operand push
     ld(to_acc, SP)
-    add(progdata) data(8)
+    add(progdata) data(8)           // a_p
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     st(BX, frm_acc)            // store 2nd operand
     ld(to_acc, SP)
-    add(progdata) data(7)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
+    add(progdata) data(7)           // b
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     mov(to_mar, progdata) data(BX)  // addition
@@ -953,9 +962,7 @@ lbl("adc")
     pop(to_mar)
     mov(to_ram, frm_acc)
     ld(to_acc, SP)
-    add(progdata) data(5) // b_p
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
+    add(progdata) data(5) // b
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     st(BX, frm_acc)            // store 2nd operand
@@ -1036,9 +1043,7 @@ lbl("adc")
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     inc_sp(1)
-lbl("__adc__ret")
     ret()
-
 
 /*-------------------------------------------------------*/
 // memset (start_p, c, bytes) {
