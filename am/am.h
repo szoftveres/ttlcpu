@@ -16,7 +16,7 @@
 #define data(l)     datal(l)
 #define def(l)      defl(l)
 
-#define mov(d, s)   inst((d), (s), "")
+#define mov(d, s)   inst((d), (s), NULL)
 #define movz(d, s)  inst((d), (s), "z")
 
 #define add(s)      mov(to_acc_adder, (s))

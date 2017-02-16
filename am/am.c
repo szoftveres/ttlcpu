@@ -59,7 +59,7 @@ instruction (int d, int s, char* m) {
     char* de = "?", *so = "?";
     int i;
     unsigned char ic = ((d << 5) | (s << 2) | 1);
-    while (*mod) {
+    while (mod && *mod) {
       switch (*mod) {
         case 'Z' : case 'z' :
           ic &= ~((unsigned char)1);
