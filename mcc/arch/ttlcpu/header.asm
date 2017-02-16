@@ -908,3 +908,179 @@ lbl("__disp_push_loop_end")
 
 /*-------------------------------------------------------*/
 
+lbl("adc")
+    dec_sp(1)
+    ld(to_acc, SP)
+    add(progdata) data(1)
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(7)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(6)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    inst(to_acc_adder, frm_ram, "c") // add with Carry
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(8)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(7)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)  // add withOUT Carry 
+    inv(frm_acc)             // 1st cmpl
+    inc()                        // 2nd cmpl      
+    st(BX, frm_acc)            // store 2nd operand
+    pop(to_acc)                // 1st operand pop
+    mov(to_mar, progdata) data(BX)
+    add(frm_ram)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    ld(to_acc, SP)
+    add(progdata) data(5) // b_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(6) // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)              // 1st operand push
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    ld(to_acc, SP)
+    add(progdata) data(1)
+    push(frm_acc)              // 1st operand push
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(6)   // cyin
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(8)   // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    inst(to_acc_adder, frm_ram, "c") // add with Carry
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(7)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(9)    // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)  // add withOUT Carry
+    inv(frm_acc)             // 1st cmpl
+    inc()                        // 2nd cmpl      
+    st(BX, frm_acc)            // store 2nd operand
+    pop(to_acc)                // 1st operand pop
+    mov(to_mar, progdata) data(BX)
+    add(frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    pop(to_acc)                // 1st operand pop
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    ld(to_acc, SP)
+    add(progdata) data(4)    // cyin
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(6)     // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)              // 1st operand push
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    ld(to_acc, SP)
+    add(progdata) data(1)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc_sp(1)
+lbl("__adc__ret")
+    ret()
+
+
+/*-------------------------------------------------------*/
+// memset (start_p, c, bytes) {
+
+lbl("memset")
+    // while (bytes) {
+lbl("___memset_loop_test")
+    ld(to_acc, SP)
+    add(progdata) data(3)  // bytes
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    jz("___memset_loop_end")
+    // *start = c;
+    ld(to_acc, SP)
+    add(progdata) data(5)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(5)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    // start_p = (start_p, asm("    inc()\n"));
+    ld(to_acc, SP)
+    add(progdata) data(5)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc()
+    mov(to_ram, frm_acc)
+    // bytes = (bytes, asm("    dec()\n"));
+    ld(to_acc, SP)
+    add(progdata) data(3)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    dec()
+    mov(to_ram, frm_acc)
+
+
+    jp("___memset_loop_test")
+lbl("___memset_loop_end")
+    ret()
+/*-------------------------------------------------------*/
+/*-------------------------------------------------------*/
