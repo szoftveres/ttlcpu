@@ -1,39 +1,3 @@
-/*
- * Returns '1' if (a & 0x80)
- */
-msb (a) {
-    (a, asm("    rol()\n")) - (a, asm("    shl()\n"));
-}
-
-/*
- * Add two (a_p + b_p) arbitrary (bytes) long big-endian integers
- * Result in a_p
- */
-add (a_p, b_p, bytes) {
-    auto cy;
-    cy = 0;
-    while (bytes) {
-        bytes = (bytes, asm("    dec()\n"));
-        cy = adc(a_p, *b_p, cy);
-        a_p = (a_p, asm("    inc()\n"));
-        b_p = (b_p, asm("    inc()\n"));
-    }
-}
-
-/*
- * Subtract two (a_p - b_p) arbitrary (bytes) long big-endian integers
- * Result in a_p
- */
-sub (a_p, b_p, bytes) {
-    auto cy;
-    cy = 1;
-    while (bytes) {
-        bytes = (bytes, asm("    dec()\n"));
-        cy = adc(a_p, (*b_p, asm("    inv(frm_acc)\n")), cy);
-        a_p = (a_p, asm("    inc()\n"));
-        b_p = (b_p, asm("    inc()\n"));
-    }
-}
 
 
 /*
@@ -44,7 +8,8 @@ shl (n_p, bytes) {
     auto cy;
     cy = 0;
     while (bytes) {
-        bytes = (bytes, asm("    dec()\n"));
+        asm("    dec()\n");
+        asm("    mov(to_ram, frm_acc)\n");
         cyn = msb(*n_p);
         *n_p = (*n_p, asm("    shl()\n")) + cy;
         cy = cyn;

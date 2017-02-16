@@ -909,8 +909,6 @@ lbl("__disp_push_loop_end")
 /*-------------------------------------------------------*/
 
 /*
-
-
 adc (a_p, b, cyin) {
     auto cyout;
     cyout = (*a_p + b) - (*a_p + b);
@@ -1046,7 +1044,171 @@ lbl("adc")
     ret()
 
 /*-------------------------------------------------------*/
-// memset (start_p, c, bytes) {
+/*
+msb (a) {
+    (a, asm("    rol()\n")) - (a, asm("    shl()\n"));
+}
+*/
+lbl("msb")
+    ld(to_acc, SP)
+    add(progdata) data(3)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    shl()
+    inv(frm_acc)             // 1st cmpl
+    inc()                        // 2nd cmpl      
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(3)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    rol()
+    mov(to_mar, progdata) data(BX)
+    add(frm_ram)
+    ret()
+/*-------------------------------------------------------*/
+
+/*
+add (a_p, b_p, bytes) {
+    auto cy;
+    cy = 0;
+    while (bytes) {
+        bytes--;
+        cy = adc(a_p, *b_p, cy);
+        a_p--;
+        b_p--;
+    }
+}
+*/
+
+lbl("add")
+    dec_sp(1)
+    ld(to_acc, SP)
+    add(progdata) data(1)               // cy
+    mov(to_mar, frm_acc)
+    mov(to_ram, progdata) data(0x0)      // const
+    // while (bytes)
+lbl("___add_loop_test")
+    ld(to_acc, SP)
+    add(progdata) data(4)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    jz("___add_loop_end")
+    // bytes--;
+    dec()
+    mov(to_ram, frm_acc)
+    // cy = adc(a_p, *b_p, cy);
+    ld(to_acc, SP)
+    add(progdata) data(1)       // cy
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(7)       // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push_unsafe(frm_acc)                      // push fn arg
+    ld(to_acc, SP)
+    add(progdata) data(7)       // *b_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push_unsafe(frm_acc)                      // push fn arg
+    ld(to_acc, SP)
+    add(progdata) data(4)       // cy
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push_unsafe(frm_acc)                      // push fn arg
+    call("adc", "___add_call_adc")
+    inc_sp(3)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    // a_p++;
+    ld(to_acc, SP)
+    add(progdata) data(6)       // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc()
+    mov(to_ram, frm_acc)
+    // b_p++;
+    ld(to_acc, SP)
+    add(progdata) data(5)       // b_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc()
+    mov(to_ram, frm_acc)
+    jp("___add_loop_test")
+lbl("___add_loop_end")
+    inc_sp(1)
+    ret()
+
+lbl("sub")
+    dec_sp(1)
+    ld(to_acc, SP)
+    add(progdata) data(1)               // cy
+    mov(to_mar, frm_acc)
+    mov(to_ram, progdata) data(0x01)      // const
+    // while (bytes)
+lbl("___sub_loop_test")
+    ld(to_acc, SP)
+    add(progdata) data(4)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    jz("___sub_loop_end")
+    // bytes--;
+    dec()
+    mov(to_ram, frm_acc)
+    // cy = adc(a_p, *b_p, cy);
+    ld(to_acc, SP)
+    add(progdata) data(1)       // cy
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(7)       // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push_unsafe(frm_acc)                      // push fn arg
+    ld(to_acc, SP)
+    add(progdata) data(7)       // *b_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inv(frm_acc)
+    push_unsafe(frm_acc)                      // push fn arg
+    ld(to_acc, SP)
+    add(progdata) data(4)       // cy
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push_unsafe(frm_acc)                      // push fn arg
+    call("adc", "___sub_call_adc")
+    inc_sp(3)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    // a_p++;
+    ld(to_acc, SP)
+    add(progdata) data(6)       // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc()
+    mov(to_ram, frm_acc)
+    // b_p++;
+    ld(to_acc, SP)
+    add(progdata) data(5)       // b_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc()
+    mov(to_ram, frm_acc)
+    jp("___sub_loop_test")
+lbl("___sub_loop_end")
+    inc_sp(1)
+    ret()
+
+
+/*-------------------------------------------------------*/
+/*-------------------------------------------------------*/
+/*-------------------------------------------------------*/
+/*-------------------------------------------------------*/
+/*-------------------------------------------------------*/
+// memset (start_p, c, bytes)
 
 lbl("memset")
     // while (bytes) {
@@ -1056,33 +1218,28 @@ lbl("___memset_loop_test")
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     jz("___memset_loop_end")
+    // bytes--;
+    dec()
+    mov(to_ram, frm_acc)
     // *start = c;
     ld(to_acc, SP)
-    add(progdata) data(5)
+    add(progdata) data(5)       // start_p 
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     push_unsafe(frm_acc)              // 1st operand push
     ld(to_acc, SP)
-    add(progdata) data(5)
+    add(progdata) data(5)       // c
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     pop(to_mar)
     mov(to_ram, frm_acc)
-    // start_p = (start_p, asm("    inc()\n"));
+    // start_p++;
     ld(to_acc, SP)
-    add(progdata) data(5)
+    add(progdata) data(5)       // start_p
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
     inc()
     mov(to_ram, frm_acc)
-    // bytes = (bytes, asm("    dec()\n"));
-    ld(to_acc, SP)
-    add(progdata) data(3)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    dec()
-    mov(to_ram, frm_acc)
-
 
     jp("___memset_loop_test")
 lbl("___memset_loop_end")
