@@ -16,7 +16,7 @@ static var_glb;
  * There are no data types, everything is an 8-bit word
  * Every function returns a value, there's no 'void' function
  */
-add (b1, b2) {
+addition (b1, b2) {
     return b1 + b2;
     /* The retrun statment can have a value, however it just works as if
      * it was a 'goto' statement that jumps to the end of
@@ -76,7 +76,7 @@ main () {
      * Built-in operator precedence can be overriden
      * with () parentheses
      */
-    for (i = NUM_TEN; (i - 1 != 0xFF - (1 == 2)) ? 1 : 0; i += add(1, 0)) {
+    for (i = NUM_TEN; (i - 1 != 0xFF - (1 == 2)) ? 1 : 0; i += addition(1, 0)) {
         auto i_p;
         /*
          * there's neither 'pointer' type, nor
