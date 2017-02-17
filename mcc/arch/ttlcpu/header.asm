@@ -911,15 +911,114 @@ lbl("__disp_push_loop_end")
 /*
 adc (a_p, b, cyin) {
     auto cyout;
-    cyout = (*a_p + b) - (*a_p + b);
-    *a_p += b;
-    cyout += (*a_p + cyin) - (*a_p + cyin);
-    *a_p += cyin;
+    cyout = (*a_p [+] b [+] cyin) - (*a_p + b + cyin);
+    *a_p += b + cyin;
     cyout;
 }
 */
 
 lbl("adc")
+    dec_sp(1)
+    ld(to_acc, SP)
+    // cyout = (*a_p [+] b [+] cyin) - (*a_p + b + cyin);
+    add(progdata) data(1)           // cyout
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(7)           // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(6)           // b
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    inst(to_acc_adder, frm_ram, "c") // add with Carry
+    // [+] cyin 
+    st(BX, frm_acc)            // store 2nd operand
+    add(progdata) data(5)           // cyin
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    inst(to_acc_adder, frm_ram, "c") // add with Carry
+
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(8)           // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(7)           // b
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)  // add withOUT Carry 
+    // + cyin
+    st(BX, frm_acc)            // store 2nd operand
+    add(progdata) data(6)           // cyin
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)  // add withOUT Carry 
+
+    inv(frm_acc)             // 1st cmpl
+    inc()                        // 2nd cmpl      
+    st(BX, frm_acc)            // store 2nd operand
+    pop(to_acc)                // 1st operand pop
+    mov(to_mar, progdata) data(BX)
+    add(frm_ram)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    // *a_p += b + cyin;
+    ld(to_acc, SP)
+    add(progdata) data(5) // b
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
+    add(progdata) data(6) // a_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    push(frm_acc)              // 1st operand push
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)
+    // + cyin
+    st(BX, frm_acc)            // store 2nd operand
+    add(progdata) data(5)           // cyin
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)
+    
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+    // cyout;
+    ld(to_acc, SP)
+    add(progdata) data(1)
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc_sp(1)
+    ret()
+
+/*
+adc_orig (a_p, b, cyin) {
+    auto cyout;
+    cyout = (*a_p [+] b) - (*a_p + b);
+    *a_p += b;
+    cyout += (*a_p [+] cyin) - (*a_p + cyin);
+    *a_p += cyin;
+    cyout;
+}
+
+
+lbl("adc_orig")
     dec_sp(1)
     ld(to_acc, SP)
     add(progdata) data(1)
@@ -1042,6 +1141,8 @@ lbl("adc")
     mov(to_acc, frm_ram)
     inc_sp(1)
     ret()
+
+*/
 
 /*-------------------------------------------------------*/
 /*
