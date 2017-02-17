@@ -938,6 +938,7 @@ lbl("adc")
     inst(to_acc_adder, frm_ram, "c") // add with Carry
     // [+] cyin 
     st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
     add(progdata) data(5)           // cyin
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
@@ -960,6 +961,7 @@ lbl("adc")
     add(frm_ram)  // add withOUT Carry 
     // + cyin
     st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
     add(progdata) data(6)           // cyin
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
@@ -991,6 +993,7 @@ lbl("adc")
     add(frm_ram)
     // + cyin
     st(BX, frm_acc)            // store 2nd operand
+    ld(to_acc, SP)
     add(progdata) data(5)           // cyin
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
@@ -1018,7 +1021,7 @@ adc_orig (a_p, b, cyin) {
 }
 
 
-lbl("adc_orig")
+lbl("adc")
     dec_sp(1)
     ld(to_acc, SP)
     add(progdata) data(1)
@@ -1141,7 +1144,6 @@ lbl("adc_orig")
     mov(to_acc, frm_ram)
     inc_sp(1)
     ret()
-
 */
 
 /*-------------------------------------------------------*/
