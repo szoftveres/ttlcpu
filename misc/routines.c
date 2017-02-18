@@ -1,7 +1,6 @@
-
-
 /*
  * SHL operation on arbitrary (bytes) long big-endian integer (n_p)
+ * Returns the carry (0 or 1)
  */
 shl (n_p, bytes) {
     auto cyn;
@@ -15,7 +14,27 @@ shl (n_p, bytes) {
         cy = cyn;
         n_p = (n_p, asm("    inc()\n"));
     }
+    cy;
 }
+
+/*
+ * res = a * b
+ * bytes [0-32]
+ */
+mul (a_p, b_p, res_p, bytes) {
+    auto bits;
+    bits = (bytes, asm("    shl() shl() shl()  // x8\n"));
+    memset(res_p, 0x00, bytes);
+    while (bits) {
+        asm("    dec()\n");
+        asm("    mov(to_ram, frm_acc)\n");
+        shl(res_p, bytes);
+        if (shl(b_p, bytes)) {
+            add(res_p, a_p, bytes);
+        }
+    }
+}
+
 
 #if 0
 /*
