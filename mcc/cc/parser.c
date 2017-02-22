@@ -623,6 +623,12 @@ void do_operations (int op_type) {
       case T_NEQ :
         CODE_do_operation_compare_neq(new_label());
         break;
+      case T_LESS :
+        CODE_do_operation_compare_less(new_label());
+        break;
+      case T_GREQ :
+        CODE_do_operation_compare_greq(new_label());
+        break;
       case T_BWAND :
       case T_RECURBWAND :
         CODE_do_operation_bwand(new_label());

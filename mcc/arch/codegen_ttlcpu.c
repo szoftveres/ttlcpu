@@ -295,11 +295,29 @@ void CODE_do_operation_compare_neq (int lbl) {
     fprintf(stdout, "lbl(\"neq_%04d_end\")\n", lbl);
 }
 
+void CODE_do_operation_compare_less (int lbl) {
+    print_debugs(__FUNCTION__);
+    CODE_do_operation_sub();
+    CODE_push_unsafe();
+    fprintf(stdout, "    call(\"msb\", \"compare_less_call_%04d\")\n", lbl);
+    fprintf(stdout, "    inc_sp(%d)\n", SYM_integer_size()); // 1 function argument
+}
+
+void CODE_do_operation_compare_greq (int lbl) {
+    print_debugs(__FUNCTION__);
+    CODE_do_operation_sub();
+    fprintf(stdout, "    inv(frm_acc)\n");
+    CODE_push_unsafe();
+    fprintf(stdout, "    call(\"msb\", \"compare_greq_call_%04d\")\n", lbl);
+    fprintf(stdout, "    inc_sp(%d)\n", SYM_integer_size()); // 1 function argument
+}
+
+
 void CODE_do_operation_bwand (int lbl) {
     print_debugs(__FUNCTION__);
     CODE_push_unsafe();
-    fprintf(stdout, "    call(\"bwand\", \"bwand_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", SYM_code_pointer_size());
+    fprintf(stdout, "    call(\"bwand\", \"bwand_call_%04d\")\n", lbl);
+    fprintf(stdout, "    inc_sp(%d)\n", SYM_integer_size() * 2); // 2 function arguments
 }
 
 void CODE_do_operation_bwxor (void) {

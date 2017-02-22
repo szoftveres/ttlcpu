@@ -53,6 +53,8 @@ void CODE_do_operation_shl (int lbl);
 void CODE_do_operation_shr (int lbl);
 void CODE_do_operation_compare_eq (int lbl);
 void CODE_do_operation_compare_neq (int lbl);
+void CODE_do_operation_compare_less (int lbl);
+void CODE_do_operation_compare_greq (int lbl);
 void CODE_do_operation_bwand (int lbl);
 void CODE_do_operation_bwxor (void);
 void CODE_do_operation_bwor (void);
