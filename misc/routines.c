@@ -35,6 +35,27 @@ mul (a_p, b_p, res_p, bytes) {
 }
 
 
+bwand2 (a,b) {
+    auto ret;
+    auto i;
+    ret = 0;
+    i = 8;
+    while (i) {
+        asm("    dec() mov(to_ram, frm_acc)\n");  // i++
+        msb((a, asm("    rol() mov(to_ram, frm_acc)\n"))) +
+        msb((b, asm("    rol() mov(to_ram, frm_acc)\n"))) + 0xFE;
+
+        asm("    jz(\"bwand2_in\")\n");
+        ret;
+        asm("    jp(\"bwand2_out\")\n");
+        asm("lbl(\"bwand2_in\")\n");
+        ret, asm("    add(progdata) data(0x80)\n");
+        asm("lbl(\"bwand2_out\")\n");
+        asm("    rol() mov(to_ram, frm_acc)\n"); //  ret << 1
+    }
+}
+
+
 #if 0
 /*
  * a [0-255]
