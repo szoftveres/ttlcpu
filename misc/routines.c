@@ -7,8 +7,7 @@ shl (n_p, bytes) {
     auto cy;
     cy = 0;
     while (bytes) {
-        asm("    dec()\n");
-        asm("    mov(to_ram, frm_acc)\n");
+        asm("    dec() mov(to_ram, frm_acc)\n");
         cyn = msb(*n_p);
         *n_p = (*n_p, asm("    shl()\n")) + cy;
         cy = cyn;
@@ -26,11 +25,11 @@ mul (a_p, b_p, res_p, bytes) {
     bits = (bytes, asm("    shl() shl() shl()  // x8\n"));
     memset(res_p, 0x00, bytes);
     while (bits) {
-        asm("    dec()\n");
-        asm("    mov(to_ram, frm_acc)\n");
+        asm("    dec() mov(to_ram, frm_acc)\n");
         shl(res_p, bytes);
         if (shl(b_p, bytes)) {
             add(res_p, a_p, bytes);
+            *b_p += 1; // rol, reconstruct b
         }
     }
 }

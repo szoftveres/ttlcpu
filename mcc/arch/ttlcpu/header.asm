@@ -1324,11 +1324,14 @@ lbl("___memset_loop_test")
     // bytes--;
     dec()
     mov(to_ram, frm_acc)
-    // *start = c;
+    // *start++ = c;
     ld(to_acc, SP)
     add(progdata) data(5)       // start_p 
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
+    inc();
+    mov(to_ram ,frm_acc)
+    dec();
     push_unsafe(frm_acc)              // 1st operand push
     ld(to_acc, SP)
     add(progdata) data(5)       // c
@@ -1336,16 +1339,48 @@ lbl("___memset_loop_test")
     mov(to_acc, frm_ram)
     pop(to_mar)
     mov(to_ram, frm_acc)
-    // start_p++;
-    ld(to_acc, SP)
-    add(progdata) data(5)       // start_p
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    inc()
-    mov(to_ram, frm_acc)
 
     jp("___memset_loop_test")
 lbl("___memset_loop_end")
     ret()
+
+// memcpy (dest_p, src_p, bytes)
+
+lbl("memcpy")
+    // while (bytes) {
+lbl("___memcpy_loop_test")
+    ld(to_acc, SP)
+    add(progdata) data(3)  // bytes
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    jz("___memcpy_loop_end")
+    // bytes--;
+    dec()
+    mov(to_ram, frm_acc)
+    // *dest_p++ = *src_p++;
+    ld(to_acc, SP)
+    add(progdata) data(5)       // dest_p 
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc();
+    mov(to_ram ,frm_acc)
+    dec();
+    push_unsafe(frm_acc)              // 1st operand push
+    ld(to_acc, SP)
+    add(progdata) data(5)       // src_p
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    inc();
+    mov(to_ram ,frm_acc)
+    dec();
+    mov(to_mar, frm_acc)
+    mov(to_acc, frm_ram)
+    pop(to_mar)
+    mov(to_ram, frm_acc)
+
+    jp("___memcpy_loop_test")
+lbl("___memcpy_loop_end")
+    ret()
+
 /*-------------------------------------------------------*/
 /*-------------------------------------------------------*/
