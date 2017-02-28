@@ -16,7 +16,7 @@ fi
 #compile
 echo "Compiling '${1}'.."
 cp ./mcc/arch/ttlcpu/header.asm  am/program.asm || exit 1
-cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> am/program.asm || exit 1
+cc -E "${1}" | grep -v '^#' | ./mcc/mcc -l cclog.txt >> am/program.asm || exit 1
 cat ./mcc/arch/ttlcpu/footer.asm >> am/program.asm || exit 1
 
 # make assembler and assemble 
