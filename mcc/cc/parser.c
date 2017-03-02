@@ -18,7 +18,6 @@ int program (void) {
     int vars;
     int var_space = 0;
 
-    logg("%s\n", __FUNCTION__);
     vars = glb_var_declarations(&var_space);
     CODE_glob_var_container(var_space);
 
@@ -49,7 +48,7 @@ int func_definition (void) {
     if (token != T_IDENTIFIER) {
         return 0;
     }
-    logg("%s [%s]\n", __FUNCTION__, lexeme);
+    logg("%s [%s]\n", __FUNCTION__, lexeme); logg_inc();
     CODE_func_definition_label(lexeme);
     fn_name = strdup(lexeme);
     lex_consume();
@@ -73,6 +72,7 @@ int func_definition (void) {
     scope_dec();
     CODE_func_definition_ret(fn_name);
     free(fn_name);
+    logg_dec();
     return 1;
 }
 
@@ -133,7 +133,7 @@ int block (void) {
     if (!lex_get(T_LEFT_BRACE, NULL)) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     vars = lcl_var_declarations(&var_space);
     CODE_var_declarations_space(var_space);
     statements();
@@ -144,7 +144,7 @@ int block (void) {
     while (vars--) {
         pop_var();
     }
-
+    logg_dec();
     return 1;
 }
 
@@ -269,7 +269,7 @@ int if_statement (void) {
     if (!lex_get(T_IDENTIFIER, "if")) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
     }
@@ -293,6 +293,7 @@ int if_statement (void) {
     } else {
         CODE_if_statement_end_noelse(lbl);
     }
+    logg_dec();
     return 1;
 }
 
@@ -303,7 +304,7 @@ int while_statement (void) {
     if (!lex_get(T_IDENTIFIER, "while")) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
     }
@@ -320,6 +321,7 @@ int while_statement (void) {
         parser_error("expected statement");
     }
     CODE_while_statement_end(lbl);
+    logg_dec();
     return 1;
 }
 
@@ -330,7 +332,7 @@ int do_statement (void) {
     if (!lex_get(T_IDENTIFIER, "do")) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     lbl = new_label();
     CODE_do_statement_base(lbl);
     if (!statement()) {
@@ -352,6 +354,7 @@ int do_statement (void) {
         parser_error("expected ';'");
     }
     CODE_do_statement_test(lbl);
+    logg_dec();
     return 1;
 }
 
@@ -363,13 +366,14 @@ int return_statement (void) {
     if (!lex_get(T_IDENTIFIER, "return")) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     expression(); /* optional return value */
     if (!lex_get(T_SEMICOLON, NULL)) {
         parser_error("expected ';'");
     }
     size = get_stack_grow(&fn);
     CODE_return_statement(fn, size);
+    logg_dec();
     return 1;
 }
 
@@ -380,7 +384,7 @@ int for_statement (void) {
     if (!lex_get(T_IDENTIFIER, "for")) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
     }
@@ -409,6 +413,7 @@ int for_statement (void) {
         parser_error("expected statement");
     }
     CODE_for_statement_end(lbl);
+    logg_dec();
     return 1;
 }
 
@@ -572,7 +577,7 @@ int binary_operation (int precedence) {
 
       default: return 0;
     }
-    logg("%s [%s]\n", __FUNCTION__, lexeme);
+    logg("%s [%s]\n", __FUNCTION__, lexeme); logg_inc();
 
     lex_consume();
 
@@ -591,7 +596,7 @@ int binary_operation (int precedence) {
 
     /* Subsequent same or lower precedence operations */
     binary_operation(0);
-
+    logg_dec();
     return 1;
 }
 
@@ -691,13 +696,14 @@ int parentheses (void) {
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     if (!expressions()) {   /* multiple expressions within () */
         parser_error("expected expression after '('");
     }
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         parser_error("expected ')'");
     }
+    logg_dec();
     return 1;
 }
 
@@ -720,11 +726,12 @@ int logical_neg (void) {
     if (!lex_get(T_NEG, NULL)) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     if (!primary_expression()) {
         parser_error("expected primary expression after '!'");
     }
     CODE_logical_neg(new_label());
+    logg_dec();
     return 1;
 }
 
@@ -732,11 +739,12 @@ int bitwise_neg (void) {
     if (!lex_get(T_BWNEG, NULL)) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     if (!primary_expression()) {
         parser_error("expected primary expression after '~'");
     }
     CODE_bitwise_neg();
+    logg_dec();
     return 1;
 }
 
@@ -744,10 +752,11 @@ int addressof (void) {
     if (!lex_get(T_BWAND, NULL)) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     if (var_address() != 1) {
         parser_error("expected variable after '&'");
     }
+    logg_dec();
     return 1;
 }
 
@@ -874,7 +883,6 @@ int asm_expression (char* identifier) {
     if (strcmp(identifier, "asm")) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
     }
@@ -882,6 +890,7 @@ int asm_expression (char* identifier) {
         if (token != T_STRING) {
             parser_error("expected string");
         }
+        logg("%s [%s]\n", __FUNCTION__, lexeme);
         str_process();
         CODE_asm_statement(lexeme);
         lex_consume();
@@ -899,7 +908,7 @@ int fn_call (char* identifier) {
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         return 0;
     }
-    logg("%s [%s]\n", __FUNCTION__, identifier);
+    logg("%s [%s]\n", __FUNCTION__, identifier); logg_inc();
     i = fn_call_args();
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         parser_error("expected ')'");
@@ -907,14 +916,16 @@ int fn_call (char* identifier) {
     CODE_fn_call(new_label(), identifier);
     CODE_stack_restore(i);
     dec_var_pos(i);
+    logg_dec();
     return 1;
 }
 
 
 int fn_call_args (void) {
     int args = 0;
-
+    logg("%s\n", __FUNCTION__); logg_inc();
     args += expression();
+    logg_dec();
     if (args) {
         CODE_fn_call_args();
         inc_var_pos(SYM_integer_size());
@@ -988,10 +999,11 @@ int dereference (void) {
     if (!lex_get(T_MUL, NULL)) {
         return 0;
     }
-    logg("%s\n", __FUNCTION__);
+    logg("%s\n", __FUNCTION__); logg_inc();
     if (object_address() != 1) {
         parser_error("expected object after '*'");
     }
+    logg_dec();
     return 1;
 }
 
