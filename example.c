@@ -3,6 +3,7 @@
  * of the c-like compiler
  */
 
+
 #define NUM_TEN     0x0A
 /* All the #preprocessor directives are currently handled by gcc (gcc -E) */
 
@@ -11,60 +12,50 @@
 static var_glb;
 /* are reset to zero before main function execution begins */
 
-/*
- * There are no data types, everything is an 8-bit 'word'
- * Every function is assumed to return a value, there's
- * no 'void' function.
- * The return value of a function is the value of the last
- * evaluated expression, the return statement needn't to be used.
- */
-return_arg (a) {
-    a;
-}
 
 /*
+ * There are no data types, everything is an 8-bit CPU-word.
+ * Every function is assumed to return a value, there's
+ * no 'void' function.
  * Function arguments are passed via the (emulated) stack.
- * The result of the expressions are stured in the accumulator;
+ * The result of the expressions are stored in the accumulator;
  * also, the accumulator is used to pass the return value of the
  * functions to the caller. Hence, the return value is
  * whatever that's in the accumulator when the function returns.
+ * The 'return' statement is available, however it needn't to be used.
  */
-
-addition (b1, b2) {
-    return b1 + b2;
-    /* The retrun statment can have a value, however it just works as if
-     * it was a 'goto' statement that jumps to the end of
-     * the function; it's used purely for program flow control.
-     * The return statement can be omitted in this case, the body
-     * of the function can be replaced with a single 'b1 + b2;' statment,
-     * the result would be the same.
-     */
+return_arg (a) {
+    a;      /* This function returns the value of its argument */
 }
 
+
 /*
- * In-line assembly for faster execution
+ * The retrun statment can have a value, however it just works as if
+ * it was a 'goto' statement that jumps to the end of
+ * the function; its only purpose is program flow control.
+ * The return statement can be omitted in the below case, the body
+ * of the function can be replaced with a 'b1 + b2;' statment,
+ * the result would be the same.
+ */
+addition (b1, b2) {
+    return b1 + b2;
+}
+
+
+/*
+ * In-line assembly:
+ * Expressions which are separated with commas, are being evaluated
+ * sequentially after each other.
+ * The first expression (a) loads the value of 'a' into the
+ * accumulator. An 'a-1' statement would form the 2nd complement
+ * of '1' and would add it to 'a'.
+ * We can do it with a signle assembly instruction, the 2nd complement of
+ * '1' is '255'; code execution speed can be significantly boosted with these tricks.
  */
 dec (a) {
-    /*
-     * Expressions which are separated with commas, are being evaluated
-     * sequentially after each other.
-     * The first expression (a) loads the value of 'a' into the
-     * accumulator. An 'a-1' statement would form the 2nd complement
-     * of '1' and would add it to 'a'.
-     * We can do it with a signle assembly instruction, the 2nd complement of
-     * '1' is '255'; code execution speed can be significantly boosted with these tricks.
-     */
     a, asm("add(progdata) data(0xFF)");
 }
 
-
-invert_out (f) {
-    out(~f);
-    /*
-     * Cannot find out() definition? See
-     * mcc/arch/ttlcpu/header.asm
-     */
-}
 
 /* The main function, program execution starts here */
 main () {
@@ -85,7 +76,7 @@ main () {
              */
             i_p = &i;  /* addressof */
             *i_p += 1; /* dereference */
-            invert_out(*i_p);
+            out(*i_p);
             var_glb += 1;
         }
         /*
@@ -109,14 +100,11 @@ out_series (num) {
 }
 
 
-
 /* Interesting stuff inside */
 #include "misc/routines.c"
 
 
-
 /* TTL-CPU specific library functions */
-
 implemented_library_functions () {
     auto a;
     auto b;
