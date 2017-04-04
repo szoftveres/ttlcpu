@@ -13,32 +13,33 @@ static var_glb;
 
 /*
  * There are no data types, everything is an 8-bit 'word'
- * Every function returns a value via the accumulator, there's
- * no 'void' function
+ * Every function is assumed to return a value, there's
+ * no 'void' function.
+ * The return value of a function is the value of the last
+ * evaluated expression, the return statement needn't to be used.
  */
+return_arg (a) {
+    a;
+}
+
+/*
+ * Function arguments are passed via the (emulated) stack.
+ * The result of the expressions are stured in the accumulator;
+ * also, the accumulator is used to pass the return value of the
+ * functions to the caller. Hence, the return value is
+ * whatever that's in the accumulator when the function returns.
+ */
+
 addition (b1, b2) {
     return b1 + b2;
     /* The retrun statment can have a value, however it just works as if
      * it was a 'goto' statement that jumps to the end of
      * the function; it's used purely for program flow control.
-     * The return value of a function is always the value
-     * of the last evaluated expression.
      * The return statement can be omitted in this case, the body
-     * of the function could be replaced with a single 'b1 + b2;' statment,
+     * of the function can be replaced with a single 'b1 + b2;' statment,
      * the result would be the same.
-     * See the 'dec' function below, which doesn't utilize the return statement;
      */
 }
-
-/*
- * Function arguments are passed via the (emulated) stack; the
- * accumulator contains the return value, which is the result of
- * the last expression.
- *
- * For stack emulation implementation details,
- * see mcc/arch/ttlcpu/header.asm
- */
-
 
 /*
  * In-line assembly for faster execution
@@ -47,13 +48,11 @@ dec (a) {
     /*
      * Expressions which are separated with commas, are being evaluated
      * sequentially after each other.
-     * The first expression (a) does nothing but loads the
-     * value of 'a' into the accumulator register. In order
-     * to decrement its value, there's no need to have the CPU
-     * form the 2nd complement of '1' and add the two numbers
-     * together; instead, we can do it with one assembly instruction,
-     * the accumulator will contain the return value.
-     * Code execution speed can be significantly boosted with these tricks.
+     * The first expression (a) loads the value of 'a' into the
+     * accumulator. An 'a-1' statement would form the 2nd complement
+     * of '1' and would add it to 'a'.
+     * We can do it with a signle assembly instruction, the 2nd complement of
+     * '1' is '255'; code execution speed can be significantly boosted with these tricks.
      */
     a, asm("add(progdata) data(0xFF)");
 }
@@ -90,10 +89,8 @@ main () {
             var_glb += 1;
         }
         /*
-         * Functions don't have to (and cannot) be declared
-         * prior to call, 'out_series' function is defined below;
-         * The assembler is responsible for collecting the symbols
-         * and for figuring out which subroutine to call.
+         * No function prototypes, each function translates
+         * to an assembler subroutine.
          */
         do {
             out_series(add(NUM_TEN, 2 << 4));
@@ -111,7 +108,12 @@ out_series (num) {
     out_series(num - 1);
 }
 
+
+
+/* Interesting stuff inside */
 #include "misc/routines.c"
+
+
 
 /* TTL-CPU specific library functions */
 
