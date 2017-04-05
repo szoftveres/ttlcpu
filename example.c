@@ -19,26 +19,56 @@ static var_glb;
  * no 'void' function.
  * Function arguments are passed via the (emulated) stack.
  * The result of the expressions are stored in the accumulator;
- * also, the accumulator is used to pass the return value of the
- * functions to the caller. Hence, the return value is
- * whatever that's in the accumulator when the function returns.
- * The 'return' statement is available, however it needn't to be used.
+ * also, the accumulator is used to transfer the return value of
+ * functions to the caller. Hence, the return value of every function is
+ * the value that's stored in the accumulator just when the function returns.
+ * The 'retrun' statment is available and can have a value, however it
+ * just works as if it was a 'goto' statement that jumps to the end of
+ * the function; its only purpose is program flow control.
  */
-return_arg (a) {
-    a;      /* This function returns the value of its argument */
+one () {
+    1;              /* This function returns '1' */
 }
 
+two () {
+    return 2;       /* This function returns '2' */
+}
+
+three () {
+    if (0) {
+        7;
+    } else {
+        3;
+    }
+    return;
+    /*
+     * This function returns '3', because '3' was the
+     * last expression that have been evaluated
+     */
+}
+
+addition (b1, b2) {
+    b1 + b2;    /* this function returns b1 + b2 */
+}
 
 /*
- * The retrun statment can have a value, however it just works as if
- * it was a 'goto' statement that jumps to the end of
- * the function; its only purpose is program flow control.
- * The return statement can be omitted in the below case, the body
- * of the function can be replaced with a 'b1 + b2;' statment,
- * the result would be the same.
+ * The below case is tricky: In order to break the loop, the program needs to
+ * evaluate the 'i != 5' expression after each cycle; hence the last expression
+ * that's being evaluated is not '1', but 'i != 5'. The same is true for
+ * 'while' and 'do-while' cycles.
  */
-addition (b1, b2) {
-    return b1 + b2;
+return_false () {
+    auto i;
+    for (i = 0; i != 5; i += 1) {
+        1;
+    }
+}
+
+return_true () {
+    auto i;
+    for (i = 0; i != 5; i += 1) {
+        return 1;   /* Got it? :) */
+    }
 }
 
 
@@ -50,7 +80,8 @@ addition (b1, b2) {
  * accumulator. An 'a-1' statement would form the 2nd complement
  * of '1' and would add it to 'a'.
  * We can do it with a signle assembly instruction, the 2nd complement of
- * '1' is '255'; code execution speed can be significantly boosted with these tricks.
+ * '1' is '255'; code execution speed can be significantly boosted
+ * with these tricks.
  */
 dec (a) {
     a, asm("add(progdata) data(0xFF)");
@@ -70,12 +101,15 @@ main () {
          */
         for (i = NUM_TEN; (i - 1 != 0xFF - (1 == 2)) ? 1 : 0; i += addition(1, 0)) {
             auto i_p;
+            auto i_pp;
             /*
              * there's neither 'pointer' type, nor
              * pointer arythmetics; everything is a 8-bit 'word'
+             * It's up to you how you use the variables.
              */
             i_p = &i;  /* addressof */
-            *i_p += 1; /* dereference */
+            i_pp = &i_p;  /* addressof */
+            **i_pp += 1; /* arbitrary deep dereferencing */
             out(*i_p);
             var_glb += 1;
         }
@@ -94,9 +128,10 @@ out_series (num) {
     out(num);
     if (!num) {
         return;
+    } else if (1) {
+        /* Arbitrary deep recursion */
+        out_series(num - 1);
     }
-    /* Arbitrary deep recursion */
-    out_series(num - 1);
 }
 
 
