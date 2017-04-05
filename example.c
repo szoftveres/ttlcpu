@@ -35,20 +35,12 @@ two () {
 }
 
 three () {
-    if (0) {
-        7;
-    } else {
-        3;
-    }
-    return;
-    /*
-     * This function returns '3', because '3' was the
-     * last expression that have been evaluated
-     */
+    3;
+    return;         /* This function returns '3' */
 }
 
 addition (b1, b2) {
-    b1 + b2;    /* this function returns b1 + b2 */
+    b1 + b2;        /* this function returns b1 + b2 */
 }
 
 /*
@@ -118,20 +110,19 @@ main () {
          * to an assembler subroutine.
          */
         do {
-            out_series(add(NUM_TEN, 2 << 4));
+            out(fibonacci(add(one(), two() << three())));
         } while (0);
     }
 }
 
 
-out_series (num) {
-    out(num);
-    if (!num) {
-        return;
-    } else if (1) {
-        /* Arbitrary deep recursion */
-        out_series(num - 1);
+fibonacci (n) {
+   if (!n) {
+        return n;
+    } else if (n == 1) {
+        return n;
     }
+    return (fibonacci(n - 1) + fibonacci(n - 2)); /* Arbitrary deep recursion */
 }
 
 
