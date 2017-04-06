@@ -110,19 +110,19 @@ main () {
          * to an assembler subroutine.
          */
         do {
-            out(fibonacci(add(one(), two() << three())));
+            out(fibonacci(addition(one(), two() << three())));
         } while (0);
     }
 }
 
 
 fibonacci (n) {
-   if (!n) {
+    if (!n) {
         return n;
     } else if (n == 1) {
         return n;
     }
-    return (fibonacci(n - 1) + fibonacci(n - 2)); /* Arbitrary deep recursion */
+    return fibonacci(n - 1) + fibonacci(n - 2);  /* Arbitrary deep recursion */
 }
 
 
@@ -167,7 +167,13 @@ implemented_library_functions () {
      */
     d = adc(a,b,c);
 
-    /* msb: returns (a & 0x80) */
+    /*
+     * msb: returns 1 if ((a & 0x80) != 0)
+     * The CPU itself doesn't have bitwise AND facilities; however
+     * it can shift and rotate bits to the left.
+     * The MSB can be obtained by this tiny 'algorithm':
+     * rol(a) - shl(a);
+     */
     b = msb(a);
 
     /*
