@@ -7,17 +7,6 @@ Toolchain elements:
 
  *  'mcc' A compiler which resembles to the 'C' programming language
     and implements a subset of it. (see 'example.c' for details)
-    * lex
-        * lexical analyzer - final state machine
-        * input: character from stdin
-        * output: token_type and lexeme
-    * cc/parser
-        * one shot top-down parser
-    * cc/sym
-        * symbols (variables)
-    * arch/codegen
-        * architecture dependent assembly code output
-        * currently only implemented for the ttl-cpu
  *  'am' A very basic assembler implemented by using the
     capabilities of the gnu-gcc preprocessor
  *  'burner' Program that transfers assembled bytecode to
