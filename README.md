@@ -5,24 +5,15 @@ http://digitarworld.uw.hu/ttlcpu.html
 
 Toolchain elements:
 
- *  'mcc' A compiler which resembles to the 'C' programming language
+ *  mcc - A compiler which resembles to the 'C' programming language
     and implements a subset of it. (see 'example.c' for details)
-    * lex
-        * lexical analyzer - final state machine
-        * input: character from stdin
-        * output: token_type and lexeme
-    * cc/parser
-        * one shot top-down parser
-    * cc/sym
-        * symbols (variables)
-    * arch/codegen
-        * architecture dependent assembly code output
-        * currently only implemented for the ttl-cpu
- *  'am' A very basic assembler implemented by using the
+ *  am - A very basic assembler implemented by using the
     capabilities of the gnu-gcc preprocessor
- *  'burner' Program that transfers assembled bytecode to
+ *  burner - Program that transfers assembled bytecode to
     the 'ttl-cpu' from a special programmer hardware based
     on the ATmega8 AVR mcu
+ *  fsk - A tool to create a raw audio from a data stream (e.g.
+    a program) for the on-board 300 baud acoustic serial receiver
 
 The ttl-cpu program can be built and transferred to ttl-cpu by running
 the './b' shell script ( syntax: ./b <source_file.c> )
