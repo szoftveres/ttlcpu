@@ -14,6 +14,23 @@ static unsigned char data[] = {
 
 };
 
+static char filterbuf[CYCLE_HI];
+static int  idx;
+
+void filterout (char c) {
+    int i;
+    int avg = 0;
+    filterbuf[idx++] = c;
+    if (idx == (sizeof(filterbuf)/sizeof(filterbuf[0]))) {
+        idx = 0;
+    }
+    for (i = 0; i != (sizeof(filterbuf)/sizeof(filterbuf[0])); i++) {
+        avg += filterbuf[i];
+    }
+    avg /= sizeof(filterbuf)/sizeof(filterbuf[0]);
+    putchar((char)avg);
+}
+
 
 void
 gen_freq (int smp_rate, int baud, int cycle) {
@@ -27,14 +44,14 @@ gen_freq (int smp_rate, int baud, int cycle) {
 
     for (p = 0; p != cycle; p++) {
         for (i = 0; i != (num_smp / 2); i++) {
-            putchar(-96);
+            filterout(-96);
         }
 
         for (i = 0; i != (num_smp / 2); i++) {
-            putchar(96);
+            filterout(96);
         }
         if (num_smp % 2) {
-            putchar(0);
+            filterout(0);
         }
     }
     return;
