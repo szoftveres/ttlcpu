@@ -1,6 +1,6 @@
 OBJDIR = cc
 SRCDIR = cc
-INCLUDE = -I cc -I arch -I lex -I logg
+INCLUDE = -I cc -I arch -I lex
 ARCHDIR = arch/$(ARCH)
 OUTDIR = .
 
@@ -19,7 +19,7 @@ OBJECTS = $(OBJDIR)/main.o\
 ASMHEADER = header.asm
 ASMFOOTER = footer.asm
 
-SUBDIRS = arch lex logg
+SUBDIRS = arch lex
 .PHONY : $(SUBDIRS)
 
 ## Build both compiler and program
@@ -34,7 +34,7 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.c
 
 ## Link object files to build the compiler
 $(PROGRAM): $(SUBDIRS) $(OBJECTS)
-	$(LD) $(OBJECTS) lex/lex.o arch/codegen_$(ARCH).o logg/logg.o -o $(OUTDIR)/$(PROGRAM)
+	$(LD) $(OBJECTS) lex/lex.o arch/codegen_$(ARCH).o -o $(OUTDIR)/$(PROGRAM)
 
 clean:
 	-rm -rf $(OBJECTS) $(OUTDIR)/$(PROGRAM) 
