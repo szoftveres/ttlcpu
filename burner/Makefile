@@ -16,7 +16,7 @@ COMMON = -mmcu=$(MCU)
 ## Compile options common for all C compilation units.
 CFLAGS = $(COMMON)
 CFLAGS += -Wall -gdwarf-2 -Os -std=gnu99 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-CFLAGS += -MD -MP -MT $(*F).o -MF dep/$(@F).d 
+CFLAGS += -MD -MP -MT $(*F).o 
 
 ## Assembly specific flags
 ASMFLAGS = $(COMMON)
@@ -69,9 +69,7 @@ size: ${TARGET}
 ## Clean target
 .PHONY: clean
 clean:
-	-rm -rf $(OBJECTS) burner.elf dep/* burner.hex burner.eep burner.lss burner.map
+	-rm -rf $(OBJECTS) burner.elf burner.hex burner.eep burner.lss burner.map burner.d
 
 
-## Other dependencies
--include $(shell mkdir dep 2>/dev/null) $(wildcard dep/*)
 
