@@ -46,7 +46,7 @@ LINKONLYOBJECTS =
 all: $(TARGET) burner.hex burner.eep burner.lss size
 
 ## Compile
-burner.o: ../burner.c
+burner.o: burner.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link

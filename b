@@ -58,13 +58,13 @@ for (( i = 0; i < (($TOTAL / $SCATTER) + 1)  ; i++ )) ; do
         echo "-- part $(($i + 1)) --"
 
         # make burner
-        cd burner/default || exit 1
+        cd burner || exit 1
         make clean || exit 1
         make all || exit 1
-        cd ../.. || exit 1
+        cd .. || exit 1
 
         #burn
-        avrdude -p m8 -c avrispmkII -P usb -B 4 -U flash:w:burner/default/burner.hex:i || exit 1
+        avrdude -p m8 -c avrispmkII -P usb -B 4 -U flash:w:burner/burner.hex:i || exit 1
 
         echo
         echo "-- done with part $(($i + 1)) --"
