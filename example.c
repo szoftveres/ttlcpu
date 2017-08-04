@@ -7,6 +7,14 @@
 #define NUM_TEN     0x0A
 /* All the #preprocessor directives are currently handled by gcc (gcc -E) */
 
+/*
+#инцлуд <стдио.х>
+
+инт маин () {
+    принтф ("хелло, ворлд!");
+    ретурн 0;
+}
+*/
 
 /* Global variables */
 static var_glb;
