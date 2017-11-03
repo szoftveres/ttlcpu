@@ -365,7 +365,7 @@ int lex (char c) {
 
 /**
 */
-void lex_consume (void) {
+void next_token (void) {
     int c;
 
     token = T_NONE;
@@ -388,7 +388,7 @@ void lex_consume (void) {
 
 void lex_init (void) {
     last_char = EOF;
-    lex_consume();
+    next_token();
 }
 
 
@@ -401,7 +401,7 @@ int lex_get (int token_type, const char* str) {
             return 0;
         }
     }
-    lex_consume();
+    next_token();
     return 1;
 }
 

@@ -49,7 +49,7 @@ int func_definition (void) {
     }
     CODE_func_definition_label(lexeme);
     fn_name = strdup(lexeme);
-    lex_consume();
+    next_token();
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
     }
@@ -174,7 +174,7 @@ int var_declaration (int* space, int stc) {
         parser_error("expected identifier");
     }
     name = strdup(lexeme);
-    lex_consume();
+    next_token();
     if (find_var(name, 1)) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
@@ -198,7 +198,7 @@ int arg_declaration (void) {
         return 0;
     }
     name = strdup(lexeme);
-    lex_consume();
+    next_token();
     if (find_var(name, 1)) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
@@ -561,7 +561,7 @@ int binary_operation (int precedence) {
       default: return 0;
     }
 
-    lex_consume();
+    next_token();
 
     CODE_push_unsafe();
     inc_var_pos(SYM_integer_size());
@@ -742,7 +742,7 @@ int numeric_const (int* value) {
         return 0;
     }
     *value = num_process();
-    lex_consume();
+    next_token();
     return 1;
 }
 
@@ -752,7 +752,7 @@ int const_expression (void) {
 
     if (token == T_STRING) {
         CODE_const_expression_str(new_label(), lexeme);
-        lex_consume();
+        next_token();
         return 1;
     }
     if (numeric_const(&val)) {
@@ -793,7 +793,7 @@ int recursive_assignment (void) {
       case T_RECURBWAND :
       case T_RECURBWOR :
       case T_RECURBWXOR :
-        lex_consume();
+        next_token();
         break;
       default:
         return 0;
@@ -862,7 +862,7 @@ int asm_expression (char* identifier) {
         }
         str_process();
         CODE_asm_statement(lexeme);
-        lex_consume();
+        next_token();
     } while (token == T_STRING);
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         parser_error("expected ')'");
@@ -979,7 +979,7 @@ int object_identifier (void) {
         return 0;
     }
     id = strdup(lexeme);
-    lex_consume();
+    next_token();
     if (function_expression(id)) {
         free(id);
         /* 2 means function ret val in acc */

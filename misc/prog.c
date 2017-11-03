@@ -48,35 +48,45 @@ mem_monitor (addr) {
 }
 
 
-disp_dec (num) {
-    auto newnum;
-    auto rem;
+swp (a_p, b_p) {
+    auto tmp;
 
-    newnum = div(num, 10, &rem);
-    if (newnum) {
-        disp_dec(newnum);
+    tmp = *a_p;
+    *a_p = *b_p;
+    *b_p = tmp;
+    disp(16);
+}
+
+qst (arr_p, size) {
+    auto idx;
+    auto lp;
+    auto arr_ep;
+
+    if (!size) {
+        return;
     }
-    disp_push(hex2sym(rem));
+    lp = 0;
+    for (idx = 1; idx != size; idx += 1) {
+        arr_ep = arr_p + idx;
+        if (*arr_ep < *arr_p) {
+            swp(arr_p + lp + 1, arr_p + idx);
+            lp += 1;
+        }
+    }
+
+    swp(arr_p + lp, arr_p);
+
+    qst(arr_p, lp);
+    qst(arr_p + lp + 1, size - lp - 1);
 }
 
-
-disp_long (np, bytes) {
-    auto ad;
-    ad = np + bytes;
-    do {
-        ad += 0xFF;
-        bytes += 0xFF;
-        disp_push(hex2sym(*ad >> 4));
-        disp_push(hex2sym(*ad));
-    } while (bytes);
-}
 
 
 main () {
     auto memaddr;
 
     memaddr = 0;
-//    msg();
+    msg();
     while (1) {
         auto c;
 
@@ -84,20 +94,7 @@ main () {
         if (c == 0x0F) {
             memset(0, 0, 8);
         } else if (c == 0x0E) {
-            auto np;
-            auto n;
-            np = 0x10;
-            memset(np,0,4); *np = msb(0xFF);
-            for (n = 0; n != 32; n += 1) {
-                /*
-                memset(4, 0, 4);
-                disp_dec(mul(n,n));
-                */
-                memset(0, 0, 8);
-                disp_long(np, 4);
-                disp(148);
-                shl(np, 3);
-            }
+            qst(0,8);
         } else if (c == 0x0D) {
             msg();
         } else if (c == 0x0C) {
