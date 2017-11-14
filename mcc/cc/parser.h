@@ -77,8 +77,7 @@ int array_index (void);
 int dereference (void);
 int object_identifier (void);
 int var_address (void);
-int object_address (void);
-int identifier_value (void);
+int object_expression (void);
 
 
 #endif

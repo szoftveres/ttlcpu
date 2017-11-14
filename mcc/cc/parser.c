@@ -12,6 +12,9 @@ void parser_error (char* s) {
     exit(1);
 }
 
+void parser_warning (char* s) {
+    fprintf(stderr, "parser warning: %s\n", s);
+}
 
 int program (void) {
     int vars;
@@ -448,7 +451,7 @@ int primary_expression (void) {
     if (const_expression()) {
         return 1;
     }
-    if (identifier_value()) {
+    if (object_expression()) {
         return 1;
     }
     return 0;
@@ -722,16 +725,6 @@ int bitwise_neg (void) {
     return 1;
 }
 
-int addressof (void) {
-    if (!lex_get(T_BWAND, NULL)) {
-        return 0;
-    }
-    if (var_address() != 1) {
-        parser_error("expected variable after '&'");
-    }
-    return 1;
-}
-
 
 int numeric_const (int* value) {
     if (token != T_CHAR &&
@@ -909,16 +902,29 @@ int fn_call_args (void) {
 
 /* ================================= */
 
+#define RC_VARIABLE     (1)
+#define RC_FUNCTION     (2)
+#define RC_ADDRESS      (3)
+
+
 /* This handles functions too */
-int identifier_value (void) {
-    int rc;
-    rc = object_address();
-    if (rc == 1) {
-        if (!assignment()) {
-            CODE_dereference();
+int object_expression (void) {
+    int rc = RC_ADDRESS;
+
+    if (!dereference()) {
+        rc = object_identifier();
+        if (!rc) {
+            return 0;
+        }
+        if (rc == RC_FUNCTION) {
+            return 1; /* Done */
         }
     }
-    return rc;
+    /* Object address in acc */
+    if (!assignment()) {
+        CODE_dereference();
+    }
+    return 1;
 }
 
 
@@ -926,19 +932,10 @@ int var_address (void) {
     int rc;
 
     rc = object_identifier();
-    if (rc == 1) {
+    if (rc == RC_VARIABLE) {
         array_index();  /* Possible addr offset */
     }
     return (rc);
-}
-
-
-int object_address (void) {
-    if (dereference()) {
-        CODE_dereference();
-        return 1;
-    }
-    return (var_address());
 }
 
 
@@ -961,11 +958,34 @@ int array_index (void) {
 
 
 int dereference (void) {
+    int rc = RC_ADDRESS;
     if (!lex_get(T_MUL, NULL)) {
         return 0;
     }
-    if (object_address() != 1) {
+    if (!dereference()) {
+        rc = var_address();
+    } else {
+        CODE_dereference();
+    }
+
+    if (rc == RC_VARIABLE) {
+        CODE_dereference();
+        return 1;
+    }
+    if (!rc && !primary_expression()) {
         parser_error("expected object after '*'");
+        return 0;
+    }
+    return 1;
+}
+
+
+int addressof (void) {
+    if (!lex_get(T_BWAND, NULL)) {
+        return 0;
+    }
+    if (var_address() != RC_VARIABLE) {
+        parser_error("expected variable after '&'");
     }
     return 1;
 }
@@ -983,7 +1003,7 @@ int object_identifier (void) {
     if (function_expression(id)) {
         free(id);
         /* 2 means function ret val in acc */
-        return 2;
+        return RC_FUNCTION;
     }
     var = find_var(id, 0);
     if (!var) {
@@ -997,7 +1017,7 @@ int object_identifier (void) {
     }
     free(id);
     /* 1 means address of obj in acc */
-    return 1;
+    return RC_VARIABLE;
 }
 
 

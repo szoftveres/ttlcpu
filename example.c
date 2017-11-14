@@ -5,16 +5,9 @@
 
 
 #define NUM_TEN     0x0A
+#define OFFSET      0x01
 /* All the #preprocessor directives are currently handled by gcc (gcc -E) */
 
-/*
-#инцлуд <стдио.х>
-
-инт маин () {
-    принтф ("хелло, ворлд!");
-    ретурн 0;
-}
-*/
 
 /* Global variables */
 static var_glb;
@@ -49,6 +42,10 @@ three () {
 
 addition (b1, b2) {
     b1 + b2;        /* this function returns b1 + b2 */
+}
+
+myaddress () {
+    0x10;
 }
 
 /*
@@ -112,6 +109,13 @@ main () {
             **i_pp += 1; /* arbitrary deep dereferencing */
             out(*i_p);
             var_glb += 1;
+
+            /*
+             * You can dereference the value of any primary
+             * expression, including the return value of a function
+             */
+            *myaddress() = *(0x10 + OFFSET);
+            *0x01 = 5;  /* Direct write to memory address 0x01 */
         }
         /*
          * No function prototypes, each function translates
