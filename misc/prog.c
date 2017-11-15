@@ -54,7 +54,7 @@ swp (a_p, b_p) {
     tmp = *a_p;
     *a_p = *b_p;
     *b_p = tmp;
-    disp(16);
+    disp(24);
 }
 
 qst (arr_p, size) {
@@ -62,7 +62,7 @@ qst (arr_p, size) {
     auto lp;
     auto arr_ep;
 
-    if (!size) {
+    if (size < 2) {
         return;
     }
     lp = 0;
