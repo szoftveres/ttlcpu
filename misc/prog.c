@@ -47,6 +47,13 @@ mem_monitor (addr) {
     d7 = hex2sym(*addr) + SYM_DP;
 }
 
+buf_push (item, b_p, size) {
+    while (size) {
+        size = (size, asm("add(progdata) data(255)"));
+        *(b_p + size) = (*((b_p + size), asm("add(progdata) data(255)")));
+    }
+    *(b_p) = item;
+}
 
 swp (a_p, b_p) {
     auto tmp;
