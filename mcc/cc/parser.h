@@ -63,8 +63,6 @@ int function_expression (char* identifier);
 
 int asm_expression (char* identifier);
 
-int sizeof_expression (char* identifier);
-
 int fn_call (char* identifier);
 
 int fn_call_args (void);
@@ -73,10 +71,8 @@ int binary_operation(int precedence);
 
 void do_operations (int op_type);
 
-int array_index (void);
 int dereference (void);
 int object_identifier (void);
-int var_address (void);
 int object_expression (void);
 
 

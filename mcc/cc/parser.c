@@ -146,29 +146,10 @@ int block (void) {
     return 1;
 }
 
-int array_dimension (int* elements) {
-    int n1;
-    int n2;
-
-    if (!lex_get(T_LEFT_SQUARE_BRACKET, NULL)) {
-        return 0;
-    }
-    if (!numeric_const(&n1)) {
-            parser_error("expected numeric constant");
-    }
-    if (!lex_get(T_RIGHT_SQUARE_BRACKET, NULL)) {
-        parser_error("expected ']'");
-    }
-    *elements = n1 * (array_dimension(&n2) ? n2 : 1);
-
-    return 1;
-}
-
 
 int var_declaration (int* space, int stc) {
     char* name;
     int   size;
-    int   num = 0;
 
     if (!lex_get(T_IDENTIFIER, stc ? "static" : "auto")) {
         return 0;
@@ -182,14 +163,11 @@ int var_declaration (int* space, int stc) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    if (!array_dimension(&num)) {
-        num = 1;
-    }
     size = SYM_integer_size();
-    push_var(name, size, num, stc);
+    push_var(name, size, stc);
     free(name);
     if (space) {
-        (*space) += (size * num);
+        (*space) += size;
     }
     return 1; /* should be strictly 1 (number of declarations found) */
 }
@@ -206,7 +184,7 @@ int arg_declaration (void) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    push_var(name, SYM_integer_size(), 1, 0 /*auto*/);
+    push_var(name, SYM_integer_size(), 0 /*auto*/);
     free(name);
     return 1; /* should be strictly 1 (number of declarations found) */
 }
@@ -813,32 +791,10 @@ int function_expression (char* identifier) {
     if (asm_expression(identifier)) {
         return 1;
     }
-    if (sizeof_expression(identifier)) {
-        return 1;
-    }
     if (fn_call(identifier)) {
         return 1;
     }
     return 0;
-}
-
-
-int sizeof_expression (char* identifier) {
-    if (strcmp(identifier, "sizeof")) {
-        return 0;
-    }
-    if (!lex_get(T_LEFT_PARENTH, NULL)) {
-        parser_error("expected '('");
-    }
-
-    if (!expression()) {
-        parser_error("expected expression");
-    }
-    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
-        parser_error("expected ')'");
-    }
-    parser_error("'sizeof' unimplemented");
-    return 1;
 }
 
 
@@ -909,9 +865,9 @@ int fn_call_args (void) {
 
 /* This handles functions too */
 int object_expression (void) {
-    int rc = RC_ADDRESS;
-
     if (!dereference()) {
+        int rc;
+
         rc = object_identifier();
         if (!rc) {
             return 0;
@@ -928,42 +884,13 @@ int object_expression (void) {
 }
 
 
-int var_address (void) {
-    int rc;
-
-    rc = object_identifier();
-    if (rc == RC_VARIABLE) {
-        array_index();  /* Possible addr offset */
-    }
-    return (rc);
-}
-
-
-int array_index (void) {
-    if (!lex_get(T_LEFT_SQUARE_BRACKET, NULL)) {
-        return 0;
-    }
-    /* XXX */ parser_error("array indexing unimplemented");
-    /* XXX save address */
-    CODE_push_unsafe();
-    if (!expressions()) {
-        parser_error("expected expression after '['");
-    }
-    /* XXX restore address and calculate */
-    if (!lex_get(T_RIGHT_SQUARE_BRACKET, NULL)) {
-        parser_error("expected ']'");
-    }
-    return 1;
-}
-
-
 int dereference (void) {
     int rc = RC_ADDRESS;
     if (!lex_get(T_MUL, NULL)) {
         return 0;
     }
     if (!dereference()) {
-        rc = var_address();
+        rc = object_identifier();
     } else {
         CODE_dereference();
     }
@@ -984,7 +911,7 @@ int addressof (void) {
     if (!lex_get(T_BWAND, NULL)) {
         return 0;
     }
-    if (var_address() != RC_VARIABLE) {
+    if (object_identifier() != RC_VARIABLE) {
         parser_error("expected variable after '&'");
     }
     return 1;
