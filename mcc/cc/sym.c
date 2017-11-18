@@ -58,12 +58,11 @@ new_var (char* name) {
 
 
 static var_t *
-add_var (var_t *var, int size, int num, int stc) {
+add_var (var_t *var, int size, int stc) {
     if (var) {
         var->next = variables;
         variables = var;
         var->size = size;
-        var->num = num;
         var->scope = scope;
         var->stc = stc;
     }
@@ -78,7 +77,7 @@ del_var (void) {
 
     var = variables;
     if (var) {
-        space = var->stc ? 0 : var->size * var->num;
+        space = var->stc ? 0 : var->size;
         variables = variables->next;
         free(var);
     }
@@ -125,16 +124,16 @@ pop_var (void) {
 }
 
 void
-push_var (char* name, int size, int num, int stc) {
+push_var (char* name, int size, int stc) {
     var_t *var;
     if (!stc) {
-        inc_var_pos(size * num);
+        inc_var_pos(size);
     }
     var = new_var(name);
-    add_var(var, size, num, stc);
+    add_var(var, size, stc);
     if (stc) {
         var->pos = stc_pos;
-        stc_pos += (size * num);
+        stc_pos += size;
     }
 }
 
