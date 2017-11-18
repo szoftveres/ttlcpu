@@ -71,9 +71,19 @@ int binary_operation(int precedence);
 
 void do_operations (int op_type);
 
-int dereference (void);
-int object_identifier (void);
 int object_expression (void);
+
+int dereference (void);
+
+typedef enum id_obj_e {
+    RC_NONE     = 0,
+    RC_ADDRESS  = 1,
+    RC_VARIABLE = 2,
+    RC_FUNCTION = 3
+} id_obj_t;
+
+
+id_obj_t object_identifier (void);
 
 
 #endif

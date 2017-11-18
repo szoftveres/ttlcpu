@@ -744,13 +744,13 @@ int assignment (void) {
         }
         CODE_pop_addr_and_store();
         dec_var_pos(SYM_integer_size());
+        return 1;
     } else if (recursive_assignment()) {
         CODE_pop_addr_and_store();
         dec_var_pos(SYM_integer_size());
-    } else {
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 
@@ -856,17 +856,10 @@ int fn_call_args (void) {
 }
 
 
-/* ================================= */
-
-#define RC_VARIABLE     (1)
-#define RC_FUNCTION     (2)
-#define RC_ADDRESS      (3)
-
-
 /* This handles functions too */
 int object_expression (void) {
     if (!dereference()) {
-        int rc;
+        id_obj_t rc;
 
         rc = object_identifier();
         if (!rc) {
@@ -885,7 +878,7 @@ int object_expression (void) {
 
 
 int dereference (void) {
-    int rc = RC_ADDRESS;
+    id_obj_t rc = RC_ADDRESS;
     if (!lex_get(T_MUL, NULL)) {
         return 0;
     }
@@ -899,9 +892,10 @@ int dereference (void) {
         CODE_dereference();
         return 1;
     }
-    if (!rc && !primary_expression()) {
-        parser_error("expected object after '*'");
-        return 0;
+    if (!rc) {
+        if (!primary_expression()) {
+            parser_error("expected object address after '*'");
+        }
     }
     return 1;
 }
@@ -918,7 +912,7 @@ int addressof (void) {
 }
 
 
-int object_identifier (void) {
+id_obj_t object_identifier (void) {
     char* id;
     var_t *var;
 
@@ -929,12 +923,13 @@ int object_identifier (void) {
     next_token();
     if (function_expression(id)) {
         free(id);
-        /* 2 means function ret val in acc */
+        /* Function return value in acc */
         return RC_FUNCTION;
     }
     var = find_var(id, 0);
     if (!var) {
         fprintf(stderr, "error : '%s' not defined in this scope\n", id);
+        free(id);
         exit(1);
     }
     if (var->stc) {
@@ -943,7 +938,7 @@ int object_identifier (void) {
         CODE_load_eff_addr_auto(var->pos);
     }
     free(id);
-    /* 1 means address of obj in acc */
+    /* Variable address in acc */
     return RC_VARIABLE;
 }
 
