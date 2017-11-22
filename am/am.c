@@ -73,14 +73,17 @@ instruction (int d, int s, char* m) {
     if ((s == frm_ram) && (d == to_ram)) {
         /* Halt and catch fire */
         fprintf(stderr, "   **** ILLEGAL  ram <- ram \n"); exit(1);
+        exit(1);
     }
     fprintf(stdout, "0x%02X,\n", ic);
+    /*
     fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0; i < 8; i++) {
         fprintf(stderr, (ic & 0x80) ? "1" : "0");
         ic = ic << 1;
     }
+    */
     switch (d) {
       case to_acc : de = "acc"; break;
       case to_acc_invert : de = "acc_invert"; break;
@@ -99,7 +102,7 @@ instruction (int d, int s, char* m) {
       case frm_ram : so = "ram"; break;
       default: fprintf(stderr, "         %d <- %d %s\n", d, s, m); exit(1); break;
     }
-    fprintf(stderr, "       mov  %s, %s %s\n", de, so, m);
+    //fprintf(stderr, "       mov  %s, %s %s\n", de, so, m);
     pc += 1;
     return;
 }
@@ -121,6 +124,7 @@ defaddr (char* n, int high) {
     }
     ic = (unsigned char) (lbl->addr >> (high ? 8 : 0));
     fprintf(stdout, "0x%02X,\n", ic);
+    /*
     fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
@@ -130,6 +134,7 @@ defaddr (char* n, int high) {
             ic,
             (high ? "high" : "low"),
             lbl->name);
+    */
     pc += 1;
     return;
 }
@@ -141,12 +146,14 @@ dataconst (unsigned int v, int shift) {
     unsigned char ic2;
 
     fprintf(stdout, "0x%02X,\n", ic);
+    /*
     fprintf(stderr, "  %04X:", pc);
     fprintf(stderr, "  0x%02X  ", ic);
     for (i = 0, ic2 = ic; i < 8; i++, ic2 = ic2 << 1) {
         fprintf(stderr, (ic2 & 0x80) ? "1" : "0");
     }
-    fprintf(stderr, "       (0x%02x)\n", ic); 
+    fprintf(stderr, "       (0x%02x)\n", ic);
+    */
     pc += 1;
     return;
 }
@@ -155,7 +162,7 @@ int
 main (int argc, char** argv) {
     struct lbl_s *lbl;
     head = NULL;
-    
+
     pc = 0;
     #include "am.h"
     pc = 0;

@@ -129,6 +129,7 @@ int block (void) {
 
 int var_declaration (int* space) {
     char* name;
+    int size;
 
     if (!lex_get(T_IDENTIFIER, "auto")) {
         return 0;
@@ -143,7 +144,7 @@ int var_declaration (int* space) {
         exit(1);
     }
     size = SYM_integer_size();
-    push_var(name, size, stc);
+    push_var(name, size);
     free(name);
     if (space) {
         (*space) += size;

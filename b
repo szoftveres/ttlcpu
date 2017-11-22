@@ -2,10 +2,10 @@
 # set -x
 
 # make c compiler
-echo "Making cc.."
+echo "Making CC .."
 cd mcc || exit 1
-make clean || exit 1
-make ARCH=ttlcpu all || exit 1
+make clean > ../build.log || exit 1
+make ARCH=ttlcpu all >> ../build.log || exit 1
 cd .. || exit 1
 
 if test -z "${1}" ; then
@@ -14,28 +14,27 @@ if test -z "${1}" ; then
 fi
 
 #compile
-echo "Compiling '${1}'.."
+echo "Running CC, '${1}' .."
 cp ./mcc/arch/ttlcpu/header.asm  am/program.asm || exit 1
-cc -E "${1}" | grep -v '^#' | ./mcc/mcc -l cclog.txt >> am/program.asm || exit 1
+cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> am/program.asm 2>> build.log || exit 1
 cat ./mcc/arch/ttlcpu/footer.asm >> am/program.asm || exit 1
 
 # make assembler and assemble 
-echo "Making AM.."
+echo "Making AM .."
 cd am || exit 1
-cc -O0 -o asm am.c || exit 1
+cc -O0 -o asm am.c >> ../build.log || exit 1
 
-echo "Running AM.."
-./asm > bytecode.h 2> asmlog.txt || exit 1
-# cat asmlog.txt
+echo "Running AM .."
+./asm > bytecode.h 2>> ../build.log || exit 1
 cd .. || exit 1
 
 LIMIT=32768
 
 TOTAL=`wc -l < am/bytecode.h`
-echo '*********************************************'
-echo -n "Bytecode program size (bytes):  "
-echo "${TOTAL}"
-echo '*********************************************'
+echo -n "Binary size: "
+echo -n "${TOTAL} "
+echo "bytes"
+echo '*************************'
 
 if (( $TOTAL > $LIMIT )) ; then
     echo
