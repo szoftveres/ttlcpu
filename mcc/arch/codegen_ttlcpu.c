@@ -54,21 +54,6 @@ void CODE_var_declarations_space (int i) {
     }
 }
 
-void CODE_glob_var_container (int i) {
-    print_debugs(__FUNCTION__);
-    fprintf(stdout, "lbl(\"__main_caller\")\n");
-    fprintf(stdout, "/* clear glb address space */\n");
-    fprintf(stdout, "    mov(to_acc, progdata) data(%d)\n", i);
-    fprintf(stdout, "lbl(\"__glb_clr\")\n");
-    fprintf(stdout, "    jz(\"__glb_clr_end\")\n");
-    fprintf(stdout, "    dec()\n");
-    fprintf(stdout, "    mov(to_mar, frm_acc)\n");
-    fprintf(stdout, "    mov(to_ram, progdata) data(0)\n");
-    fprintf(stdout, "    jp(\"__glb_clr\")\n");
-    fprintf(stdout, "lbl(\"__glb_clr_end\")\n");
-    fprintf(stdout, "    jp(\"main\")\n");
-}
-
 
 void CODE_if_statement_head (int lbl) {
     print_debugs(__FUNCTION__);
@@ -364,12 +349,6 @@ void CODE_load_eff_addr_auto (int pos) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, "    ld(to_acc, SP)\n");
     fprintf(stdout, "    add(progdata) data(%d)\n", pos + 1);
-}
-
-void CODE_load_eff_addr_stc (int pos) {
-    print_debugs(__FUNCTION__);
-//    unimplemented(__FUNCTION__);
-    fprintf(stdout, "    mov(to_acc, progdata) data(0x%X)\n", pos);
 }
 
 

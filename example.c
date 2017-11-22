@@ -9,11 +9,6 @@
 /* All the #preprocessor directives are currently handled by gcc (gcc -E) */
 
 
-/* Global variables */
-static var_glb;
-/* are reset to zero before main function execution begins */
-
-
 /*
  * There are no data types, everything is an 8-bit CPU-word.
  * Every function is assumed to return a value, there's
@@ -89,7 +84,7 @@ dec (a) {
 main () {
     /* Variable declarations at the beginning of each block */
     auto i;
-    static g;
+    auto g;
 
     while (1) {
         /*
@@ -108,7 +103,7 @@ main () {
             i_pp = &i_p;  /* addressof */
             **i_pp += 1; /* arbitrary deep dereferencing */
             out(*i_p);
-            var_glb += 1;
+            g += 1;
 
             /*
              * You can dereference the value of any primary

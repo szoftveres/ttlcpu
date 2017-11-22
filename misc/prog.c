@@ -1,16 +1,4 @@
 #include "../lib/ttlcpuio.h"
-
-
-static d0;
-static d1;
-static d2;
-static d3;
-static d4;
-static d5;
-static d6;
-static d7;
-
-
 #include "routines.c"
 
 
@@ -37,14 +25,14 @@ msg () {
 
 
 mem_monitor (addr) {
-    d0 = SYM_LEFT_BRACKET;
-    d1 = hex2sym(addr >> 4);
-    d2 = hex2sym(addr);
-    d3 = SYM_RIGHT_BRACKET;
-    d4 = SYM_SPACE;
-    d5 = SYM_SPACE;
-    d6 = hex2sym(*addr >> 4);
-    d7 = hex2sym(*addr) + SYM_DP;
+    *0 = SYM_LEFT_BRACKET;
+    *1 = hex2sym(addr >> 4);
+    *2 = hex2sym(addr);
+    *3 = SYM_RIGHT_BRACKET;
+    *4 = SYM_SPACE;
+    *5 = SYM_SPACE;
+    *6 = hex2sym(*addr >> 4);
+    *7 = hex2sym(*addr) + SYM_DP;
 }
 
 buf_push (item, b_p, size) {

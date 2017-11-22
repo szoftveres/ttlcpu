@@ -16,12 +16,8 @@ void parser_warning (char* s) {
     fprintf(stderr, "parser warning: %s\n", s);
 }
 
-int program (void) {
+void program (void) {
     int vars;
-    int var_space = 0;
-
-    vars = glb_var_declarations(&var_space);
-    CODE_glob_var_container(var_space);
 
     func_definitions();
     if (token != T_EOF) {
@@ -30,7 +26,7 @@ int program (void) {
     while (vars--) {
         pop_var();
     }
-    exit(0);
+    return;
 }
 
 
@@ -98,28 +94,12 @@ int arg_declarations (void) {
 int lcl_var_declarations (int* space) {
     int vars = 0;
 
-    vars += var_declaration(space, 0 /*auto*/);
-    vars += var_declaration(NULL, 1 /*static*/);
+    vars += var_declaration(space);
     if (vars) {
         if (!lex_get(T_SEMICOLON, NULL)) {
             parser_error("expected ';'");
         }
         vars += lcl_var_declarations(space);
-    }
-    return vars;
-
-}
-
-
-int glb_var_declarations (int* space) {
-    int vars = 0;
-
-    vars += var_declaration(space, 1 /*static*/);
-    if (vars) {
-        if (!lex_get(T_SEMICOLON, NULL)) {
-            parser_error("expected ';'");
-        }
-        vars += glb_var_declarations(space);
     }
     return vars;
 
@@ -147,11 +127,10 @@ int block (void) {
 }
 
 
-int var_declaration (int* space, int stc) {
+int var_declaration (int* space) {
     char* name;
-    int   size;
 
-    if (!lex_get(T_IDENTIFIER, stc ? "static" : "auto")) {
+    if (!lex_get(T_IDENTIFIER, "auto")) {
         return 0;
     }
     if (token != T_IDENTIFIER) {
@@ -184,7 +163,7 @@ int arg_declaration (void) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    push_var(name, SYM_integer_size(), 0 /*auto*/);
+    push_var(name, SYM_integer_size());
     free(name);
     return 1; /* should be strictly 1 (number of declarations found) */
 }
@@ -932,11 +911,7 @@ id_obj_t object_identifier (void) {
         free(id);
         exit(1);
     }
-    if (var->stc) {
-        CODE_load_eff_addr_stc(var->pos);
-    } else {
-        CODE_load_eff_addr_auto(var->pos);
-    }
+    CODE_load_eff_addr_auto(var->pos);
     free(id);
     /* Variable address in acc */
     return RC_VARIABLE;

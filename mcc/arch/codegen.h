@@ -12,7 +12,6 @@ void CODE_func_definition_ret (char* fn_name);
 void CODE_stack_restore (int i);
 
 void CODE_var_declarations_space (int i);
-void CODE_glob_var_container (int i);
 
 void CODE_if_statement_head (int lbl);
 void CODE_if_statement_mid (int lbl);
@@ -68,7 +67,6 @@ void CODE_ternary_cond_end (int lbl);
 void CODE_pop_addr_and_store (void);
 void CODE_dereference (void);
 
-void CODE_load_eff_addr_stc (int pos);
 void CODE_load_eff_addr_auto (int pos);
 
 

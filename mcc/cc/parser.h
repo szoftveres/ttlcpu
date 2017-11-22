@@ -1,16 +1,15 @@
 #ifndef _PARSER_H_
 #define _PARSER_H_
 
-int program (void);
+void program (void);
 
 int func_definitions (void);
 
 int func_definition (void);
 
 
-int var_declaration (int* space, int stc);
+int var_declaration (int* space);
 
-int glb_var_declarations (int* space);
 int lcl_var_declarations (int* space);
 
 int arg_declaration (void);

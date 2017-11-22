@@ -15,9 +15,8 @@ static int             lbl;
 
 /* scope - 0 means global */
 static int             scope;
-static int             stc_pos;
 
-static int             stack_grow;
+static int             stack_grow; /* for return stmt */
 static char            function_name[32];
 
 void
@@ -26,7 +25,6 @@ sym_init (void) {
     variables = NULL;
     scope = 0;
     stack_grow = 0;
-    stc_pos = 0;
 }
 
 
@@ -58,13 +56,12 @@ new_var (char* name) {
 
 
 static var_t *
-add_var (var_t *var, int size, int stc) {
+add_var (var_t *var, int size) {
     if (var) {
         var->next = variables;
         variables = var;
         var->size = size;
         var->scope = scope;
-        var->stc = stc;
     }
     return var;
 }
@@ -77,7 +74,7 @@ del_var (void) {
 
     var = variables;
     if (var) {
-        space = var->stc ? 0 : var->size;
+        space = var->size;
         variables = variables->next;
         free(var);
     }
@@ -89,7 +86,6 @@ void
 inc_var_pos (int b) {
     var_t *it;
     for (it = variables; it; it = it->next) {
-        if (it->stc) continue;
         it->pos += b;
     }
     stack_grow += b;
@@ -100,7 +96,6 @@ void
 dec_var_pos (int b) {
     var_t* it;
     for (it = variables; it; it = it->next) {
-        if (it->stc) continue;
         it->pos -= b;
     }
     stack_grow -= b;
@@ -124,17 +119,11 @@ pop_var (void) {
 }
 
 void
-push_var (char* name, int size, int stc) {
+push_var (char* name, int size) {
     var_t *var;
-    if (!stc) {
-        inc_var_pos(size);
-    }
+    inc_var_pos(size);
     var = new_var(name);
-    add_var(var, size, stc);
-    if (stc) {
-        var->pos = stc_pos;
-        stc_pos += size;
-    }
+    add_var(var, size);
 }
 
 int

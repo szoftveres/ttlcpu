@@ -123,7 +123,7 @@ lbl("__disp_clr_end")
     
     stackinit()
 
-    call("__main_caller", "__main_caller_ret")
+    call("main", "__main_caller_ret")
 
     out(progdata) data(0)
 lbl("__haltcpu")
