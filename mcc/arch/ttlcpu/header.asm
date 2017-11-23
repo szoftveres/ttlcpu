@@ -240,287 +240,109 @@ lbl("__bit_02_end")
 
 /*
 
-bwand (var a, var b) {
-    var a_lcl;
-    var b_lcl;
-    var i;
-    var cc;
-    var ret;
-    var ret_add;
-
-    ret_add = 1;
+bwand2 (a,b) {
+    auto ret;
+    auto i;
     ret = 0;
-    cc = 0;
+    i = 8;
+    while (i) {
+        asm("    dec() mov(to_ram, frm_acc)\n");  // i++
 
-    while(cc != 8) {
-        a_lcl = a;
-        b_lcl = b;
+        ret; asm("    rol() mov(to_ram, frm_acc)\n"); //  ret << 1
 
-        i = 7-cc;
-        while (i) {
-            a_lcl;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
-            b_lcl;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
+        msb((a, asm("    rol() mov(to_ram, frm_acc)\n"))) +
+        msb((b, asm("    rol() mov(to_ram, frm_acc)\n"))) + 0xFE;
 
-            i;
-            asm ("    dec()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
-        }
-
-        a_lcl;
-        asm ("    rol()\n");
-        asm ("    mov(to_ram, frm_acc)\n");
-        b_lcl;
-        asm ("    rol()\n");
-        asm ("    mov(to_ram, frm_acc)\n");
-
-        i = cc;
-        while (i) {
-            a_lcl;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
-            b_lcl;
-            asm ("    shl()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
-
-            i;
-            asm ("    dec()\n");
-            asm ("    mov(to_ram, frm_acc)\n");
-        }
-
-        if (a_lcl) if(b_lcl) {
-            ret += ret_add;
-        }
-        
-        ret_add;
-        asm ("    shl()\n");
-        asm ("    mov(to_ram, frm_acc)\n");
-        
-        cc;
-        asm ("    inc()\n");
-        asm ("    mov(to_ram, frm_acc)\n");
+        asm("    jz(\"bwand2_in\")\n");
+        ret;
+        asm("    jp(\"bwand2_out\")\n");
+        asm("lbl(\"bwand2_in\")\n");
+        ret, asm("    add(progdata) data(0x80)\n");
+        asm("lbl(\"bwand2_out\")\n");
+        asm("    mov(to_ram, frm_acc)\n"); //  ret << 1
     }
     ret;
-
 }
 
 */  
 
 lbl("bwand")
-    dec_sp(6)
-
-// ret_add = 1;
-    // ld(to_acc, SP)
-    add(progdata) data(0+1)
-    mov(to_mar, frm_acc)
-    mov(to_ram, progdata) data(1)
-
-// ret = 0;
-    inc()
-    mov(to_mar, frm_acc)
-    mov(to_ram, progdata) data(0)
-
-// cc = 0;
-    inc()
-    mov(to_mar, frm_acc)
-    mov(to_ram, progdata) data(0)
-
-    mov(to_acc, frm_ram)
-
-// while(cc != 8)
-lbl("__bwand_rst_1")
-    add(progdata) data(-8)
-    jz("__bwand_done")
-
-// a_lcl = a;
+    dec_sp(2)
     ld(to_acc, SP)
-    add(progdata) data(9+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    push_unsafe(frm_acc)                  // 1st operand push
-    ld(to_acc, SP)
-    add(progdata) data(6+1)
-    st(BX, frm_acc)                // store 2nd operand
-    pop(to_acc)                      // 1st operand pop
-    mov(to_mar, progdata) data(BX)
-    mov(to_mar, frm_ram)
+    add(progdata) data(2)
+    push_unsafe(frm_acc)              // 1st operand push
+    mov(to_acc, progdata) data(0x0)      // const
+    pop(to_mar)
     mov(to_ram, frm_acc)
-
-// b_lcl = b;
     ld(to_acc, SP)
-    add(progdata) data(8+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    push_unsafe(frm_acc)                  // 1st operand push
-    ld(to_acc, SP)
-    add(progdata) data(5+1)
-    st(BX, frm_acc)                // store 2nd operand
-    pop(to_acc)                      // 1st operand pop
-    mov(to_mar, progdata) data(BX)
-    mov(to_mar, frm_ram)
+    add(progdata) data(1)
+    push_unsafe(frm_acc)              // 1st operand push
+    mov(to_acc, progdata) data(0x8)      // const
+    pop(to_mar)
     mov(to_ram, frm_acc)
-
-// i = 7-cc;
+lbl("__bwand_while_test")
     ld(to_acc, SP)
-    add(progdata) data(2+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc_invert, frm_ram)
-    inc()                        // 2nd cmpl      
-    add(progdata) data(7)
-    push_unsafe(frm_acc)                  // 1st operand push
-    ld(to_acc, SP)
-    add(progdata) data(4+1)
-    st(BX, frm_acc)                // store 2nd operand
-    pop(to_acc)                      // 1st operand pop
-    mov(to_mar, progdata) data(BX)
-    mov(to_mar, frm_ram)
-    mov(to_ram, frm_acc)
-
-// while (i) {
-lbl("__bwand_sl1_test")
-    jz("__bwand_sl1_end")
-
-    ld(to_acc, SP)
-    add(progdata) data(5+1)
+    add(progdata) data(1)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    shl()
-    mov(to_ram, frm_acc)
-
+    jz("__bwand_while_end")
+    dec() mov(to_ram, frm_acc)
     ld(to_acc, SP)
-    add(progdata) data(4+1)
+    add(progdata) data(2)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    shl()
-    mov(to_ram, frm_acc)
-
+    rol() mov(to_ram, frm_acc)
     ld(to_acc, SP)
-    add(progdata) data(3+1)
+    add(progdata) data(6)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    dec()
-    mov(to_ram, frm_acc)
-
-    jp("__bwand_sl1_test")
-lbl("__bwand_sl1_end")
-
+    rol() mov(to_ram, frm_acc)
+    push_unsafe(frm_acc)                      // push fn arg
+    call("msb", "__bwand_msb_call_1")
+    inc_sp(1)
+    push_unsafe(frm_acc)              // 1st operand push
     ld(to_acc, SP)
-    add(progdata) data(5+1)
+    add(progdata) data(6)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    rol()
-    mov(to_ram, frm_acc)
-
-    ld(to_acc, SP)
-    add(progdata) data(4+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    rol()
-    mov(to_ram, frm_acc)
-
-// i = cc;
-    ld(to_acc, SP)
-    add(progdata) data(2+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    push_unsafe(frm_acc)                  // 1st operand push
-    ld(to_acc, SP)
-    add(progdata) data(4+1)
-    st(BX, frm_acc)                // store 2nd operand
-    pop(to_acc)                      // 1st operand pop
-    mov(to_mar, progdata) data(BX)
-    mov(to_mar, frm_ram)
-    mov(to_ram, frm_acc)
-
-// while (i) {
-lbl("__bwand_sl2_test")
-    jz("__bwand_sl2_end")
-
-    ld(to_acc, SP)
-    add(progdata) data(5+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    shl()
-    mov(to_ram, frm_acc)
-
-    ld(to_acc, SP)
-    add(progdata) data(4+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    shl()
-    mov(to_ram, frm_acc)
-
-    ld(to_acc, SP)
-    add(progdata) data(3+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    dec()
-    mov(to_ram, frm_acc)
-
-    jp("__bwand_sl2_test")
-lbl("__bwand_sl2_end")
-
-// if (a_lcl) if(b_lcl)
-    ld(to_acc, SP)
-    add(progdata) data(5+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    jz("__bwand_neg")
-    ld(to_acc, SP)
-    add(progdata) data(4+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    jz("__bwand_neg")
-
-// ret += ret_add;
-    ld(to_acc, SP)
-    add(progdata) data(1+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    push_unsafe(frm_acc)                  // 1st operand push
-    ld(to_acc, SP)
-    add(progdata) data(1+1)
-    mov(to_mar, frm_acc)
-    mov(to_acc, frm_ram)
-    st(BX, frm_acc)                // store 2nd operand
-    pop(to_acc)                      // 1st operand pop
+    rol() mov(to_ram, frm_acc)
+    push_unsafe(frm_acc)                      // push fn arg
+    call("msb", "__bwand_msb_call_2")
+    inc_sp(1)
+    st(BX, frm_acc)            // store 2nd operand
+    pop(to_acc)                // 1st operand pop
     mov(to_mar, progdata) data(BX)  // addition
     add(frm_ram)
-    push_unsafe(frm_acc)                  // 1st operand push
+    push_unsafe(frm_acc)              // 1st operand push
+    mov(to_acc, progdata) data(0xFE)      // const
+    st(BX, frm_acc)            // store 2nd operand
+    pop(to_acc)                // 1st operand pop
+    mov(to_mar, progdata) data(BX)  // addition
+    add(frm_ram)
+    jz("__bwand_in")
     ld(to_acc, SP)
-    add(progdata) data(2+1)
-    st(BX, frm_acc)                // store 2nd operand
-    pop(to_acc)                      // 1st operand pop
-    mov(to_mar, progdata) data(BX)
-    mov(to_mar, frm_ram)
-    mov(to_ram, frm_acc)
-lbl("__bwand_neg")
-
-    ld(to_acc, SP)
-    add(progdata) data(0+1)
+    add(progdata) data(2)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    shl()
-    mov(to_ram, frm_acc)
-
+    jp("__bwand_out")
+lbl("__bwand_in")
     ld(to_acc, SP)
-    add(progdata) data(2+1)
+    add(progdata) data(2)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    inc()
+    add(progdata) data(0x80)
+lbl("__bwand_out")
     mov(to_ram, frm_acc)
-
-    jp("__bwand_rst_1")
-lbl("__bwand_done")
+    jp("__bwand_while_test")
+lbl("__bwand_while_end")
     ld(to_acc, SP)
-    add(progdata) data(1+1)
+    add(progdata) data(2)
     mov(to_mar, frm_acc)
     mov(to_acc, frm_ram)
-    inc_sp(6)
+    inc_sp(2)
+lbl("__bwand__ret")
     ret()
+
 
 /*-------------------------------------------------------*/
 
