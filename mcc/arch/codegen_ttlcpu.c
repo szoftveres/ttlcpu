@@ -43,14 +43,14 @@ void CODE_func_definition_ret (char* fn_name) {
 void CODE_stack_restore (int i) {
     print_debugs(__FUNCTION__);
     if (i) {
-        fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size() * i);
+        fprintf(stdout, "    inc_sp(%u)\n", i);
     }
 }
 
 void CODE_var_declarations_space (int i) {
     print_debugs(__FUNCTION__);
     if (i) {
-        fprintf(stdout, "    dec_sp(%u)\n", SYM_integer_size() * i);
+        fprintf(stdout, "    dec_sp(%u)\n", i);
     }
 }
 
@@ -152,7 +152,7 @@ void CODE_asm_statement (char* s) {
 void CODE_return_statement (char* s, int d) {
     print_debugs(__FUNCTION__);
     if (d) {
-        fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size() * d);
+        fprintf(stdout, "    inc_sp(%u)\n", d);
     }
     fprintf(stdout, "    jp(\"__%s__ret\")\n", s);
 }
@@ -348,7 +348,7 @@ void CODE_dereference (void) {
 void CODE_load_eff_addr_auto (int pos) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, "    ld(to_acc, SP)\n");
-    fprintf(stdout, "    add(progdata) data(%d)\n", pos + 1);
+    fprintf(stdout, "    add(progdata) data(%d)\n", pos);
 }
 
 

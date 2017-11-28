@@ -912,7 +912,7 @@ id_obj_t object_identifier (void) {
         free(id);
         exit(1);
     }
-    CODE_load_eff_addr_auto(var->pos);
+    CODE_load_eff_addr_auto((var->pos * SYM_integer_size()) + SYM_integer_size());
     free(id);
     /* Variable address in acc */
     return RC_VARIABLE;

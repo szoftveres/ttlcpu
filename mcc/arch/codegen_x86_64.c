@@ -11,21 +11,21 @@ static void unimplemented (const char* s) {
 
 
 static void print_debugs (const char* s) {
-//    fprintf(stdout, "    /* %s */\n", s);
+    fprintf(stdout, "# [%s]\n", s);
     ;
 }
 
 
 int SYM_integer_size (void) {
-    return 1;                   /* 8 bit var */
+    return 8;                   /* 64 bit */
 }
 
 int SYM_data_pointer_size (void) {
-    return 1;                   /* 256 bytes RAM */
+    return 8;                   /* 64 bit */
 }
 
 int SYM_code_pointer_size (void) {
-    return 2;                   /* 64k program memory */
+    return 8;                   /* 64 bit */
 }
 
 void CODE_func_definition_label (char* fn_name) {
@@ -43,14 +43,14 @@ void CODE_func_definition_ret (char* fn_name) {
 void CODE_stack_restore (int i) {
     print_debugs(__FUNCTION__);
     if (i) {
-        fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size() * i);
+        fprintf(stdout, "    add  $%u,%%rsp\n", i);
     }
 }
 
 void CODE_var_declarations_space (int i) {
     print_debugs(__FUNCTION__);
     if (i) {
-        fprintf(stdout, "    dec_sp(%u)\n", SYM_integer_size() * i);
+        fprintf(stdout, "    sub  $%u,%%rsp\n", i);
     }
 }
 
@@ -179,7 +179,7 @@ void CODE_push (void) {
 
 void CODE_push_unsafe (void) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    push_unsafe(frm_acc)              // 1st operand push\n");
+    fprintf(stdout, "    push %%rax                 # 1st operand push\n");
 }
 
 void CODE_operand_pop (void) {
@@ -310,25 +310,29 @@ void CODE_pop_addr_and_store (void) {
 
 void CODE_dereference (void) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    mov(to_mar, frm_acc)\n");
-    fprintf(stdout, "    mov(to_acc, frm_ram)\n");
+    fprintf(stdout, "    mov  (%%rax),%%rax\n");
 }
 
 
 void CODE_load_eff_addr_auto (int pos) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    ld(to_acc, SP)\n");
-    fprintf(stdout, "    add(progdata) data(%d)\n", pos + 1);
+    fprintf(stdout, "    mov  %%rsp,%%rax\n");
+    fprintf(stdout, "    sub  $%d,%%rax\n", pos);
 }
 
 
 void CODE_const_expression_str (int lbl, char* c) {
-    unimplemented(__FUNCTION__);
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, ".data\n");
+    fprintf(stdout, "str_const_%04d:\n", lbl);
+    fprintf(stdout, "    .string  %s\n", c);
+    fprintf(stdout, ".text\n");
+    fprintf(stdout, "    mov  $str_const_%04d,%%rax    # str const\n", lbl);
 }
 
 void CODE_const_expression_int (int i) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    mov(to_acc, progdata) data(0x%X)      // const\n", i);
+    fprintf(stdout, "    mov  $0x%X,%%rax    # const\n", i);
 }
 
 void CODE_fn_call (int lbl, char* fn_name) {
