@@ -2,16 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+/*
 
 static void unimplemented (const char* s) {
     fprintf(stderr, "[%s] unimplemented on this architecture\n", s);
     exit(1);
 }
-
+*/
 
 static void print_debugs (const char* s) {
-    fprintf(stdout, "# [%s]\n", s);
+//    fprintf(stdout, "# [%s]\n", s);
     ;
 }
 
@@ -161,9 +161,9 @@ void CODE_asm_statement (char* s) {
 void CODE_return_statement (char* s, int d) {
     print_debugs(__FUNCTION__);
     if (d) {
-        fprintf(stdout, "    inc_sp(%u)\n", ARCH_integer_size() * d);
+        fprintf(stdout, "    add  $%u,%%rsp\n", d);
     }
-    fprintf(stdout, "    jmp(\"__%s__ret\")\n", s);
+    fprintf(stdout, "    jmp __%s__ret\n", s);
 }
 
 void CODE_logical_neg (int lbl) {
@@ -199,18 +199,24 @@ void CODE_operand_pop (void) {
 }
 
 void CODE_do_operation_mul (int lbl) {
-    unimplemented(__FUNCTION__);
-
     print_debugs(__FUNCTION__);
-
+    CODE_operand_pop();
+    fprintf(stdout, "    mul  %%rbx\n");
 }
 
 void CODE_do_operation_div (void) {
-    unimplemented(__FUNCTION__);
+    print_debugs(__FUNCTION__);
+    CODE_operand_pop();
+    fprintf(stdout, "    xor  %%rdx, %%rdx\n");
+    fprintf(stdout, "    div  %%rbx\n");
 }
 
 void CODE_do_operation_mod (void) {
-    unimplemented(__FUNCTION__);
+    print_debugs(__FUNCTION__);
+    CODE_operand_pop();
+    fprintf(stdout, "    xor  %%rdx, %%rdx\n");
+    fprintf(stdout, "    div  %%rbx\n");
+    fprintf(stdout, "    mov  %%rdx, %%rax\n");
 }
 
 void CODE_do_operation_add (void) {
@@ -222,15 +228,19 @@ void CODE_do_operation_add (void) {
 void CODE_do_operation_sub (void) {
     print_debugs(__FUNCTION__);
     CODE_operand_pop();
-    fprintf(stdout, "   sub  %%rbx, %%rax\n");
+    fprintf(stdout, "    sub  %%rbx, %%rax\n");
 }
 
 void CODE_do_operation_shl (int lbl) {
     print_debugs(__FUNCTION__);
+    CODE_operand_pop();
+    fprintf(stdout, "    shl  %%rbx, %%rax\n");
 }
 
 void CODE_do_operation_shr (int lbl) {
     print_debugs(__FUNCTION__);
+    CODE_operand_pop();
+    fprintf(stdout, "    shr  %%rbx, %%rax\n");
 }
 
 
@@ -260,35 +270,45 @@ void CODE_do_operation_compare_neq (int lbl) {
 
 void CODE_do_operation_compare_less (int lbl) {
     print_debugs(__FUNCTION__);
-    CODE_do_operation_sub();
-    CODE_push_unsafe();
-    fprintf(stdout, "    call(\"msb\", \"compare_less_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size()); // 1 function argument
+    CODE_operand_pop();
+    fprintf(stdout, "    cmp %%rbx, %%rax\n");
+    fprintf(stdout, "    jc  less_%04d\n", lbl);
+    fprintf(stdout, "    mov $0x0,%%rax\n");
+    fprintf(stdout, "    jmp less_%04d_end\n", lbl);
+    fprintf(stdout, "less_%04d:\n", lbl);
+    fprintf(stdout, "    mov $0x1,%%rax\n");
+    fprintf(stdout, "less_%04d_end:\n", lbl);
 }
 
 void CODE_do_operation_compare_greq (int lbl) {
     print_debugs(__FUNCTION__);
-    CODE_do_operation_sub();
-    fprintf(stdout, "    inv(frm_acc)\n");
-    CODE_push_unsafe();
-    fprintf(stdout, "    call(\"msb\", \"compare_greq_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size()); // 1 function argument
+    CODE_operand_pop();
+    fprintf(stdout, "    cmp %%rbx, %%rax\n");
+    fprintf(stdout, "    jc  greq_%04d\n", lbl);
+    fprintf(stdout, "    mov $0x1,%%rax\n");
+    fprintf(stdout, "    jmp greq_%04d_end\n", lbl);
+    fprintf(stdout, "greq_%04d:\n", lbl);
+    fprintf(stdout, "    mov $0x0,%%rax\n");
+    fprintf(stdout, "greq_%04d_end:\n", lbl);
 }
 
 
 void CODE_do_operation_bwand (int lbl) {
     print_debugs(__FUNCTION__);
-    CODE_push_unsafe();
-    fprintf(stdout, "    call(\"bwand\", \"bwand_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size() * 2); // 2 function arguments
+    CODE_operand_pop();
+    fprintf(stdout, "    and  %%rbx, %%rax\n");
 }
 
 void CODE_do_operation_bwxor (void) {
-    unimplemented(__FUNCTION__);
+    print_debugs(__FUNCTION__);
+    CODE_operand_pop();
+    fprintf(stdout, "    xor  %%rbx, %%rax\n");
 }
 
 void CODE_do_operation_bwor (void) {
-    unimplemented(__FUNCTION__);
+    print_debugs(__FUNCTION__);
+    CODE_operand_pop();
+    fprintf(stdout, "    or   %%rbx, %%rax\n");
 }
 
 

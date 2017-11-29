@@ -11,7 +11,7 @@ _exit:
         xor     %rdi, %rdi              # we want return code 0
         syscall                         # invoke operating system to exit
 
-mputchar:
+putc:
          # write(1, message, 13)
          mov     %rsp, %rax
          add     $0x8, %rax
