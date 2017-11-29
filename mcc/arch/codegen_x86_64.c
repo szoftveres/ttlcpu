@@ -16,15 +16,15 @@ static void print_debugs (const char* s) {
 }
 
 
-int SYM_integer_size (void) {
+int ARCH_integer_size (void) {
     return 8;                   /* 64 bit */
 }
 
-int SYM_data_pointer_size (void) {
+int ARCH_data_pointer_size (void) {
     return 8;                   /* 64 bit */
 }
 
-int SYM_code_pointer_size (void) {
+int ARCH_code_pointer_size (void) {
     return 8;                   /* 64 bit */
 }
 
@@ -119,12 +119,13 @@ void CODE_for_statement_test (int lbl) {
 
 void CODE_for_statement_evaluate (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jz(\"for_%04d_end\")\n", lbl);
+    fprintf(stdout, "    cmp $0x0, %%rax\n");
+    fprintf(stdout, "    jz  for_%04d_end\n", lbl);
 }
 
 void CODE_for_statement_jp_to_base (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp(\"for_%04d_base\")\n", lbl);
+    fprintf(stdout, "    jp  for_%04d_base\n", lbl);
 }
 
 void CODE_for_statement_action (int lbl) {
@@ -134,7 +135,7 @@ void CODE_for_statement_action (int lbl) {
 
 void CODE_for_statement_jp_to_test (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp(\"for_%04d_test\")\n", lbl);
+    fprintf(stdout, "    jp  for_%04d_test\n", lbl);
 }
 
 void CODE_for_statement_base (int lbl) {
@@ -144,7 +145,7 @@ void CODE_for_statement_base (int lbl) {
 
 void CODE_for_statement_end (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp(\"for_%04d_action\")\n", lbl);
+    fprintf(stdout, "    jp  for_%04d_action\n", lbl);
     fprintf(stdout, "for_%04d_end:\n", lbl);
 }
 
@@ -157,7 +158,7 @@ void CODE_asm_statement (char* s) {
 void CODE_return_statement (char* s, int d) {
     print_debugs(__FUNCTION__);
     if (d) {
-        fprintf(stdout, "    inc_sp(%u)\n", SYM_integer_size() * d);
+        fprintf(stdout, "    inc_sp(%u)\n", ARCH_integer_size() * d);
     }
     fprintf(stdout, "    jp(\"__%s__ret\")\n", s);
 }
@@ -179,7 +180,7 @@ void CODE_bitwise_neg (void) {
 
 void CODE_push (void) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    push(frm_acc)              // 1st operand push\n");
+    fprintf(stdout, "    push %%rax                 # 1st operand push\n");
 }
 
 void CODE_push_unsafe (void) {
@@ -189,8 +190,8 @@ void CODE_push_unsafe (void) {
 
 void CODE_operand_pop (void) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    st(BX, frm_acc)            // store 2nd operand\n");
-    fprintf(stdout, "    pop(to_acc)                // 1st operand pop\n");
+    fprintf(stdout, "    mov  %%rax, %%rbx          # store 2nd operand\n");
+    fprintf(stdout, "    pop  %%rax                 # 1st operand pop\n");
 }
 
 void CODE_do_operation_mul (int lbl) {
@@ -211,17 +212,13 @@ void CODE_do_operation_mod (void) {
 void CODE_do_operation_add (void) {
     print_debugs(__FUNCTION__);
     CODE_operand_pop();
-    fprintf(stdout, "    mov(to_mar, progdata) data(BX)  // addition\n");
-    fprintf(stdout, "    add(frm_ram)\n");
+    fprintf(stdout, "    add  %%rbx, %%rax\n");
 }
 
 void CODE_do_operation_sub (void) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    inv(frm_acc)             // 1st cmpl\n");
-    fprintf(stdout, "    inc()                        // 2nd cmpl      \n");
     CODE_operand_pop();
-    fprintf(stdout, "    mov(to_mar, progdata) data(BX)\n");
-    fprintf(stdout, "    add(frm_ram)\n");
+    fprintf(stdout, "   sub  %%rbx, %%rax\n");
 }
 
 void CODE_do_operation_shl (int lbl) {
@@ -260,7 +257,7 @@ void CODE_do_operation_compare_less (int lbl) {
     CODE_do_operation_sub();
     CODE_push_unsafe();
     fprintf(stdout, "    call(\"msb\", \"compare_less_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", SYM_integer_size()); // 1 function argument
+    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size()); // 1 function argument
 }
 
 void CODE_do_operation_compare_greq (int lbl) {
@@ -269,7 +266,7 @@ void CODE_do_operation_compare_greq (int lbl) {
     fprintf(stdout, "    inv(frm_acc)\n");
     CODE_push_unsafe();
     fprintf(stdout, "    call(\"msb\", \"compare_greq_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", SYM_integer_size()); // 1 function argument
+    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size()); // 1 function argument
 }
 
 
@@ -277,7 +274,7 @@ void CODE_do_operation_bwand (int lbl) {
     print_debugs(__FUNCTION__);
     CODE_push_unsafe();
     fprintf(stdout, "    call(\"bwand\", \"bwand_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", SYM_integer_size() * 2); // 2 function arguments
+    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size() * 2); // 2 function arguments
 }
 
 void CODE_do_operation_bwxor (void) {

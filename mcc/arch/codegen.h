@@ -1,10 +1,9 @@
 #ifndef _CODEGEN_H_
 #define _CODEGEN_H_
 
-int SYM_integer_size (void);
-int SYM_data_pointer_size (void);
-int SYM_code_pointer_size (void);
-
+int ARCH_integer_size (void);
+int ARCH_data_pointer_size (void);
+int ARCH_code_pointer_size (void);
 int ARCH_stack_post_decrement (void);
 
 

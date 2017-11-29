@@ -57,7 +57,7 @@ int func_definition (void) {
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         parser_error("expected ')'");
     }
-    inc_var_pos(SYM_code_pointer_size());
+    inc_var_pos(ARCH_code_pointer_size());
     /* The above one doesn't need a pair, (out of scope on return) */
     reset_stack_grow(fn_name);
     if (!block()) {
@@ -143,7 +143,7 @@ int var_declaration (int* space) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    size = SYM_integer_size();
+    size = ARCH_integer_size();
     push_var(name, size);
     free(name);
     if (space) {
@@ -164,7 +164,7 @@ int arg_declaration (void) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    push_var(name, SYM_integer_size());
+    push_var(name, ARCH_integer_size());
     free(name);
     return 1; /* should be strictly 1 (number of declarations found) */
 }
@@ -525,7 +525,7 @@ int binary_operation (int precedence) {
     next_token();
 
     CODE_push_unsafe();
-    inc_var_pos(SYM_integer_size());
+    inc_var_pos(ARCH_integer_size());
     /* matching dec_var_pos in do_operations */
 
     if (!primary_expression()) {
@@ -604,7 +604,7 @@ void do_operations (int op_type) {
         parser_error("unknown / unimplemented operator");
         return;
     }
-    dec_var_pos(SYM_integer_size());
+    dec_var_pos(ARCH_integer_size());
     /* there's a POP in each operation */
     return;
 }
@@ -718,16 +718,16 @@ int assignment (void) {
     /* Addr of location in acc */
     if (lex_get(T_ASSIGN, NULL)) {
         CODE_push_unsafe();
-        inc_var_pos(SYM_integer_size());
+        inc_var_pos(ARCH_integer_size());
         if (!expression()) {
             parser_error("expected expression after '='");
         }
         CODE_pop_addr_and_store();
-        dec_var_pos(SYM_integer_size());
+        dec_var_pos(ARCH_integer_size());
         return 1;
     } else if (recursive_assignment()) {
         CODE_pop_addr_and_store();
-        dec_var_pos(SYM_integer_size());
+        dec_var_pos(ARCH_integer_size());
         return 1;
     }
     return 0;
@@ -751,11 +751,11 @@ int recursive_assignment (void) {
     }
 
     CODE_push();               /* Push the address where we store back */
-    inc_var_pos(SYM_integer_size());  /* matching dec_var_pos */
+    inc_var_pos(ARCH_integer_size());  /* matching dec_var_pos */
 
     CODE_dereference();
     CODE_push_unsafe();
-    inc_var_pos(SYM_integer_size());
+    inc_var_pos(ARCH_integer_size());
     /* matching dec_var_pos in do_operations */
 
     if (!expression()) {    /* only one expression after assignment */
@@ -811,8 +811,8 @@ int fn_call (char* identifier) {
         parser_error("expected ')'");
     }
     CODE_fn_call(new_label(), identifier);
-    CODE_stack_restore(i * SYM_integer_size());
-    dec_var_pos(i);
+    CODE_stack_restore(i * ARCH_integer_size());
+    dec_var_pos(i * ARCH_integer_size());
     return 1;
 }
 
@@ -822,7 +822,7 @@ int fn_call_args (void) {
     args += expression();
     if (args) {
         CODE_fn_call_args();
-        inc_var_pos(SYM_integer_size());
+        inc_var_pos(ARCH_integer_size());
         if (lex_get(T_COMMA, NULL)) {
             int more_args;
             more_args = fn_call_args();
@@ -912,8 +912,9 @@ id_obj_t object_identifier (void) {
         free(id);
         exit(1);
     }
-    CODE_load_eff_addr_auto((var->pos * SYM_integer_size()) +
-                            (ARCH_stack_post_decrement() ? SYM_integer_size() : 0));
+    CODE_load_eff_addr_auto(var->pos +
+                           (ARCH_stack_post_decrement() ?
+                            ARCH_integer_size() : 0));
     free(id);
     /* Variable address in acc */
     return RC_VARIABLE;
