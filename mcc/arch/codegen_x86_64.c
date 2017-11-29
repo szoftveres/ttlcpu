@@ -28,6 +28,11 @@ int SYM_code_pointer_size (void) {
     return 8;                   /* 64 bit */
 }
 
+int ARCH_stack_post_decrement (void) {
+    return 0;
+}
+
+
 void CODE_func_definition_label (char* fn_name) {
     fprintf(stdout, "\n");
     print_debugs(__FUNCTION__);
@@ -304,8 +309,8 @@ void CODE_ternary_cond_end (int lbl) {
 
 void CODE_pop_addr_and_store (void) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    pop(to_mar)\n");
-    fprintf(stdout, "    mov(to_ram, frm_acc)\n");
+    fprintf(stdout, "    pop  %%rdx\n");
+    fprintf(stdout, "    mov  %%rax,(%%rdx)\n");
 }
 
 void CODE_dereference (void) {
@@ -317,7 +322,7 @@ void CODE_dereference (void) {
 void CODE_load_eff_addr_auto (int pos) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, "    mov  %%rsp,%%rax\n");
-    fprintf(stdout, "    sub  $%d,%%rax\n", pos);
+    fprintf(stdout, "    add  $%d,%%rax\n", pos);
 }
 
 
@@ -337,12 +342,12 @@ void CODE_const_expression_int (int i) {
 
 void CODE_fn_call (int lbl, char* fn_name) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    call(\"%s\", \"call_%04d\")\n", fn_name, lbl);
+    fprintf(stdout, "    call %s\n", fn_name);
 }
 
 void CODE_fn_call_args (void) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    push_unsafe(frm_acc)                      // push fn arg\n");
+    fprintf(stdout, "    push %%rax                      # push fn arg\n");
 }
 
 

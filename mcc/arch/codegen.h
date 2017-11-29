@@ -5,6 +5,8 @@ int SYM_integer_size (void);
 int SYM_data_pointer_size (void);
 int SYM_code_pointer_size (void);
 
+int ARCH_stack_post_decrement (void);
+
 
 void CODE_func_definition_label (char* fn_name);
 void CODE_func_definition_ret (char* fn_name);

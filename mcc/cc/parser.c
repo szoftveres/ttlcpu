@@ -811,7 +811,7 @@ int fn_call (char* identifier) {
         parser_error("expected ')'");
     }
     CODE_fn_call(new_label(), identifier);
-    CODE_stack_restore(i);
+    CODE_stack_restore(i * SYM_integer_size());
     dec_var_pos(i);
     return 1;
 }
@@ -912,7 +912,8 @@ id_obj_t object_identifier (void) {
         free(id);
         exit(1);
     }
-    CODE_load_eff_addr_auto((var->pos * SYM_integer_size()) + SYM_integer_size());
+    CODE_load_eff_addr_auto((var->pos * SYM_integer_size()) +
+                            (ARCH_stack_post_decrement() ? SYM_integer_size() : 0));
     free(id);
     /* Variable address in acc */
     return RC_VARIABLE;

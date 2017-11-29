@@ -28,6 +28,11 @@ int SYM_code_pointer_size (void) {
     return 2;                   /* 64k program memory */
 }
 
+int ARCH_stack_post_decrement (void) {
+    return 1;
+}
+
+
 void CODE_func_definition_label (char* fn_name) {
     fprintf(stdout, "\n");
     print_debugs(__FUNCTION__);
