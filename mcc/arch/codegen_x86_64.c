@@ -62,12 +62,13 @@ void CODE_var_declarations_space (int i) {
 
 void CODE_if_statement_head (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jz(\"if_continue_%04d\")\n", lbl);
+    fprintf(stdout, "    cmp $0x0, %%rax\n");
+    fprintf(stdout, "    jz  if_continue_%04d\n", lbl);
 }
 
 void CODE_if_statement_mid (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp(\"endif_%04d\")\n", lbl);
+    fprintf(stdout, "    jmp endif_%04d\n", lbl);
     fprintf(stdout, "if_continue_%04d:\n", lbl);
 }
 
@@ -89,12 +90,13 @@ void CODE_while_statement_test (int lbl) {
 
 void CODE_while_statement_evaluate (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jz(\"while_%04d_end\")\n", lbl);
+    fprintf(stdout, "    cmp $0x0, %%rax\n");
+    fprintf(stdout, "    jz  while_%04d_end\n", lbl);
 }
 
 void CODE_while_statement_end (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp(\"while_%04d_test\")\n", lbl);
+    fprintf(stdout, "    jmp while_%04d_test\n", lbl);
     fprintf(stdout, "while_%04d_end:\n", lbl);
 }
 
@@ -106,8 +108,9 @@ void CODE_do_statement_base (int lbl) {
 
 void CODE_do_statement_test (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jz(\"do_%04d_end\")\n", lbl);
-    fprintf(stdout, "    jp(\"do_%04d_base\")\n", lbl);
+    fprintf(stdout, "    cmp $0x0, %%rax\n");
+    fprintf(stdout, "    jz  do_%04d_end\n", lbl);
+    fprintf(stdout, "    jmp do_%04d_base\n", lbl);
     fprintf(stdout, "do_%04d_end:\n", lbl);
 }
 
@@ -125,7 +128,7 @@ void CODE_for_statement_evaluate (int lbl) {
 
 void CODE_for_statement_jp_to_base (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp  for_%04d_base\n", lbl);
+    fprintf(stdout, "    jmp for_%04d_base\n", lbl);
 }
 
 void CODE_for_statement_action (int lbl) {
@@ -135,7 +138,7 @@ void CODE_for_statement_action (int lbl) {
 
 void CODE_for_statement_jp_to_test (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp  for_%04d_test\n", lbl);
+    fprintf(stdout, "    jmp for_%04d_test\n", lbl);
 }
 
 void CODE_for_statement_base (int lbl) {
@@ -145,7 +148,7 @@ void CODE_for_statement_base (int lbl) {
 
 void CODE_for_statement_end (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp  for_%04d_action\n", lbl);
+    fprintf(stdout, "    jmp for_%04d_action\n", lbl);
     fprintf(stdout, "for_%04d_end:\n", lbl);
 }
 
@@ -160,16 +163,17 @@ void CODE_return_statement (char* s, int d) {
     if (d) {
         fprintf(stdout, "    inc_sp(%u)\n", ARCH_integer_size() * d);
     }
-    fprintf(stdout, "    jp(\"__%s__ret\")\n", s);
+    fprintf(stdout, "    jmp(\"__%s__ret\")\n", s);
 }
 
 void CODE_logical_neg (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jz(\"log_neg_%04d\")\n", lbl);
-    fprintf(stdout, "    mov(to_acc, progdata) data(0)\n");
-    fprintf(stdout, "    jp(\"log_neg_%04d_end\")\n", lbl);
+    fprintf(stdout, "    cmp $0x0, %%rax\n");
+    fprintf(stdout, "    jz  log_neg_%04d\n", lbl);
+    fprintf(stdout, "    mov $0x0,%%rax\n");
+    fprintf(stdout, "    jmp log_neg_%04d_end\n", lbl);
     fprintf(stdout, "log_neg_%04d:\n", lbl);
-    fprintf(stdout, "    mov(to_acc, progdata) data(1)\n");
+    fprintf(stdout, "    mov $0x1,%%rax\n");
     fprintf(stdout, "log_neg_%04d_end:\n", lbl);
 }
 
@@ -233,22 +237,24 @@ void CODE_do_operation_shr (int lbl) {
 void CODE_do_operation_compare_eq (int lbl) {
     print_debugs(__FUNCTION__);
     CODE_do_operation_sub();
-    fprintf(stdout, "    jz(\"eq_%04d\")\n", lbl);
-    fprintf(stdout, "    mov(to_acc, progdata) data(0)\n");
-    fprintf(stdout, "    jp(\"eq_%04d_end\")\n", lbl);
+    fprintf(stdout, "    cmp $0x0,%%rax\n");
+    fprintf(stdout, "    jz  eq_%04d\n", lbl);
+    fprintf(stdout, "    mov $0x0,%%rax\n");
+    fprintf(stdout, "    jmp eq_%04d_end\n", lbl);
     fprintf(stdout, "eq_%04d:\n", lbl);
-    fprintf(stdout, "    mov(to_acc, progdata) data(1)\n");
+    fprintf(stdout, "    mov $0x1,%%rax\n");
     fprintf(stdout, "eq_%04d_end:\n", lbl);
 }
 
 void CODE_do_operation_compare_neq (int lbl) {
     print_debugs(__FUNCTION__);
     CODE_do_operation_sub();
-    fprintf(stdout, "    jz(\"neq_%04d\")\n", lbl);
-    fprintf(stdout, "    mov(to_acc, progdata) data(1)\n");
-    fprintf(stdout, "    jp(\"neq_%04d_end\")\n", lbl);
+    fprintf(stdout, "    cmp $0x0, %%rax\n");
+    fprintf(stdout, "    jz  neq_%04d\n", lbl);
+    fprintf(stdout, "    mov $0x1,%%rax\n");
+    fprintf(stdout, "    jmp neq_%04d_end\n", lbl);
     fprintf(stdout, "neq_%04d:\n", lbl);
-    fprintf(stdout, "    mov(to_acc, progdata) data(0)\n");
+    fprintf(stdout, "    mov $0x0,%%rax\n");
     fprintf(stdout, "neq_%04d_end:\n", lbl);
 }
 
@@ -289,12 +295,13 @@ void CODE_do_operation_bwor (void) {
 
 void CODE_ternary_cond_test (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jz(\"ternary_second_%04d\")\n", lbl);
+    fprintf(stdout, "    cmp $0x0, %%rax\n");
+    fprintf(stdout, "    jz  ternary_second_%04d\n", lbl);
 }
 
 void CODE_ternary_cond_mid (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    jp(\"ternary_end_%04d\")\n", lbl);
+    fprintf(stdout, "    jmp ternary_end_%04d\n", lbl);
     fprintf(stdout, "ternary_second_%04d:\n", lbl);
 }
 
