@@ -1,4 +1,10 @@
 
+/* Get argument */
+getarg (argv, arg) {
+    *(argv + (arg * 8));
+}
+
+
 /* Print unsigned decimal integer */
 putu (num) {
     if(num / 10){

@@ -18,12 +18,22 @@ fibonacci (n) {
 }
 
 
-main () {
+main (argc, argv) {
     auto i;
 
     msg("x86-64");
 
-    for (i = 0; i != 10; i += 1) {
+    puts("argc: "); putu(argc); puts("\n");
+
+    for (i = 0; i != argc; i += 1) {
+        puts("arg ");
+        putu(i);
+        puts(": ");
+        puts(getarg(argv, i));
+        puts("\n");
+    }
+
+    for (i = 30; i != 40; i += 1) {
         putu(i);
         puts(": ");
         putu(fibonacci(i));
@@ -31,6 +41,5 @@ main () {
     }
     0;
 }
-
 
 

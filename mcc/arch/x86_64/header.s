@@ -3,7 +3,16 @@
 .text
 
 _start:                         # call main function then exit
+
+    mov     %rsp, %rax
+    mov     (%rax),%rax         # argc
+    push    %rax
+    mov     %rsp, %rax
+    add     $0x10, %rax         # argv
+    push    %rax
     call main
+    pop     %rdi
+    pop     %rdi
     mov     %rax, %rdi          # rdi contains exit code
     mov     $60, %rax           # system call 60 is exit
     syscall                     # invoke operating system to exit
