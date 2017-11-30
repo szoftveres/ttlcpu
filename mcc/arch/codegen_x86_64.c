@@ -354,7 +354,7 @@ void CODE_const_expression_str (int lbl, char* c) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, ".data\n");
     fprintf(stdout, "str_const_%04d:\n", lbl);
-    fprintf(stdout, "    .string  %s\n", c);
+    fprintf(stdout, ".string        %s\n", c);
     fprintf(stdout, ".text\n");
     fprintf(stdout, "    mov  $str_const_%04d,%%rax    # str const\n", lbl);
 }

@@ -134,7 +134,7 @@ fibonacci (n) {
 
 
 /* Interesting stuff inside */
-#include "misc/routines.c"
+#include "misc/ttlcpu_routines.c"
 
 
 /* TTL-CPU specific library functions */

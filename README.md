@@ -29,3 +29,11 @@ The './b' shell script:
  - the AVR programmer writes the bytecode to the program memory of
    the ttl-cpu
 
+
+NOTE
+====
+'mcc' has x86-64 support on Linux, try this:
+./bx misc/unix_prog.c
+./unix_prog.bin
+
+

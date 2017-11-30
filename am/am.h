@@ -95,5 +95,5 @@
 #endif
 /* ============================================================ */
 
-#include "./program.asm"
+#include "./program_ttlcpu.s"
 
