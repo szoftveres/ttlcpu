@@ -26,9 +26,9 @@ main (argc, argv) {
     puts("argc: "); putu(argc); puts("\n");
 
     for (i = 0; i != argc; i += 1) {
-        puts("arg ");
+        puts("argv[");
         putu(i);
-        puts(": ");
+        puts("]: ");
         puts(getarg(argv, i));
         puts("\n");
     }

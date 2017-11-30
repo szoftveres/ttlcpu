@@ -1,7 +1,9 @@
 # ttlcpu
 
 Toolchain for the 8-bit TTL CPU:
+```
 http://digitarworld.uw.hu/ttlcpu.html
+```
 
 Toolchain elements:
 
@@ -30,10 +32,12 @@ The './b' shell script:
    the ttl-cpu
 
 
-NOTE
-====
+## Note
+
 'mcc' has x86-64 support on Linux, try this:
+```
 ./bx misc/unix_prog.c
 ./unix_prog.bin
+```
 
 
