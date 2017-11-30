@@ -4,7 +4,7 @@
 ARCHITECTURE=x86_64
 
 # make c compiler
-echo "Making CC .."
+echo "Making CC for ${ARCHITECTURE} .."
 cd mcc || exit 1
 make clean > ../build.log || exit 1
 make "ARCH=${ARCHITECTURE}" all >> ../build.log || exit 1
