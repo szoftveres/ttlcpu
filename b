@@ -3,11 +3,17 @@
 
 ARCHITECTURE=ttlcpu
 
+error () {
+    echo "ERROR:"
+    tail -n 5 build.log
+    exit 1
+}
+
 # make c compiler
 echo "Making CC for ${ARCHITECTURE} .."
 cd mcc || exit 1
 make clean > ../build.log || exit 1
-make "ARCH=${ARCHITECTURE}" all >> ../build.log || exit 1
+make "ARCH=${ARCHITECTURE}" all >> ../build.log || error
 cd .. || exit 1
 
 if test -z "${1}" ; then
@@ -18,16 +24,16 @@ fi
 #compile
 echo "Running CC, '${1}' .."
 cp "./mcc/arch/${ARCHITECTURE}/header.asm"  "am/program_${ARCHITECTURE}.s" || exit 1
-cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> "am/program_${ARCHITECTURE}.s" 2>> build.log || exit 1
+cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> "am/program_${ARCHITECTURE}.s" 2>> build.log || error
 cat "./mcc/arch/${ARCHITECTURE}/footer.asm" >> "am/program_${ARCHITECTURE}.s" || exit 1
 
 # make assembler and assemble 
 echo "Making AM .."
 cd am || exit 1
-cc -O0 -o asm am.c >> ../build.log || exit 1
+cc -O0 -o asm am.c >> ../build.log || error
 
 echo "Running AM .."
-./asm > bytecode.h 2>> ../build.log || exit 1
+./asm > bytecode.h 2>> ../build.log || error
 cd .. || exit 1
 
 LIMIT=32768

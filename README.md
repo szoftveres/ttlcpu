@@ -3,41 +3,42 @@
 Toolchain for the 8-bit TTL CPU:
 ```
 http://digitarworld.uw.hu/ttlcpu.html
+https://hackaday.io/project/11703-8-bit-ttl-cpu
 ```
 
 Toolchain elements:
 
- *  mcc - A compiler which resembles to the 'C' programming language
-    and implements a subset of it. (see 'example.c' for details)
- *  am - A very basic assembler implemented by using the
-    capabilities of the gnu-gcc preprocessor
- *  burner - Program that transfers assembled bytecode to
-    the 'ttl-cpu' from a special programmer hardware based
-    on the ATmega8 AVR mcu
- *  fsk - A tool to create a raw audio from a data stream (e.g.
-    a program) for the on-board 300 baud acoustic serial receiver
+ *  [mcc](https://github.com/szoftveres/ttlcpu/tree/master/mcc) - A compiler that implements a subset the
+    'C' programming language (see [example.c](https://github.com/szoftveres/ttlcpu/blob/master/example.c)).
+ *  [am](https://github.com/szoftveres/ttlcpu/tree/master/am) - A basic assembler implemented in gnu-gcc
+    preprocessor macros.
+ *  [burner](https://github.com/szoftveres/ttlcpu/tree/master/burner) - AtMega8 firmware for loading bytecode
+    into the program memory of the ttl-cpu.
 
 The ttl-cpu program can be built and transferred to ttl-cpu by running
-the './b' shell script ( syntax: ./b <source_file.c> )
+the './b' script ( syntax: ./b <source_file.c> )
 
 The './b' shell script:
- - builds the 'mcc' compiler for 'ttl-cpu' architecture
- - copies '/mcc/arch/ttlcpu/header.asm' to am/prog.asm
- - invokes 'mcc' to compile the specified source file, and extends
-   am/prog.asm with the assembly program output
- - extends am/prog.asm with '/mcc/arch/ttlcpu/footer.asm'
- - 'am' takes 'am/prog.asm', compiles it and generates the ttl-cpu bytecode
- - 'burner' takes the bytecode and AVRDude burns it into the AVR programmer
- - the AVR programmer writes the bytecode to the program memory of
-   the ttl-cpu
+ - Builds the 'mcc' compiler for 'ttl-cpu' architecture.
+ - Copies '/mcc/arch/ttlcpu/header.asm' to am/prog.asm.
+ - Invokes 'mcc' to compile the specified source file, and
+   extends am/prog.asm with the output assembly program.
+ - Extends am/prog.asm with '/mcc/arch/ttlcpu/footer.asm'.
+ - Runs 'am', which assemles 'am/prog.asm'  and generates
+   the ttl-cpu bytecode.
+ - Builds 'burner', which includes the ttl-cpu bytecode.
+ - Invokes AvrDude to transfer 'burner' to the Atmega8
+   burner board, which finally transfers the bytecode to
+   the ttl-cpu.
 
 
 ## Note
 
-'mcc' has x86-64 support on Linux, try this:
+'mcc' has x86-64 support, try this on a 64-bit Linux PC:
 ```
 ./bx misc/unix_prog.c
-./unix_prog.bin
+echo -n Hello World | ./unix_prog.bin /bin/ls -l .
 ```
-
+See mcc/arch/x86_64/header.s for implemented system calls,
+and misc/unix_routines.c for helper functions.
 

@@ -1,13 +1,23 @@
 #!/bin/bash
 # set -x
 
-ARCHITECTURE=x86_64
+ARCHITECTURE_=`uname -m`"_"`uname -s`
+
+echo $ARCHITECTURE_
+
+ARCHITECTURE=`uname -m`
+
+error () {
+    echo "ERROR:"
+    tail -n 5 build.log
+    exit 1
+}
 
 # make c compiler
 echo "Making CC for ${ARCHITECTURE} .."
 cd mcc || exit 1
 make clean > ../build.log || exit 1
-make "ARCH=${ARCHITECTURE}" all >> ../build.log || exit 1
+make "ARCH=${ARCHITECTURE}" all >> ../build.log || error
 cd .. || exit 1
 
 if test -z "${1}" ; then
@@ -18,11 +28,12 @@ fi
 #compile
 echo "Running CC, '${1}' .."
 cp "./mcc/arch/${ARCHITECTURE}/header.s"  "am/program_${ARCHITECTURE}.s" || exit 1
-cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> "am/program_${ARCHITECTURE}.s" 2>> build.log || exit 1
+cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> "am/program_${ARCHITECTURE}.s" 2>> build.log || error
 # cat "./mcc/arch/${ARCHITECTURE}/footer.s" >> "am/program_${ARCHITECTURE}.s" || exit 1
 
-gcc -c -o "am/program_${ARCHITECTURE}.o" "am/program_${ARCHITECTURE}.s" || exit 1
-ld -o unix_prog.bin "am/program_${ARCHITECTURE}.o" || exit 1
+gcc -c -o "am/program_${ARCHITECTURE}.o" "am/program_${ARCHITECTURE}.s" 2>> build.log || error
+ld -o unix_prog.bin "am/program_${ARCHITECTURE}.o" 2>> build.log || error
 
-
+echo "SUCCESS"
+exit 0
 
