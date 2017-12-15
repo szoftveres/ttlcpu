@@ -26,7 +26,7 @@ SUBDIRS = arch lex
 all: $(PROGRAM)
 
 $(SUBDIRS):
-	$(MAKE) -C $@
+	$(MAKE) "ARCH=${ARCH}" -C $@
 
 ## Compile source files
 $(OBJDIR)/%.o : $(SRCDIR)/%.c

@@ -1,7 +1,7 @@
 #!/bin/bash
 # set -x
 
-ARCHITECTURE=ttlcpu
+PLATFORM=ttlcpu
 
 error () {
     echo "ERROR:"
@@ -10,10 +10,10 @@ error () {
 }
 
 # make c compiler
-echo "Making CC for ${ARCHITECTURE} .."
+echo "Making CC for ${PLATFORM} .."
 cd mcc || exit 1
 make clean > ../build.log || exit 1
-make "ARCH=${ARCHITECTURE}" all >> ../build.log || error
+make "ARCH=${PLATFORM}" all >> ../build.log || error
 cd .. || exit 1
 
 if test -z "${1}" ; then
@@ -23,9 +23,9 @@ fi
 
 #compile
 echo "Running CC, '${1}' .."
-cp "./mcc/arch/${ARCHITECTURE}/header.asm"  "am/program_${ARCHITECTURE}.s" || exit 1
-cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> "am/program_${ARCHITECTURE}.s" 2>> build.log || error
-cat "./mcc/arch/${ARCHITECTURE}/footer.asm" >> "am/program_${ARCHITECTURE}.s" || exit 1
+cp "./mcc/arch/${PLATFORM}/header.s"  "am/program_${PLATFORM}.s" || exit 1
+cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> "am/program_${PLATFORM}.s" 2>> build.log || error
+cat "./mcc/arch/${PLATFORM}/footer.s" >> "am/program_${PLATFORM}.s" || exit 1
 
 # make assembler and assemble 
 echo "Making AM .."

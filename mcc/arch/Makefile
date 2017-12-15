@@ -9,8 +9,7 @@ LD = gcc
 CFLAGS = -Wall -O0 -I $(INCLDIR)
 
 ## Objects that must be built in order to link
-OBJECTS = $(OBJDIR)/codegen_ttlcpu.o\
-          $(OBJDIR)/codegen_x86_64.o
+OBJECTS = $(OBJDIR)/codegen_$(ARCH).o
 
 
 ## Build both compiler and program
@@ -21,5 +20,5 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c -o $(OBJDIR)/$*.o $< 
 
 clean:
-	-rm -rf $(OBJECTS)
+	-rm -rf *.o
 
