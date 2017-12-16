@@ -15,9 +15,8 @@
  * Function arguments are placed onto the stack in order(!) prior to function
  * call, the return value of a function is the data that is in the main data
  * register (accumulator, rax, eax, etc..) upon return.
- * Every expression is evaluated into the main data register, hence
- * the assumed return value of every function is the value of the last
- * evaluated expression.
+ * Expressions are evaluated into the main data register, hence the assumed
+ * return value of a function is the value of the last evaluated expression.
  */
 
 one () {
@@ -44,7 +43,7 @@ myaddress () {
 /*
  * The below function returns, when the loop finishes with 'i != 5' expression
  * becoming 'false'. The return value of the function hence will be '0' (false),
- * because 'i != 5' was the last evaluated expression of the function.
+ * because 'i != 5' was the last evaluated expression.
  */
 
 #define TRUE    (1)
@@ -74,12 +73,12 @@ return_true () {
  * In-line assembly, comma separated expressions.
  */
 minus_one (a) {
-    a, asm("add(progdata) data(0xFF)");
+    a, asm("add(progdata) data(0xFF)"); /* Quick two's complement addition */
 }
 
 
 /*
- * Program execution starts with the main funcion.
+ * The main funcion.
  */
 main () {
     /* Variable declarations at the beginning of each block */
@@ -109,8 +108,9 @@ main () {
             *0x01 = *0x02; /* Copy data from 0x02 to 0x01 */
         }
         /*
-         * No function prototypes, each function translates
-         * to an assembler subroutine.
+         * Function forward declarations are not needed; function calls and
+         * definitions directly translate to assembler subroutine calls and
+         * assembler labels respectively.
          */
         do {
             out(fibonacci(addition(one(), two() << three())));
