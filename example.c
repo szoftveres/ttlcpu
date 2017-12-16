@@ -8,20 +8,18 @@
 #define OFFSET      0x01
 /* All the #preprocessor directives are currently handled by gcc (gcc -E) */
 
-
 /*
- * There are no data types, everything is an 8-bit CPU-word.
- * Every function is assumed to return a value, there's
- * no 'void' function.
- * Function arguments are passed via the (emulated) stack.
- * The result of the expressions are stored in the accumulator;
- * also, the accumulator is used to transfer the return value of
- * functions to the caller. Hence, the return value of every function is
- * the value that's stored in the accumulator just when the function returns.
- * The 'retrun' statment is available and can have a value, however it
- * just works as if it was a 'goto' statement that jumps to the end of
- * the function; its only purpose is program flow control.
+ * This is a typeless language, the CPU word determines the size of the main
+ * data type (8-bit for the ttl-cpu, 64 bit for x86-64), which may represent
+ * data as well as a pointer to data (or to another pointer).
+ * Function arguments are placed onto the stack in order(!) prior to function
+ * call, the return value of a function is the data that is in the main data
+ * register (accumulator, rax, eax, etc..) upon return.
+ * Every expression is evaluated into the main data register, hence
+ * the assumed return value of every function is the value of the last
+ * evaluated expression.
  */
+
 one () {
     1;              /* This function returns '1' */
 }
@@ -36,51 +34,53 @@ three () {
 }
 
 addition (b1, b2) {
-    b1 + b2;        /* this function returns b1 + b2 */
+    b1 + b2;        /* this function returns the value of b1 + b2 */
 }
 
 myaddress () {
-    0x10;
+    0x10;           /* This function returns 0x10 */
 }
 
 /*
- * The below case is tricky: In order to break the loop, the program needs to
- * evaluate the 'i != 5' expression after each cycle; hence the last expression
- * that's being evaluated is not '1', but 'i != 5'. The same is true for
- * 'while' and 'do-while' cycles.
+ * The below function returns, when the loop finishes with 'i != 5' expression
+ * becoming 'false'. The return value of the function hence will be '0' (false),
+ * because 'i != 5' was the last evaluated expression of the function.
  */
+
+#define TRUE    (1)
+
 return_false () {
     auto i;
     for (i = 0; i != 5; i += 1) {
-        1;
+        TRUE;
     }
 }
+
+/*
+ * The below function will return 'true' (1), because the loop will break with
+ * an explicit 'return' statement, which is executed after loading the value of
+ * the last evaluated expression (TRUE) into the main data register.
+ */
 
 return_true () {
     auto i;
     for (i = 0; i != 5; i += 1) {
-        return 1;   /* Got it? :) */
+        return TRUE;
     }
 }
 
 
 /*
- * In-line assembly:
- * Expressions which are separated with commas, are being evaluated
- * sequentially after each other.
- * The first expression (a) loads the value of 'a' into the
- * accumulator. An 'a-1' statement would form the 2nd complement
- * of '1' and would add it to 'a'.
- * We can do it with a signle assembly instruction, the 2nd complement of
- * '1' is '255'; code execution speed can be significantly boosted
- * with these tricks.
+ * In-line assembly, comma separated expressions.
  */
-dec (a) {
+minus_one (a) {
     a, asm("add(progdata) data(0xFF)");
 }
 
 
-/* The main function, program execution starts here */
+/*
+ * Program execution starts with the main funcion.
+ */
 main () {
     /* Variable declarations at the beginning of each block */
     auto i;
@@ -88,17 +88,12 @@ main () {
 
     while (1) {
         /*
-         * Built-in operator precedence can be overriden
-         * with () parentheses
+         * Built-in operator precedence can be overriden with () parentheses
          */
         for (i = NUM_TEN; (i - 1 != 0xFF - (1 == 2)) ? 1 : 0; i += addition(1, 0)) {
             auto i_p;
             auto i_pp;
-            /*
-             * there's neither 'pointer' type, nor
-             * pointer arythmetics; everything is a 8-bit 'word'
-             * It's up to you how you use the variables.
-             */
+
             i_p = &i;  /* addressof */
             i_pp = &i_p;  /* addressof */
             **i_pp += 1; /* arbitrary deep dereferencing */
@@ -106,11 +101,12 @@ main () {
             g += 1;
 
             /*
-             * You can dereference the value of any primary
-             * expression, including the return value of a function
+             * Every primary expression can be dereferenced, including the
+             * return value of functions.
              */
             *myaddress() = *(0x10 + OFFSET);
-            *0x01 = 5;  /* Direct write to memory address 0x01 */
+            *0x01 = 0x05;  /* Direct write 0x05 to memory address 0x01 */
+            *0x01 = *0x02; /* Copy data from 0x02 to 0x01 */
         }
         /*
          * No function prototypes, each function translates

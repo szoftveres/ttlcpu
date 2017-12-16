@@ -39,6 +39,6 @@ The './b' shell script:
 ./bx misc/unix_prog.c
 echo -n Hello World | ./unix_prog.bin /bin/ls -l .
 ```
-See mcc/arch/x86_64/header.s for implemented system calls,
-and misc/unix_routines.c for helper functions.
+See [mcc/arch/x86_64_Linux/header.s](https://github.com/szoftveres/ttlcpu/blob/master/mcc/arch/x86_64_Linux/header.s) for implemented system calls,
+and [misc/unix_routines.c](https://github.com/szoftveres/ttlcpu/blob/master/misc/unix_routines.c) for helper functions.
 

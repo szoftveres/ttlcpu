@@ -1,5 +1,9 @@
 .global _start
 
+
+.bss
+bss_start:
+
 .text
 
 _start:                         # call main function then exit
