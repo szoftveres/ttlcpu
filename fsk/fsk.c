@@ -14,20 +14,20 @@ static unsigned char data[] = {
 
 };
 
-static char filterbuf[CYCLE_HI];
+static signed int filterbuf[CYCLE_LO];
 static int  idx;
 
 void filterout (char c) {
     int i;
-    int avg = 0;
-    filterbuf[idx++] = c;
-    if (idx == (sizeof(filterbuf)/sizeof(filterbuf[0]))) {
+    signed int avg = 0;
+    filterbuf[idx++] = (signed int)c;
+    if (idx >= (sizeof(filterbuf)/sizeof(filterbuf[0]))) {
         idx = 0;
     }
     for (i = 0; i != (sizeof(filterbuf)/sizeof(filterbuf[0])); i++) {
         avg += filterbuf[i];
     }
-    avg /= sizeof(filterbuf)/sizeof(filterbuf[0]);
+    avg /= (signed int)(sizeof(filterbuf)/sizeof(filterbuf[0]));
     putchar((char)avg);
 }
 

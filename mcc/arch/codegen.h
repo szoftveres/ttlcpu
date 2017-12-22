@@ -1,14 +1,12 @@
 #ifndef _CODEGEN_H_
 #define _CODEGEN_H_
 
-int ARCH_integer_size (void);
-int ARCH_data_pointer_size (void);
+int ARCH_word_size (void);
 int ARCH_code_pointer_size (void);
 int ARCH_stack_post_decrement (void);
 
 
 void CODE_func_definition_label (char* fn_name);
-void CODE_func_definition_ret (char* fn_name);
 
 void CODE_stack_restore (int i);
 
@@ -35,7 +33,9 @@ void CODE_for_statement_base (int lbl);
 void CODE_for_statement_end (int lbl);
 
 void CODE_asm_statement (char* s);
-void CODE_return_statement (char* s, int d);
+void CODE_return_statement (int lbl, int d);
+void CODE_break_statement (int lbl, int d);
+void CODE_continue_statement (int lbl, int d);
 
 void CODE_logical_neg (int lbl);
 void CODE_bitwise_neg (void);
@@ -80,6 +80,8 @@ void CODE_fn_call (int lbl, char* fn_name);
 
 void CODE_fn_call_args (void);
 
-
+void CODE_ret_jmppoint (int lbl);
+void CODE_break_jmppoint (int lbl);
+void CODE_continue_jmppoint (int lbl);
 
 #endif

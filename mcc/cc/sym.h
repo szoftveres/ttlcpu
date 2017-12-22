@@ -14,6 +14,17 @@ typedef struct var_s {
 } var_t;
 
 
+typedef struct jmpstack_s {
+    int                 lbl;
+    int                 stack_grow;
+    struct jmpstack_s   *next;
+} jmpstack_t;
+
+
+extern jmpstack_t       *returnstack;
+extern jmpstack_t       *breakstack;
+extern jmpstack_t       *continuestack;
+
 
 void sym_init (void);
 void push_var (char* name, int size);
@@ -22,12 +33,14 @@ var_t *find_var (char* name, int scope_loc);
 void inc_var_pos (int b);
 void dec_var_pos (int b);
 
-void reset_stack_grow (char* fn_name);
-int get_stack_grow (char** fn_name);
-
 int new_label (void);
 
 void scope_inc (void);
 void scope_dec (void);
+
+void jmpstack_push (jmpstack_t** stack, int lbl);
+int jmpstack_pop (jmpstack_t** stack);
+int jmpstack_grow (jmpstack_t** stack);
+int jmpstack_lbl (jmpstack_t** stack);
 
 #endif

@@ -16,11 +16,7 @@ static void print_debugs (const char* s) {
 }
 
 
-int ARCH_integer_size (void) {
-    return 8;                   /* 64 bit */
-}
-
-int ARCH_data_pointer_size (void) {
+int ARCH_word_size (void) {
     return 8;                   /* 64 bit */
 }
 
@@ -39,10 +35,20 @@ void CODE_func_definition_label (char* fn_name) {
     fprintf(stdout, "%s:\n", fn_name);
 }
 
-void CODE_func_definition_ret (char* fn_name) {
+void CODE_ret_jmppoint (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "__%s__ret:\n", fn_name);
+    fprintf(stdout, "__%04d__return:\n", lbl);
     fprintf(stdout, "    ret\n");
+}
+
+void CODE_break_jmppoint (int lbl) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "__%04d__break:\n", lbl);
+}
+
+void CODE_continue_jmppoint (int lbl) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "__%04d__continue:\n", lbl);
 }
 
 void CODE_stack_restore (int i) {
@@ -158,12 +164,28 @@ void CODE_asm_statement (char* s) {
     fprintf(stdout, "%s", s);
 }
 
-void CODE_return_statement (char* s, int d) {
+void CODE_return_statement (int lbl, int d) {
     print_debugs(__FUNCTION__);
     if (d) {
         fprintf(stdout, "    add  $%u,%%rsp\n", d);
     }
-    fprintf(stdout, "    jmp __%s__ret\n", s);
+    fprintf(stdout, "    jmp __%04d__return\n", lbl);
+}
+
+void CODE_break_statement (int lbl, int d) {
+    print_debugs(__FUNCTION__);
+    if (d) {
+        fprintf(stdout, "    add  $%u,%%rsp\n", d);
+    }
+    fprintf(stdout, "    jmp __%04d__break\n", lbl);
+}
+
+void CODE_continue_statement (int lbl, int d) {
+    print_debugs(__FUNCTION__);
+    if (d) {
+        fprintf(stdout, "    add  $%u,%%rsp\n", d);
+    }
+    fprintf(stdout, "    jmp __%04d__continue\n", lbl);
 }
 
 void CODE_logical_neg (int lbl) {

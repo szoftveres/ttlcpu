@@ -2,9 +2,7 @@
 
 
 fibonacci (n) {
-    if (!n) {
-        return n;
-    } else if (n == 1) {
+    if (n < 2) {
         return n;
     }
     return fibonacci(n - 1) + fibonacci(n - 2);  /* Arbitrary deep recursion */
@@ -16,11 +14,11 @@ main (argc, argv) {
     auto c;
 
     puts("Hello World!\n");
-    puts("argc: "); putu(argc); puts("\n");
+    puts("argc: "); putd(argc); puts("\n");
 
     for (i = 0; i != argc; i += 1) {
         puts("argv[");
-        putu(i);
+        putd(i);
         puts("]: ");
         puts(getarg(argv, i));
         puts("\n");
@@ -33,7 +31,7 @@ main (argc, argv) {
         puts("parent: waiting\n");
         waitpid(c, &code);
         puts("parent: child exited with code (");
-        putu(code / 256);
+        putd(code / 256);
         puts(")\n");
     } else {
         execv(getarg(argv, 1), getargaddr(argv, 1));
@@ -45,9 +43,9 @@ main (argc, argv) {
 
     for (i = 30; i != 40; i += 1) {
         puts("fibonacci(");
-        putu(i);
+        putd(i);
         puts(") = ");
-        putu(fibonacci(i));
+        putd(fibonacci(i));
         puts("\n");
     }
 

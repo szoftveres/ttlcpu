@@ -50,7 +50,7 @@ lbladd (char* n) {
 
 static void
 lblprint(char* n) {
-    fprintf(stderr, "%s:\n", n);
+    fprintf(stderr, "%s\n", n);
 }
 
 static void

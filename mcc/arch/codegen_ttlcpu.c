@@ -16,12 +16,8 @@ static void print_debugs (const char* s) {
 }
 
 
-int ARCH_integer_size (void) {
+int ARCH_word_size (void) {
     return 1;                   /* 8 bit var */
-}
-
-int ARCH_data_pointer_size (void) {
-    return 1;                   /* 256 bytes RAM */
 }
 
 int ARCH_code_pointer_size (void) {
@@ -39,10 +35,20 @@ void CODE_func_definition_label (char* fn_name) {
     fprintf(stdout, "lbl(\"%s\")\n", fn_name);
 }
 
-void CODE_func_definition_ret (char* fn_name) {
+void CODE_ret_jmppoint (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "lbl(\"__%s__ret\")\n", fn_name);
+    fprintf(stdout, "lbl(\"__%04d__return\")\n", lbl);
     fprintf(stdout, "    ret()\n");
+}
+
+void CODE_break_jmppoint (int lbl) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "lbl(\"__%04d__break\")\n", lbl);
+}
+
+void CODE_continue_jmppoint (int lbl) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "lbl(\"__%04d__continue\")\n", lbl);
 }
 
 void CODE_stack_restore (int i) {
@@ -154,13 +160,31 @@ void CODE_asm_statement (char* s) {
     fprintf(stdout, "%s", s);
 }
 
-void CODE_return_statement (char* s, int d) {
+void CODE_return_statement (int lbl, int d) {
     print_debugs(__FUNCTION__);
     if (d) {
         fprintf(stdout, "    inc_sp(%u)\n", d);
     }
-    fprintf(stdout, "    jp(\"__%s__ret\")\n", s);
+    fprintf(stdout, "    jp(\"__%04d__return\")\n", lbl);
 }
+
+void CODE_break_statement (int lbl, int d) {
+    print_debugs(__FUNCTION__);
+    if (d) {
+        fprintf(stdout, "    inc_sp(%u)\n", d);
+    }
+    fprintf(stdout, "    jp(\"__%04d__break\")\n", lbl);
+}
+
+void CODE_continue_statement (int lbl, int d) {
+    print_debugs(__FUNCTION__);
+    if (d) {
+        fprintf(stdout, "    inc_sp(%u)\n", d);
+    }
+    fprintf(stdout, "    jp(\"__%04d__continue\")\n", lbl);
+}
+
+
 
 void CODE_logical_neg (int lbl) {
     print_debugs(__FUNCTION__);
@@ -290,7 +314,7 @@ void CODE_do_operation_compare_less (int lbl) {
     CODE_do_operation_sub();
     CODE_push_unsafe();
     fprintf(stdout, "    call(\"msb\", \"compare_less_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size()); // 1 function argument
+    fprintf(stdout, "    inc_sp(%d)\n", ARCH_word_size()); // 1 function argument
 }
 
 void CODE_do_operation_compare_greq (int lbl) {
@@ -299,7 +323,7 @@ void CODE_do_operation_compare_greq (int lbl) {
     fprintf(stdout, "    inv(frm_acc)\n");
     CODE_push_unsafe();
     fprintf(stdout, "    call(\"msb\", \"compare_greq_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size()); // 1 function argument
+    fprintf(stdout, "    inc_sp(%d)\n", ARCH_word_size()); // 1 function argument
 }
 
 
@@ -307,7 +331,7 @@ void CODE_do_operation_bwand (int lbl) {
     print_debugs(__FUNCTION__);
     CODE_push_unsafe();
     fprintf(stdout, "    call(\"bwand\", \"bwand_call_%04d\")\n", lbl);
-    fprintf(stdout, "    inc_sp(%d)\n", ARCH_integer_size() * 2); // 2 function arguments
+    fprintf(stdout, "    inc_sp(%d)\n", ARCH_word_size() * 2); // 2 function arguments
 }
 
 void CODE_do_operation_bwxor (void) {

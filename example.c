@@ -11,7 +11,9 @@
 /*
  * This is a typeless language, the CPU word determines the size of the main
  * data type (8-bit for the ttl-cpu, 64 bit for x86-64), which may represent
- * data as well as a pointer to data (or to another pointer).
+ * data as well as a pointer to data (or to another pointer). The actual size
+ * of the CPU word can be retrieved by the 'sizeof()' function (no arguments
+ * required).
  * Function arguments are placed onto the stack in order(!) prior to function
  * call, the return value of a function is the data that is in the main data
  * register (accumulator, rax, eax, etc..) upon return.
@@ -38,6 +40,10 @@ addition (b1, b2) {
 
 myaddress () {
     0x10;           /* This function returns 0x10 */
+}
+
+cpu_word_in_bytes () {
+    sizeof();       /* Doesn't need any arguemts */
 }
 
 /*
@@ -98,7 +104,8 @@ main () {
             **i_pp += 1; /* arbitrary deep dereferencing */
             out(*i_p);
             g += 1;
-
+            if (i == 11) {continue;} /* next cycle */
+            if (i == 13) {break;} /* break */
             /*
              * Every primary expression can be dereferenced, including the
              * return value of functions.
@@ -107,6 +114,16 @@ main () {
             *0x01 = 0x05;  /* Direct write 0x05 to memory address 0x01 */
             *0x01 = *0x02; /* Copy data from 0x02 to 0x01 */
         }
+
+        /* 'do {}' is a single cycle loop, equivalent to 'do {} while(0);' */
+        do {
+            if (i == 5)
+                break;
+            if (i == 6)
+                continue; /* same effect as 'break' */
+            out(i);
+        }
+
         /*
          * Function forward declarations are not needed; function calls and
          * definitions directly translate to assembler subroutine calls and

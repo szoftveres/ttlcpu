@@ -11,20 +11,24 @@
 static var_t            *variables;
 
 /* unique labels */
-static int             lbl;
+static int              lbl;
 
 /* scope - 0 means global */
-static int             scope;
+static int              scope;
 
-static int             stack_grow; /* for return stmt */
-static char            function_name[32];
+jmpstack_t              *returnstack;
+jmpstack_t              *breakstack;
+jmpstack_t              *continuestack;
+
 
 void
 sym_init (void) {
     lbl = 0;
     variables = NULL;
     scope = 0;
-    stack_grow = 0;
+    returnstack = NULL;
+    breakstack = NULL;
+    continuestack = NULL;
 }
 
 
@@ -88,7 +92,9 @@ inc_var_pos (int b) {
     for (it = variables; it; it = it->next) {
         it->pos += b;
     }
-    stack_grow += b;
+    if (returnstack) {returnstack->stack_grow += b;}
+    if (breakstack) {breakstack->stack_grow += b;}
+    if (continuestack) {continuestack->stack_grow += b;}
 }
 
 
@@ -98,19 +104,9 @@ dec_var_pos (int b) {
     for (it = variables; it; it = it->next) {
         it->pos -= b;
     }
-    stack_grow -= b;
-}
-
-void
-reset_stack_grow (char* fn_name) {
-    stack_grow = 0;
-    strcpy(function_name, fn_name);
-}
-
-int
-get_stack_grow (char** fn_name) {
-    *fn_name = function_name;
-    return (stack_grow);
+    if (returnstack) {returnstack->stack_grow -= b;}
+    if (breakstack) {breakstack->stack_grow -= b;}
+    if (continuestack) {continuestack->stack_grow -= b;}
 }
 
 void
@@ -140,3 +136,36 @@ void
 scope_dec (void) {
     scope -= 1;
 }
+
+void
+jmpstack_push (jmpstack_t** stack, int lbl) {
+    jmpstack_t      *br;
+
+    br = (jmpstack_t*) malloc(sizeof(jmpstack_t));
+    br->lbl = lbl;
+    br->stack_grow = 0;
+    br->next = *stack;
+    *stack = br;
+}
+
+int
+jmpstack_pop (jmpstack_t** stack) {
+    int             lbl;
+    jmpstack_t      *br = *stack;
+
+    lbl = (*stack)->lbl;
+    *stack = (*stack)->next;
+    free(br);
+    return (lbl);
+}
+
+int
+jmpstack_grow (jmpstack_t** stack) {
+    return ((*stack)->stack_grow);
+}
+
+int
+jmpstack_lbl (jmpstack_t** stack) {
+    return ((*stack)->lbl);
+}
+

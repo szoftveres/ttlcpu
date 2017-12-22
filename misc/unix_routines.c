@@ -4,7 +4,7 @@
 
 /* Get argument */
 getargaddr (argv, arg) {
-    argv + (arg * 8);
+    argv + (arg * sizeof());
 }
 
 getarg (argv, arg) {
@@ -27,9 +27,9 @@ getchar () {
 }
 
 /* Print unsigned decimal integer */
-putu (num) {
+putd (num) {
     if(num / 10){
-        putu(num / 10);
+        putd(num / 10);
     }
     putchar((num % 10) + '0');
 }

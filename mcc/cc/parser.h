@@ -29,6 +29,8 @@ int while_statement (void);
 int do_statement (void);
 int for_statement (void);
 int return_statement (void);
+int break_statement (void);
+int continue_statement (void);
 
 int statement (void);
 
@@ -61,6 +63,7 @@ int const_expression (void);
 int function_expression (char* identifier);
 
 int asm_expression (char* identifier);
+int sizeof_expression (char* identifier);
 
 int fn_call (char* identifier);
 
