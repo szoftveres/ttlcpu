@@ -219,6 +219,9 @@ int keyword (void) {
     if (continue_statement()) {
         return 1;
     }
+    if (switch_statement()) {
+        return 1;
+    }
     return 0;
 }
 
@@ -260,6 +263,9 @@ int break_statement (void) {
     if (!lex_get(T_IDENTIFIER, "break")) {
         return 0;
     }
+    if (!breakstack) {
+        parser_error("nothing to break from");
+    }
     if (!lex_get(T_SEMICOLON, NULL)) {
         parser_error("expected ';'");
     }
@@ -273,6 +279,9 @@ int break_statement (void) {
 int continue_statement (void) {
     if (!lex_get(T_IDENTIFIER, "continue")) {
         return 0;
+    }
+    if (!continuestack) {
+        parser_error("nothing to continue");
     }
     if (!lex_get(T_SEMICOLON, NULL)) {
         parser_error("expected ';'");
@@ -886,7 +895,7 @@ int fn_call_args (void) {
     int args = 0;
     args += expression();
     if (args) {
-        CODE_fn_call_args();
+        CODE_push_unsafe();
         inc_var_pos(ARCH_word_size());
         if (lex_get(T_COMMA, NULL)) {
             int more_args;
@@ -983,6 +992,118 @@ id_obj_t object_identifier (void) {
     free(id);
     /* Variable address in acc */
     return RC_VARIABLE;
+}
+
+
+int switch_statement (void) {
+    int lbl;
+    int next_lbl;
+
+    if (!lex_get(T_IDENTIFIER, "switch")) {
+        return 0;
+    }
+    if (!lex_get(T_LEFT_PARENTH, NULL)) {
+        parser_error("expected '('");
+    }
+    if (!expressions()) {
+        parser_error("expected expression");
+    }
+    if (!lex_get(T_RIGHT_PARENTH, NULL)) {
+        parser_error("expected ')'");
+    }
+    lbl = new_label();
+    jmpstack_push(&breakstack, lbl);
+    CODE_push_unsafe();
+    inc_var_pos(ARCH_word_size());
+    CODE_caseblock_start(lbl);
+    if (!switch_block(lbl, &next_lbl)) { /* either one */
+        case_type_statement(lbl, &next_lbl);
+    }
+    CODE_caseblock_end(next_lbl);
+    CODE_stack_restore(ARCH_word_size());
+    dec_var_pos(ARCH_word_size());
+    jmpstack_pop(&breakstack);
+    CODE_break_jmppoint(lbl);
+    return 1;
+}
+
+
+int switch_block (int lbl, int *next_lbl) {
+    *next_lbl = lbl;
+    if (!lex_get(T_LEFT_BRACE, NULL)) {
+        return 0;
+    }
+    if (case_type_statements(lbl, next_lbl)) {
+        lbl = *next_lbl;
+    }
+
+    if (!lex_get(T_RIGHT_BRACE, NULL)) {
+        parser_error("expected '}'");
+    }
+    return 1;
+}
+
+
+int case_type_statements (int lbl, int *next_lbl) {
+    *next_lbl = lbl;
+    if (case_type_statement(lbl, next_lbl)) {
+        lbl = *next_lbl;
+        case_type_statements(lbl, next_lbl);
+        return 1;
+    }
+    return 0;
+}
+
+
+int case_type_statement (int lbl, int *next_lbl) {
+    *next_lbl = lbl;
+    if (case_statement(lbl, next_lbl)) {
+        lbl = *next_lbl;
+        case_type_statement(lbl, next_lbl);
+        return 1;
+    }
+    if (default_statement(lbl, next_lbl)) {
+        lbl = *next_lbl;
+        case_type_statement(lbl, next_lbl);
+        return 1;
+    }
+    if (statement()) {
+        return 1;
+    }
+    return 0;
+}
+
+
+int case_statement (int lbl, int *next_lbl) {
+    int num_const;
+
+    *next_lbl = lbl;
+    if (!lex_get(T_IDENTIFIER, "case")) {
+        return 0;
+    }
+    *next_lbl = new_label();
+    if(!numeric_const (&num_const)) {
+        parser_error("expected numeric const after 'case'");
+    }
+    if (!lex_get(T_COLON, NULL)) {
+        parser_error("expected ':'");
+    }
+    CODE_caseblock(lbl, *next_lbl, num_const);
+    return 1;
+}
+
+
+int default_statement (int lbl, int *next_lbl) {
+    *next_lbl = lbl;
+    if (!lex_get(T_IDENTIFIER, "default")) {
+        return 0;
+    }
+    *next_lbl = new_label();
+    if (!lex_get(T_COLON, NULL)) {
+        parser_error("expected ':'");
+    }
+    CODE_caseblock_end(lbl);
+    return 1;
 }
 
 

@@ -391,9 +391,25 @@ void CODE_fn_call (int lbl, char* fn_name) {
     fprintf(stdout, "    call %s\n", fn_name);
 }
 
-void CODE_fn_call_args (void) {
+
+void CODE_caseblock_start (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    push %%rax                      # push fn arg\n");
+    fprintf(stdout, "    jmp case_eval_%04d\n", lbl);
+
+}
+
+void CODE_caseblock (int lbl, int next_lbl, int data_const) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "    jmp case_start_%04d\n", lbl);
+    fprintf(stdout, "case_eval_%04d:\n", lbl);
+    fprintf(stdout, "    cmp $0x%X, (%%rsp)   # case data\n", data_const);
+    fprintf(stdout, "    jnz case_eval_%04d\n", next_lbl);
+    fprintf(stdout, "case_start_%04d:\n", lbl);
+}
+
+void CODE_caseblock_end (int lbl) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "case_eval_%04d:\n", lbl);
 }
 
 

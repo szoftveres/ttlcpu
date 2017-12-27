@@ -41,12 +41,21 @@ main (argc, argv) {
         exit(1);
     }
 
-    for (i = 30; i != 40; i += 1) {
-        puts("fibonacci(");
-        putd(i);
-        puts(") = ");
-        putd(fibonacci(i));
-        puts("\n");
+    for (i = 0; i != 100; i += 1) {
+        switch (i) {
+          case 30:
+          case 32:
+          case 34:
+          case 36:
+          case 38:
+          case 40:
+            puts("fibonacci(");
+            putd(i);
+            puts(") = ");
+            putd(fibonacci(i));
+            puts("\n");
+            break;
+        }
     }
 
     while ((c = getchar()) != EOF) {

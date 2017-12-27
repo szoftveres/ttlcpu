@@ -78,10 +78,13 @@ void CODE_const_expression_int (int i);
 
 void CODE_fn_call (int lbl, char* fn_name);
 
-void CODE_fn_call_args (void);
-
 void CODE_ret_jmppoint (int lbl);
 void CODE_break_jmppoint (int lbl);
 void CODE_continue_jmppoint (int lbl);
+
+
+void CODE_caseblock_start (int lbl);
+void CODE_caseblock (int lbl, int next_lbl, int data_const);
+void CODE_caseblock_end (int lbl);
 
 #endif

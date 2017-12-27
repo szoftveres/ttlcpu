@@ -395,9 +395,27 @@ void CODE_fn_call (int lbl, char* fn_name) {
     fprintf(stdout, "    call(\"%s\", \"call_%04d\")\n", fn_name, lbl);
 }
 
-void CODE_fn_call_args (void) {
+
+void CODE_caseblock_start (int lbl) {
     print_debugs(__FUNCTION__);
-    fprintf(stdout, "    push_unsafe(frm_acc)                      // push fn arg\n");
+    fprintf(stdout, "    jp(\"case_eval_%04d\")\n", lbl);
+}
+
+void CODE_caseblock (int lbl, int next_lbl, int data_const) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "    jp(\"case_start_%04d\")\n", lbl);
+    fprintf(stdout, "lbl(\"case_eval_%04d\")\n", lbl);
+    CODE_load_eff_addr_auto(1);
+    CODE_dereference();
+    fprintf(stdout, "    add(progdata) data(0x%X)   // case data\n", (unsigned char)((~((unsigned char)data_const))+1) );
+    fprintf(stdout, "    jz(\"case_start_%04d\")\n", lbl);
+    fprintf(stdout, "    jp(\"case_eval_%04d\")\n", next_lbl);
+    fprintf(stdout, "lbl(\"case_start_%04d\")\n", lbl);
+}
+
+void CODE_caseblock_end (int lbl) {
+    print_debugs(__FUNCTION__);
+    fprintf(stdout, "lbl(\"case_eval_%04d\")\n", lbl);
 }
 
 

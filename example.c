@@ -104,8 +104,15 @@ main () {
             **i_pp += 1; /* arbitrary deep dereferencing */
             out(*i_p);
             g += 1;
-            if (i == 11) {continue;} /* next cycle */
-            if (i == 13) {break;} /* break */
+
+            switch (i) {
+              case 10: case 11: case 12:
+                continue;    /* continue 'for' cycle */
+              default:
+                break;       /* break from switch */
+            }
+            if (i == 13) {break;} /* break from 'for' cycle */
+
             /*
              * Every primary expression can be dereferenced, including the
              * return value of functions.
@@ -113,6 +120,7 @@ main () {
             *myaddress() = *(0x10 + OFFSET);
             *0x01 = 0x05;  /* Direct write 0x05 to memory address 0x01 */
             *0x01 = *0x02; /* Copy data from 0x02 to 0x01 */
+
         }
 
         /* 'do {}' is a single cycle loop, equivalent to 'do {} while(0);' */

@@ -87,5 +87,14 @@ typedef enum id_obj_e {
 
 id_obj_t object_identifier (void);
 
+int switch_statement (void);
+int case_type_statements (int lbl, int *next_lbl);
+int case_type_statement (int lbl, int *next_lbl);
+int case_statement (int lbl, int *next_lbl);
+int default_statement (int lbl, int *next_lbl);
+int switch_block (int lbl, int *next_lbl);
+
+
+
 
 #endif
