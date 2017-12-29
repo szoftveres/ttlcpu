@@ -60,8 +60,8 @@ int func_definition (void) {
     /* The above one doesn't need a pair, (out of scope on return) */
     lbl = new_label();
     jmpstack_push(&returnstack, lbl);
-    if (!block()) {
-        parser_error("expected block");
+    if (!statement()) {
+        parser_error("expected statement(s)");
     }
     jmpstack_pop(&returnstack);
     while (args--) {
@@ -1012,18 +1012,24 @@ int switch_statement (void) {
         parser_error("expected ')'");
     }
     lbl = new_label();
-    jmpstack_push(&breakstack, lbl);
+
     CODE_push_unsafe();
     inc_var_pos(ARCH_word_size());
+
+    jmpstack_push(&breakstack, lbl);
+
     CODE_caseblock_start(lbl);
     if (!switch_block(lbl, &next_lbl)) { /* either one */
         case_type_statement(lbl, &next_lbl);
     }
     CODE_caseblock_end(next_lbl);
-    CODE_stack_restore(ARCH_word_size());
-    dec_var_pos(ARCH_word_size());
+
     jmpstack_pop(&breakstack);
     CODE_break_jmppoint(lbl);
+
+    CODE_stack_restore(ARCH_word_size());
+    dec_var_pos(ARCH_word_size());
+
     return 1;
 }
 

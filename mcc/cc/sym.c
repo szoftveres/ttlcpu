@@ -148,15 +148,13 @@ jmpstack_push (jmpstack_t** stack, int lbl) {
     *stack = br;
 }
 
-int
+void
 jmpstack_pop (jmpstack_t** stack) {
-    int             lbl;
     jmpstack_t      *br = *stack;
 
-    lbl = (*stack)->lbl;
     *stack = (*stack)->next;
     free(br);
-    return (lbl);
+    return;
 }
 
 int

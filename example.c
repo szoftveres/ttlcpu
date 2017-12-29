@@ -47,6 +47,19 @@ cpu_word_in_bytes () {
 }
 
 /*
+ * A function begins with the 'name()' and a satement.
+ * A '{block}' itself is a statement that contains multiple statements,
+ * however functions can be written without involving a '{block}' as long
+ * as the function body itself is a single statement.
+ * Below are examples of legal function definitions:
+ */
+
+five (a) while (1) for (a = 0; a != 10; a += 1) if (a == 5) return a;
+add2 (a, b) a + b;
+sub2 (a, b) a - b;
+nop(); /* This is the definition (not pre-declaration) of an empty function */
+
+/*
  * The below function returns, when the loop finishes with 'i != 5' expression
  * becoming 'false'. The return value of the function hence will be '0' (false),
  * because 'i != 5' was the last evaluated expression.
@@ -106,7 +119,9 @@ main () {
             g += 1;
 
             switch (i) {
-              case 10: case 11: case 12:
+              case 10:
+              case 11:
+              case 12:
                 continue;    /* continue 'for' cycle */
               default:
                 break;       /* break from switch */
@@ -143,14 +158,12 @@ main () {
     }
 }
 
-
+/* Arbitrary deep recursion */
 fibonacci (n) {
-    if (!n) {
-        return n;
-    } else if (n == 1) {
+    if (n < 2) {
         return n;
     }
-    return fibonacci(n - 1) + fibonacci(n - 2);  /* Arbitrary deep recursion */
+    return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
 

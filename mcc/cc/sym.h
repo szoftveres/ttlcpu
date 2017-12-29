@@ -39,7 +39,7 @@ void scope_inc (void);
 void scope_dec (void);
 
 void jmpstack_push (jmpstack_t** stack, int lbl);
-int jmpstack_pop (jmpstack_t** stack);
+void jmpstack_pop (jmpstack_t** stack);
 int jmpstack_grow (jmpstack_t** stack);
 int jmpstack_lbl (jmpstack_t** stack);
 
