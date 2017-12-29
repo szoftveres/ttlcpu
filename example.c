@@ -6,14 +6,17 @@
 
 #define NUM_TEN     0x0A
 #define OFFSET      0x01
-/* All the #preprocessor directives are currently handled by gcc (gcc -E) */
+/*
+ * All the #preprocessor directives and comments are currently
+ * handled by gcc (gcc -E)
+ */
 
 /*
  * This is a typeless language, the CPU word determines the size of the main
- * data type (8-bit for the ttl-cpu, 64 bit for x86-64), which may represent
- * data as well as a pointer to data (or to another pointer). The actual size
- * of the CPU word can be retrieved by the 'sizeof()' function (no arguments
- * required).
+ * data type (8-bit for the ttl-cpu, 64 bit for x86-64). A CPU word may
+ * represent data, as well as a pointer to data (or to another pointer).
+ * the actual size of the CPU word can be retrieved by the 'sizeof()' function
+ * (no arguments needed).
  * Function arguments are placed onto the stack in order(!) prior to function
  * call, the return value of a function is the data that is in the main data
  * register (accumulator, rax, eax, etc..) upon return.
@@ -47,19 +50,6 @@ cpu_word_in_bytes () {
 }
 
 /*
- * A function begins with the 'name()' and a satement.
- * A '{block}' itself is a statement that contains multiple statements,
- * however functions can be written without involving a '{block}' as long
- * as the function body itself is a single statement.
- * Below are examples of legal function definitions:
- */
-
-five (a) while (1) for (a = 0; a != 10; a += 1) if (a == 5) return a;
-add2 (a, b) a + b;
-sub2 (a, b) a - b;
-nop(); /* This is the definition (not pre-declaration) of an empty function */
-
-/*
  * The below function returns, when the loop finishes with 'i != 5' expression
  * becoming 'false'. The return value of the function hence will be '0' (false),
  * because 'i != 5' was the last evaluated expression.
@@ -87,6 +77,18 @@ return_true () {
     }
 }
 
+/*
+ * A function begins with the 'name()' and a satement.
+ * A '{block}' itself is a statement that contains multiple statements,
+ * however functions can be written without involving a '{block}' as long
+ * as the function body itself is a single statement.
+ * Below are examples of legal function definitions:
+ */
+
+five (a) while (1) for (a = 0; a != 10; a += 1) if (a == 5) return a;
+add2 (a, b) a + b;
+sub2 (a, b) a - b;
+nop (); /* This is the definition (not pre-declaration) of an empty function */
 
 /*
  * In-line assembly, comma separated expressions.
@@ -129,7 +131,7 @@ main () {
             if (i == 13) {break;} /* break from 'for' cycle */
 
             /*
-             * Every primary expression can be dereferenced, including the
+             * Any primary expression can be dereferenced, including the
              * return value of functions.
              */
             *myaddress() = *(0x10 + OFFSET);
