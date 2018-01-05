@@ -68,7 +68,7 @@ void CODE_ternary_cond_end (int lbl);
 void CODE_pop_addr_and_store (void);
 void CODE_dereference (void);
 
-void CODE_load_eff_addr_auto (int pos);
+void CODE_load_eff_addr_auto (int dist);
 
 
 void CODE_const_expression_str (int lbl, char* c);

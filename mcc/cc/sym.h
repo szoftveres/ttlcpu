@@ -4,43 +4,33 @@
 #include "lex.h"
 
 
-typedef struct var_s {
-    char                name[MAX_TOKEN_SIZE];
-    int                 scope;
-    int                 pos;
-    int                 size;   /* Size of this type */
-    struct var_s        *child; /* In case it represents a structure */
-    struct var_s        *next;
-} var_t;
+typedef struct sym_s {
+    union {
+        char                name[MAX_TOKEN_SIZE];
+        int                 lbl;
+    };
+    int                 dist;
+    struct sym_s        *next;
+} sym_t;
 
 
-typedef struct jmpstack_s {
-    int                 lbl;
-    int                 stack_grow;
-    struct jmpstack_s   *next;
-} jmpstack_t;
+extern sym_t       *variables;
+extern sym_t       *returns;
+extern sym_t       *breaks;
+extern sym_t       *continues;
 
-
-extern jmpstack_t       *returnstack;
-extern jmpstack_t       *breakstack;
-extern jmpstack_t       *continuestack;
-
-
-void sym_init (void);
-void push_var (char* name, int size);
-void pop_var (void);
-var_t *find_var (char* name, int scope_loc);
-void inc_var_pos (int b);
-void dec_var_pos (int b);
 
 int new_label (void);
 
-void scope_inc (void);
-void scope_dec (void);
-
-void jmpstack_push (jmpstack_t** stack, int lbl);
-void jmpstack_pop (jmpstack_t** stack);
-int jmpstack_grow (jmpstack_t** stack);
-int jmpstack_lbl (jmpstack_t** stack);
+void sym_init (void);
+void sym_dist_inc (int b);
+void sym_dist_dec (int b);
+sym_t* sym_create_lbl (int lbl);
+sym_t* sym_create_name (const char* name);
+void sym_push (sym_t** stack, sym_t *sym);
+void sym_pop (sym_t** stack);
+int sym_dist_top (sym_t** stack);
+int sym_dist_name (sym_t** stack, const char* name, int *dist);
+int sym_lbl_top (sym_t** stack);
 
 #endif

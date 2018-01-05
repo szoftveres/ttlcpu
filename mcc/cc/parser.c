@@ -17,14 +17,9 @@ void parser_warning (char* s) {
 }
 
 void program (void) {
-    int vars;
-
     func_definitions();
     if (token != T_EOF) {
         parser_error("expected function definition");
-    }
-    while (vars--) {
-        pop_var();
     }
     return;
 }
@@ -51,23 +46,22 @@ int func_definition (void) {
     if (!lex_get(T_LEFT_PARENTH, NULL)) {
         parser_error("expected '('");
     }
-    scope_inc();
     args = arg_declarations();
     if (!lex_get(T_RIGHT_PARENTH, NULL)) {
         parser_error("expected ')'");
     }
-    inc_var_pos(ARCH_code_pointer_size());
+    sym_dist_inc(ARCH_code_pointer_size());
     /* The above one doesn't need a pair, (out of scope on return) */
     lbl = new_label();
-    jmpstack_push(&returnstack, lbl);
+    sym_push(&returns, sym_create_lbl(lbl));
     if (!statement()) {
         parser_error("expected statement(s)");
     }
-    jmpstack_pop(&returnstack);
+    sym_pop(&returns);
     while (args--) {
-        pop_var();
+        sym_pop(&variables);
+        sym_dist_dec(ARCH_word_size());
     }
-    scope_dec();
     CODE_ret_jmppoint(lbl);
     return 1;
 }
@@ -121,7 +115,8 @@ int block (void) {
     }
     CODE_stack_restore(var_space);
     while (vars--) {
-        pop_var();
+        sym_pop(&variables);
+        sym_dist_dec(ARCH_word_size());
     }
     return 1;
 }
@@ -139,12 +134,9 @@ int var_declaration (int* space) {
     }
     name = strdup(lexeme);
     next_token();
-    if (find_var(name, 1)) {
-        fprintf(stderr, "error : '%s' already defined\n", name);
-        exit(1);
-    }
     size = ARCH_word_size();
-    push_var(name, size);
+    sym_dist_inc(size);
+    sym_push(&variables, sym_create_name(name));
     free(name);
     if (space) {
         (*space) += size;
@@ -160,11 +152,12 @@ int arg_declaration (void) {
     }
     name = strdup(lexeme);
     next_token();
-    if (find_var(name, 1)) {
+    if (sym_dist_name(&variables, name, NULL)) {
         fprintf(stderr, "error : '%s' already defined\n", name);
         exit(1);
     }
-    push_var(name, ARCH_word_size());
+    sym_dist_inc(ARCH_word_size());
+    sym_push(&variables, sym_create_name(name));
     free(name);
     return 1; /* should be strictly 1 (number of declarations found) */
 }
@@ -181,12 +174,9 @@ int statements (void) {
 
 
 int statement (void) {
-    scope_inc();
     if (block()) {
-        scope_dec();
         return 1;
     }
-    scope_dec();
     if (keyword()) {
         return 1;
     }
@@ -263,14 +253,14 @@ int break_statement (void) {
     if (!lex_get(T_IDENTIFIER, "break")) {
         return 0;
     }
-    if (!breakstack) {
+    if (!breaks) {
         parser_error("nothing to break from");
     }
     if (!lex_get(T_SEMICOLON, NULL)) {
         parser_error("expected ';'");
     }
-    CODE_break_statement(jmpstack_lbl(&breakstack),
-                         jmpstack_grow(&breakstack));
+    CODE_break_statement(sym_lbl_top(&breaks),
+                         sym_dist_top(&breaks));
 
     return 1;
 }
@@ -280,14 +270,14 @@ int continue_statement (void) {
     if (!lex_get(T_IDENTIFIER, "continue")) {
         return 0;
     }
-    if (!continuestack) {
+    if (!continues) {
         parser_error("nothing to continue");
     }
     if (!lex_get(T_SEMICOLON, NULL)) {
         parser_error("expected ';'");
     }
-    CODE_continue_statement(jmpstack_lbl(&continuestack),
-                            jmpstack_grow(&continuestack));
+    CODE_continue_statement(sym_lbl_top(&continues),
+                            sym_dist_top(&continues));
     return 1;
 }
 
@@ -300,8 +290,8 @@ int return_statement (void) {
     if (!lex_get(T_SEMICOLON, NULL)) {
         parser_error("expected ';'");
     }
-    CODE_return_statement(jmpstack_lbl(&returnstack),
-                          jmpstack_grow(&returnstack));
+    CODE_return_statement(sym_lbl_top(&returns),
+                          sym_dist_top(&returns));
     return 1;
 }
 
@@ -324,13 +314,13 @@ int while_statement (void) {
         parser_error("expected ')'");
     }
     CODE_while_statement_evaluate(lbl);
-    jmpstack_push(&breakstack, lbl);
-    jmpstack_push(&continuestack, lbl);
+    sym_push(&breaks, sym_create_lbl(lbl));
+    sym_push(&continues, sym_create_lbl(lbl));
     if (!statement()) {
         parser_error("expected statement");
     }
-    jmpstack_pop(&breakstack);
-    jmpstack_pop(&continuestack);
+    sym_pop(&breaks);
+    sym_pop(&continues);
     CODE_continue_jmppoint(lbl);
     CODE_while_statement_end(lbl);
     CODE_break_jmppoint(lbl);
@@ -346,13 +336,13 @@ int do_statement (void) {
     }
     lbl = new_label();
     CODE_do_statement_base(lbl);
-    jmpstack_push(&breakstack, lbl);
-    jmpstack_push(&continuestack, lbl);
+    sym_push(&breaks, sym_create_lbl(lbl));
+    sym_push(&continues, sym_create_lbl(lbl));
     if (!statement()) {
         parser_error("expected statement");
     }
-    jmpstack_pop(&breakstack);
-    jmpstack_pop(&continuestack);
+    sym_pop(&breaks);
+    sym_pop(&continues);
     CODE_continue_jmppoint(lbl);
 
     if (lex_get(T_IDENTIFIER, "while")) {
@@ -405,13 +395,13 @@ int for_statement (void) {
         parser_error("expected ')'");
     }
     CODE_for_statement_base(lbl);
-    jmpstack_push(&breakstack, lbl);
-    jmpstack_push(&continuestack, lbl);
+    sym_push(&breaks, sym_create_lbl(lbl));
+    sym_push(&continues, sym_create_lbl(lbl));
     if (!statement()) {
         parser_error("expected statement");
     }
-    jmpstack_pop(&breakstack);
-    jmpstack_pop(&continuestack);
+    sym_pop(&breaks);
+    sym_pop(&continues);
     CODE_continue_jmppoint(lbl);
     CODE_for_statement_end(lbl);
     CODE_break_jmppoint(lbl);
@@ -582,8 +572,8 @@ int binary_operation (int precedence) {
     next_token();
 
     CODE_push_unsafe();
-    inc_var_pos(ARCH_word_size());
-    /* matching dec_var_pos in do_operations */
+    sym_dist_inc(ARCH_word_size());
+    /* matching sym_dist_dec in do_operations */
 
     if (!primary_expression()) {
         parser_error("expected expression after operator");
@@ -592,7 +582,7 @@ int binary_operation (int precedence) {
     /* Subsequent higher precedence operations */
     binary_operation(precedence + 1);
 
-    do_operations(op); /* inc_var_pos is in do_operations */
+    do_operations(op); /* sym_dist_inc is in do_operations */
 
     /* Subsequent same or lower precedence operations */
     binary_operation(0);
@@ -661,7 +651,7 @@ void do_operations (int op_type) {
         parser_error("unknown / unimplemented operator");
         return;
     }
-    dec_var_pos(ARCH_word_size());
+    sym_dist_dec(ARCH_word_size());
     /* there's a POP in each operation */
     return;
 }
@@ -775,16 +765,16 @@ int assignment (void) {
     /* Addr of location in acc */
     if (lex_get(T_ASSIGN, NULL)) {
         CODE_push_unsafe();
-        inc_var_pos(ARCH_word_size());
+        sym_dist_inc(ARCH_word_size());
         if (!expression()) {
             parser_error("expected expression after '='");
         }
         CODE_pop_addr_and_store();
-        dec_var_pos(ARCH_word_size());
+        sym_dist_dec(ARCH_word_size());
         return 1;
     } else if (recursive_assignment()) {
         CODE_pop_addr_and_store();
-        dec_var_pos(ARCH_word_size());
+        sym_dist_dec(ARCH_word_size());
         return 1;
     }
     return 0;
@@ -808,17 +798,17 @@ int recursive_assignment (void) {
     }
 
     CODE_push();               /* Push the address where we store back */
-    inc_var_pos(ARCH_word_size());  /* matching dec_var_pos */
+    sym_dist_inc(ARCH_word_size());  /* matching sym_dist_dec */
 
     CODE_dereference();
     CODE_push_unsafe();
-    inc_var_pos(ARCH_word_size());
-    /* matching dec_var_pos in do_operations */
+    sym_dist_inc(ARCH_word_size());
+    /* matching sym_dist_dec in do_operations */
 
     if (!expression()) {    /* only one expression after assignment */
         parser_error("expected expression after assignment operator");
     }
-    do_operations(op_type);  /* inc_var_pos is in do_operations */
+    do_operations(op_type);  /* sym_dist_inc is in do_operations */
 
     return 1;
 }
@@ -886,7 +876,7 @@ int fn_call (char* identifier) {
     }
     CODE_fn_call(new_label(), identifier);
     CODE_stack_restore(i * ARCH_word_size());
-    dec_var_pos(i * ARCH_word_size());
+    sym_dist_dec(i * ARCH_word_size());
     return 1;
 }
 
@@ -896,7 +886,7 @@ int fn_call_args (void) {
     args += expression();
     if (args) {
         CODE_push_unsafe();
-        inc_var_pos(ARCH_word_size());
+        sym_dist_inc(ARCH_word_size());
         if (lex_get(T_COMMA, NULL)) {
             int more_args;
             more_args = fn_call_args();
@@ -968,7 +958,7 @@ int addressof (void) {
 
 id_obj_t object_identifier (void) {
     char* id;
-    var_t *var;
+    int dist;
 
     if (token != T_IDENTIFIER) {
         return 0;
@@ -980,13 +970,12 @@ id_obj_t object_identifier (void) {
         /* Function return value in acc */
         return RC_FUNCTION;
     }
-    var = find_var(id, 0);
-    if (!var) {
-        fprintf(stderr, "error : '%s' not defined in this scope\n", id);
+    if (!sym_dist_name(&variables, id, &dist)) {
+        fprintf(stderr, "error : '%s' not defined\n", id);
         free(id);
         exit(1);
     }
-    CODE_load_eff_addr_auto(var->pos +
+    CODE_load_eff_addr_auto(dist +
                            (ARCH_stack_post_decrement() ?
                             ARCH_word_size() : 0));
     free(id);
@@ -1014,9 +1003,9 @@ int switch_statement (void) {
     lbl = new_label();
 
     CODE_push_unsafe();
-    inc_var_pos(ARCH_word_size());
+    sym_dist_inc(ARCH_word_size());
 
-    jmpstack_push(&breakstack, lbl);
+    sym_push(&breaks, sym_create_lbl(lbl));
 
     CODE_caseblock_start(lbl);
     if (!switch_block(lbl, &next_lbl)) { /* either one */
@@ -1024,11 +1013,11 @@ int switch_statement (void) {
     }
     CODE_caseblock_end(next_lbl);
 
-    jmpstack_pop(&breakstack);
+    sym_pop(&breaks);
     CODE_break_jmppoint(lbl);
 
     CODE_stack_restore(ARCH_word_size());
-    dec_var_pos(ARCH_word_size());
+    sym_dist_dec(ARCH_word_size());
 
     return 1;
 }

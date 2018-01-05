@@ -365,10 +365,10 @@ void CODE_dereference (void) {
 }
 
 
-void CODE_load_eff_addr_auto (int pos) {
+void CODE_load_eff_addr_auto (int dist) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, "    mov  %%rsp,%%rax\n");
-    fprintf(stdout, "    add  $%d,%%rax\n", pos);
+    fprintf(stdout, "    add  $%d,%%rax\n", dist);
 }
 
 

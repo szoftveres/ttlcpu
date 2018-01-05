@@ -374,10 +374,10 @@ void CODE_dereference (void) {
 }
 
 
-void CODE_load_eff_addr_auto (int pos) {
+void CODE_load_eff_addr_auto (int dist) {
     print_debugs(__FUNCTION__);
     fprintf(stdout, "    ld(to_acc, SP)\n");
-    fprintf(stdout, "    add(progdata) data(%d)\n", pos);
+    fprintf(stdout, "    add(progdata) data(%d)\n", dist);
 }
 
 
