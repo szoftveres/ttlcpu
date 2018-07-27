@@ -1,32 +1,28 @@
 OBJDIR = .
 SRCDIR = .
-INCLUDE = -I cc -I arch -I lex
-ARCHDIR = arch/$(ARCH)
+INCLUDE = -I mcc -I mcc/lex
 OUTDIR = .
 
 ## General Flags
-PROGRAM = mcc
+PROGRAM = cc
 CC = gcc
 LD = gcc
 CFLAGS = -Wall -O0 $(INCLUDE)
 
 ## Objects that must be built in order to link
-OBJECTS = $(OBJDIR)/main.o\
-          $(OBJDIR)/parser.o\
-          $(OBJDIR)/sym.o\
+OBJECTS = $(OBJDIR)/main.o          \
+          $(OBJDIR)/codegen.o       \
 
 
-ASMHEADER = header.asm
-ASMFOOTER = footer.asm
-
-SUBDIRS = arch lex
+SUBDIRS = mcc
 .PHONY : $(SUBDIRS)
 
 ## Build both compiler and program
 all: $(PROGRAM)
 
 $(SUBDIRS):
-	$(MAKE) "ARCH=${ARCH}" -C $@
+	git submodule update --init
+	$(MAKE) -C $@
 
 ## Compile source files
 $(OBJDIR)/%.o : $(SRCDIR)/%.c
@@ -34,7 +30,7 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.c
 
 ## Link object files to build the compiler
 $(PROGRAM): $(SUBDIRS) $(OBJECTS)
-	$(LD) $(OBJECTS) lex/lex.o arch/codegen_$(ARCH).o -o $(OUTDIR)/$(PROGRAM)
+	$(LD) $(OBJECTS) mcc/mcc.a -o $(OUTDIR)/$(PROGRAM)
 
 clean:
 	-rm -rf $(OBJECTS) $(OUTDIR)/$(PROGRAM) 

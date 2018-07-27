@@ -1,0 +1,3 @@
+[submodule "compiler/mcc"]
+	path = compiler/mcc
+	url = https://github.com/szoftveres/mcc.git
