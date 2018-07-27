@@ -21,7 +21,7 @@ SUBDIRS = mcc
 all: $(PROGRAM)
 
 $(SUBDIRS):
-	git submodule update --init
+	git submodule update --remote --init
 	$(MAKE) -C $@
 
 ## Compile source files

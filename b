@@ -3,8 +3,6 @@
 
 git submodule update --init --recursive
 
-PLATFORM=ttlcpu
-
 error () {
     echo "ERROR:"
     tail -n 5 build.log
@@ -12,10 +10,10 @@ error () {
 }
 
 # make c compiler
-echo "Making CC for ${PLATFORM} .."
-cd mcc || exit 1
+echo "Making compiler .."
+cd compiler || exit 1
 make clean > ../build.log || exit 1
-make "ARCH=${PLATFORM}" all >> ../build.log || error
+make all >> ../build.log || error
 cd .. || exit 1
 
 if test -z "${1}" ; then
@@ -24,10 +22,10 @@ if test -z "${1}" ; then
 fi
 
 #compile
-echo "Running CC, '${1}' .."
-cp "./mcc/arch/${PLATFORM}/header.s"  "am/program_${PLATFORM}.s" || exit 1
-cc -E "${1}" | grep -v '^#' | ./mcc/mcc >> "am/program_${PLATFORM}.s" 2>> build.log || error
-cat "./mcc/arch/${PLATFORM}/footer.s" >> "am/program_${PLATFORM}.s" || exit 1
+echo "Running compiler, '${1}' .."
+cp "./compiler/header.s"  "am/program.s" || exit 1
+cc -E "${1}" | grep -v '^#' | ./compiler/cc >> "am/program.s" 2>> build.log || error
+cat "./compiler/footer.s" >> "am/program.s" || exit 1
 
 # make assembler and assemble 
 echo "Making AM .."
