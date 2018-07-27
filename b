@@ -1,8 +1,6 @@
 #!/bin/bash
 # set -x
 
-git submodule update --init --recursive
-
 error () {
     echo "ERROR:"
     tail -n 5 build.log
@@ -12,7 +10,6 @@ error () {
 # make c compiler
 echo "Making compiler .."
 cd compiler || exit 1
-make clean > ../build.log || exit 1
 make all >> ../build.log || error
 cd .. || exit 1
 
