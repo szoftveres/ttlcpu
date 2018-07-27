@@ -1,5 +1,5 @@
-OBJDIR = cc
-SRCDIR = cc
+OBJDIR = .
+SRCDIR = .
 INCLUDE = -I cc -I arch -I lex
 ARCHDIR = arch/$(ARCH)
 OUTDIR = .
