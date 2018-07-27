@@ -1,3 +1,0 @@
-[submodule "mcc/lex"]
-	path = mcc/lex
-	url = https://github.com/szoftveres/lex.git
