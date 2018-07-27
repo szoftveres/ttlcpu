@@ -1,6 +1,8 @@
 #!/bin/bash
 # set -x
 
+git submodule update --init --recursive
+
 PLATFORM=ttlcpu
 
 error () {
