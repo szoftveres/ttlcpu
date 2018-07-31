@@ -4,7 +4,7 @@
 #include "parser.h"
 
 int main (int argc, char* argv[]) {
-    lex_init();
+    lex_init(0);
     program();
     exit(0);
 }
